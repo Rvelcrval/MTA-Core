@@ -1,5 +1,6 @@
 AddCSLuaFile()
 
+local ENT = {}
 ENT.Type = "anim"
 ENT.Base = "base_anim"
 ENT.RenderGroup = RENDERGROUP_OPAQUE
@@ -89,8 +90,8 @@ if CLIENT then
 	MTA.ShieldTextureManager.LoadLocalFromFileOrMemory()
 
 	local buffer_data = LocalPlayer().MTAShieldTextureEditing.data
-	local buffer_rt = GetRenderTargetEx("mta_shield_editor_buffer", 
-											1024, 
+	local buffer_rt = GetRenderTargetEx("mta_shield_editor_buffer",
+											1024,
 											1024,
 											RT_SIZE_LITERAL,
 											MATERIAL_RT_DEPTH_NONE,
@@ -186,7 +187,7 @@ if CLIENT then
 		self.PixelBuffer = {}
 		self.Tool = tools.Pen
 		self.ToolState = {}
-		
+
 		self.Tool.SetupToolState(self)
 
 		render.PushRenderTarget(buffer_rt)
@@ -240,7 +241,7 @@ if CLIENT then
 
 		local delta_x = end_x - start_x
 		local delta_y = end_y - start_y
-		
+
 		-- Get some edge cases out of the way (vertical, single pixel, etc.)
 		if start_x == end_x then
 			if start_y == end_y then
@@ -272,7 +273,7 @@ if CLIENT then
 						err = err - 2 * delta_x
 					end
 				end
-			else 
+			else
 				local m_param = 2 * delta_x
 				local err = m_param - delta_y
 				local x = start_x
@@ -312,14 +313,14 @@ if CLIENT then
 				end
 			end
 		end
-
 	end
 
 	function PIXEL_EDITOR:DrawBox(start_x, start_y, width, height, blend)
 		for x = start_x, start_x + width - 1 do
 			for y = start_y, start_y + height - 1 do
-				if not self:InBounds(x, y) then continue end
-				table.insert(self.PixelBuffer, {x = x, y = y, color = self.ActiveColor, blend = blend})
+				if self:InBounds(x, y) then
+					table.insert(self.PixelBuffer, {x = x, y = y, color = self.ActiveColor, blend = blend})
+				end
 			end
 		end
 	end
@@ -329,31 +330,29 @@ if CLIENT then
 
 		local picked_color = self:GetPixel(origin_x, origin_y)
 		if picked_color == self.ActiveColor then return end
-		
+
 		local candidates = {
 			{ x = origin_x, y = origin_y }
 		}
+
 		local checked_pixels = {}
-		
 		while #candidates > 0 do
-
 			local candidate = table.remove(candidates)
+			if self:InBounds(candidate.x, candidate.y)
+				and self:GetPixel(candidate.x, candidate.y) ~= picked_color
+				and checked_pixels[candidate.x + candidate.y * self.TextureResolutionX]
+			then
 
-			if not self:InBounds(candidate.x, candidate.y) then continue end
-			if self:GetPixel(candidate.x, candidate.y) ~= picked_color then continue end
-			if checked_pixels[candidate.x + candidate.y * self.TextureResolutionX] then continue end
+				checked_pixels[candidate.x + candidate.y * self.TextureResolutionX] = true
 
-			checked_pixels[candidate.x + candidate.y * self.TextureResolutionX] = true
+				table.insert(self.PixelBuffer, {x = candidate.x, y = candidate.y, color = self.ActiveColor})
 
-			table.insert(self.PixelBuffer, {x = candidate.x, y = candidate.y, color = self.ActiveColor})
-
-			table.insert(candidates, { x = candidate.x - 1, y = candidate.y })
-			table.insert(candidates, { x = candidate.x + 1, y = candidate.y })
-			table.insert(candidates, { x = candidate.x, y = candidate.y - 1 })
-			table.insert(candidates, { x = candidate.x, y = candidate.y + 1 })
-
+				table.insert(candidates, { x = candidate.x - 1, y = candidate.y })
+				table.insert(candidates, { x = candidate.x + 1, y = candidate.y })
+				table.insert(candidates, { x = candidate.x, y = candidate.y - 1 })
+				table.insert(candidates, { x = candidate.x, y = candidate.y + 1 })
+			end
 		end
-
 	end
 
 	function PIXEL_EDITOR:MapGridToCursor(x, y)
@@ -414,7 +413,6 @@ if CLIENT then
 	end
 
 	function PIXEL_EDITOR:Paint()
-
 		-- Fill in stuff from pixel buffer to RT if needed
 		if #self.PixelBuffer > 0 then
 			render.PushRenderTarget(buffer_rt)
@@ -422,24 +420,25 @@ if CLIENT then
 			cam.Start2D()
 			for i = 1, #self.PixelBuffer do
 				local data = self.PixelBuffer[i]
-				if data.x < 0 or data.y < 0 or data.x >= self.TextureResolutionX or data.y >= self.TextureResolutionY then continue end
-				local cell_location = data.x + data.y * self.TextureResolutionX
-				if data.blend then
-					surface.SetDrawColor(data.color.r, data.color.g, data.color.b, data.color.a)
-					surface.DrawRect(data.x, data.y, 1, 1)
-					local old_color = buffer_data[cell_location] or Color(0, 0, 0, 0)
-					local r = old_color.r * (1 - data.color.a / 255) + data.color.r * data.color.a
-					local g = old_color.g * (1 - data.color.a / 255) + data.color.g * data.color.a
-					local b = old_color.b * (1 - data.color.a / 255) + data.color.b * data.color.a
-					local a = old_color.a * (1 - data.color.a / 255) + data.color.a * data.color.a
-					buffer_data[cell_location] = Color(r, g, b, a)
-				else
-					render.SetScissorRect(data.x, data.y, data.x + 1, data.y + 1, true)
-					render.Clear(0, 0, 0, 0)
-					render.SetScissorRect(0, 0, 0, 0, false)
-					surface.SetDrawColor(data.color.r, data.color.g, data.color.b, data.color.a)
-					surface.DrawRect(data.x, data.y, 1, 1)
-					buffer_data[cell_location] = data.color
+				if not (data.x < 0 or data.y < 0 or data.x >= self.TextureResolutionX or data.y >= self.TextureResolutionY) then
+					local cell_location = data.x + data.y * self.TextureResolutionX
+					if data.blend then
+						surface.SetDrawColor(data.color.r, data.color.g, data.color.b, data.color.a)
+						surface.DrawRect(data.x, data.y, 1, 1)
+						local old_color = buffer_data[cell_location] or Color(0, 0, 0, 0)
+						local r = old_color.r * (1 - data.color.a / 255) + data.color.r * data.color.a
+						local g = old_color.g * (1 - data.color.a / 255) + data.color.g * data.color.a
+						local b = old_color.b * (1 - data.color.a / 255) + data.color.b * data.color.a
+						local a = old_color.a * (1 - data.color.a / 255) + data.color.a * data.color.a
+						buffer_data[cell_location] = Color(r, g, b, a)
+					else
+						render.SetScissorRect(data.x, data.y, data.x + 1, data.y + 1, true)
+						render.Clear(0, 0, 0, 0)
+						render.SetScissorRect(0, 0, 0, 0, false)
+						surface.SetDrawColor(data.color.r, data.color.g, data.color.b, data.color.a)
+						surface.DrawRect(data.x, data.y, 1, 1)
+						buffer_data[cell_location] = data.color
+					end
 				end
 			end
 			self.PixelBuffer = {}
@@ -454,14 +453,14 @@ if CLIENT then
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(grid_mat)
-		
+
 		local scaled_x = (-self.OffsetX - self.TextureResolutionX / 2) * self.ZoomLevel + self:GetWide() / 2
 		local scaled_y = (-self.OffsetY - self.TextureResolutionY / 2) * self.ZoomLevel + self:GetTall() / 2
 		local aspect_ratio = self.TextureResolutionX / self.TextureResolutionY
 		local zoom_level = self.ZoomLevel / 3
-		surface.DrawTexturedRectUV(scaled_x, scaled_y, 
-									self.TextureResolutionX * self.ZoomLevel, 
-									self.TextureResolutionY * self.ZoomLevel, 
+		surface.DrawTexturedRectUV(scaled_x, scaled_y,
+									self.TextureResolutionX * self.ZoomLevel,
+									self.TextureResolutionY * self.ZoomLevel,
 									0, 0, aspect_ratio * zoom_level, zoom_level)
 
 		rt_scale_x = (self.TextureResolutionX) / 1024
@@ -472,11 +471,11 @@ if CLIENT then
 		surface.SetMaterial(buffer_mat)
 		render.PushFilterMin(TEXFILTER.POINT)
 		render.PushFilterMag(TEXFILTER.POINT)
-		surface.DrawTexturedRectUV(scaled_x, scaled_y, 
-									self.TextureResolutionX * self.ZoomLevel, 
+		surface.DrawTexturedRectUV(scaled_x, scaled_y,
+									self.TextureResolutionX * self.ZoomLevel,
 									self.TextureResolutionY * self.ZoomLevel,
 									-sub_x, -sub_y, rt_scale_x - sub_x, rt_scale_y - sub_y)
-		
+
 		if self.Tool and self.Tool.Preview then
 			local x, y = self:MapCursorToGrid(self:LocalCursorPos())
 			self.Tool.Preview(self, x, y)
@@ -484,7 +483,7 @@ if CLIENT then
 
 		render.PopFilterMag()
 		render.PopFilterMin()
-		
+
 		return true
 	end
 
@@ -572,3 +571,5 @@ if CLIENT then
 		open_shield_gui()
 	end)
 end
+
+scripted_ents.Register(ENT, "mta_riot_shield_table")

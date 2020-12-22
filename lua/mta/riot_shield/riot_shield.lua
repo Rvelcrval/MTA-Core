@@ -1,12 +1,12 @@
-local ENT = {
-	Base = "base_anim",
-	PrintName = "Riot Shield",
-	Author = "Earu",
-	Editable = false,
-	Spawnable = false,
-	AdminOnly = false,
-	lobbyok = true,
-}
+local ENT = {}
+ENT.Base = "base_anim"
+ENT.PrintName = "Riot Shield"
+ENT.Author = "Earu"
+ENT.Editable = false
+ENT.Spawnable = false
+ENT.AdminOnly = false
+ENT.PhysgunDisabled = true
+ENT.lobbyok = true
 
 local MTA_SHIELD_TEXTURE_UPDATE = "MTA_SHIELD_TEXTURE_UPDATE"
 
@@ -114,8 +114,8 @@ if CLIENT then
 		if not cached_texture then return end
 
 		if not self.CustomTexture then
-			self.CustomTexture = GetRenderTarget("weapon_riot_shield_texture" .. (self:GetOwner():SteamID64() or "_BOT"), 
-						1024, 
+			self.CustomTexture = GetRenderTarget("weapon_riot_shield_texture" .. (self:GetOwner():SteamID64() or "_BOT"),
+						1024,
 						1024)
 			render.PushRenderTarget(self.CustomTexture)
 			render.OverrideAlphaWriteEnable(true, true)
@@ -162,7 +162,7 @@ if CLIENT then
 		local cam_ang_local = Angle(0, 90, -90)
 		local cam_pos, cam_ang = LocalToWorld(cam_pos_local, cam_ang_local, pos, ang)
 		cam.Start3D2D(cam_pos, cam_ang, -0.1)
-		
+
 		local scale_x = self.CachedTexture.width / self.CustomTexture:GetMappingWidth()
 		local scale_y = self.CachedTexture.height / self.CustomTexture:GetMappingHeight()
 		local sub_x = 0.5 / self.CustomTexture:GetMappingWidth()

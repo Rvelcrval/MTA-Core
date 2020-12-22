@@ -34,13 +34,13 @@ if SERVER then
 			height = CUSTOM_TEXTURE_HEIGHT,
 			data = data
         }
-        
+
 		net.Start(MTA_SHIELD_TEXTURE_UPDATE, true)
 		net.WriteEntity(ply)
 		net_table_to_colors(data)
 		net.Broadcast()
     end)
-    
+
     net.Receive(MTA_SHIELD_TEXTURE_REQUEST, function(len, ply)
         local texture_ply = net.ReadEntity()
         if not IsValid(texture_ply) then return end
@@ -55,7 +55,6 @@ if SERVER then
 end
 
 if CLIENT then
-
     net.Receive(MTA_SHIELD_TEXTURE_UPDATE, function(len)
 		local ply = net.ReadEntity()
 		local texture_data = net_colors_to_table()
