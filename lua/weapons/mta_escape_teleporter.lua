@@ -11,6 +11,7 @@ SWEP.DrawAmmo = false
 SWEP.DrawCrosshair = false
 SWEP.ViewModel = "models/weapons/c_medkit.mdl"
 SWEP.WorldModel = "models/weapons/w_medkit.mdl"
+SWEP.UseHands = true
 
 SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = -1
@@ -30,6 +31,15 @@ end
 
 function SWEP:Deploy()
 	self:SetHoldType("slam")
+	if CLIENT then
+		local owner = self:GetOwner()
+		if owner == LocalPlayer() then
+			local vm = owner:GetViewModel()
+			if IsValid(vm) then
+				vm:SetMaterial("Models/props_combine/CombineThumper002")
+			end
+		end
+	end
 end
 
 if SERVER then
@@ -65,6 +75,7 @@ end
 
 hook.Add("MTAPlayerWantedLevelIncreased", "mta_escape_teleporter", function(ply, factor)
 	if factor > 10 and not ply:HasWeapon("mta_escape_teleporter") then
-		ply:Give("mta_escape_teleporter")
+		local wep = ply:Give("mta_escape_teleporter")
+		wep.unrestricted_gun = true
 	end
 end)
