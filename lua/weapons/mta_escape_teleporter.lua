@@ -34,14 +34,13 @@ function SWEP:Deploy()
 end
 
 if CLIENT then
-	function SWEP:Think()
-		local lp = LocalPlayer()
-		if self:IsCarriedByLocalPlayer() and lp:GetActiveWeapon() == self then
-			local vm = lp:GetViewModel()
-			if IsValid(vm) then
-				vm:SetMaterial("Models/props_combine/CombineThumper002")
-			end
-		end
+	function SWEP:Initialize()
+		hook.Add("PreDrawViewModel", self, function(_, vm)
+			render.MaterialOverride("Models/props_combine/CombineThumper002")
+			vm:DrawModel()
+			render.MaterialOverride()
+			return true
+		end)
 	end
 end
 
