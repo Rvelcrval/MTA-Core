@@ -87,7 +87,7 @@ hook.Add("PhysgunPickup", tag, function(ply, ent)
 end)
 
 hook.Add("PlayerCanPickupItem", tag, function(ply, item)
-    if is_constrained(ply) then
+    if ply.MTABad then
         -- disallow picking up dissolving items
         for _, ent in ipairs(item:GetChildren()) do
             if ent:GetClass() == "env_entity_dissolver" then
@@ -98,7 +98,7 @@ hook.Add("PlayerCanPickupItem", tag, function(ply, item)
 end)
 
 hook.Add("PlayerCanPickupWeapon", tag, function(ply, wep)
-    if is_constrained(ply) then
+    if ply.MTABad then
         -- disallow picking up dissolving items
         for _, ent in ipairs(wep:GetChildren()) do
             if ent:GetClass() == "env_entity_dissolver" then
@@ -108,11 +108,9 @@ hook.Add("PlayerCanPickupWeapon", tag, function(ply, wep)
     end
 end)
 
-hook.Add("PlayerAmmoChange", tag, function(ply, id, old, new)
-    -- cap max ammo to double hl2 stock
-    if is_constrained(ply) then
-        local max = game.GetAmmoMax(id) * 2
-        ply:SetAmmo(math.min(max, new), id)
+hook.Add("CanPlyUseMSItems", tag, function(ply, name, func)
+    if ply.MTABad then
+        return false
     end
 end)
 

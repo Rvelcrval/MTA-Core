@@ -19,8 +19,6 @@ local CUSTOM_TEXTURE_HEIGHT = 108
 if SERVER then
 
 	util.AddNetworkString(MTA_SHIELD_GUI_OPEN)
-	util.AddNetworkString(MTA_SHIELD_TEXTURE_UPDATE)
-	util.AddNetworkString(MTA_SHIELD_TEXTURE_UPDATE_BROADCAST) -- Is this even necessary?
 
 	function ENT:Initialize()
 		self:SetModel("models/cloud/ballisticshield_mod.mdl")
