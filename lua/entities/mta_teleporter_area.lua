@@ -51,6 +51,8 @@ if SERVER then
 			ring:SetPos(ply:GetPos() + Vector(0, 0, 10) * i + Vector(0, 0, 10))
 			ring:SetSkin(2)
 			ring:SetMoveType(MOVETYPE_NONE)
+			ring:SetRenderMode(RENDERMODE_TRANSCOLOR)
+			ring:SetColor(Color(0, 0, 0, 0))
 			ring.Direction = i % 2 == 0 and 1 or -1
 			table.insert(self.Rings, ring)
 		end
@@ -71,6 +73,8 @@ if SERVER then
 
 	function ENT:EndTouch(ent)
 		if ent == self.Player then
+			self:EmitSound("ambient/energy/zap9.wav")
+			self:EmitSound("ambient/energy/power_off1.wav")
 			self:Remove()
 		end
 	end
@@ -86,7 +90,7 @@ if SERVER then
 			self.NextTeleportCheck = CurTime() + 1
 		end
 
-		if not self.FinalSoundsPlayed and self.TeleportTime > (TIME_TO_TELEPORT - 8) then
+		if not self.FinalSoundsPlayed and self.TeleportTime > (TIME_TO_TELEPORT - 9) then
 			self:EmitSound("ambient/levels/labs/teleport_mechanism_windup5.wav")
 			self.FinalSoundsPlayed = true
 		end
@@ -97,6 +101,8 @@ if SERVER then
 				ring:SetSkin(1)
 			end
 
+			local alpha = 50 + ((TIME_TO_TELEPORT / 255) * self.TeleportTime * 2 * 100)
+			ring:SetColor(Color(255, 255, 255, alpha))
 			ring:SetPos(Vector(pos.x, pos.y, ring:GetPos().z))
 
 			local ang = ring:GetAngles()
@@ -129,15 +135,18 @@ if CLIENT then
 	function ENT:Draw()
 		if MTA.IsOptedOut() then return end
 
-		local alpha = 10 + math.abs((math.sin(CurTime() * 3) * 150))
+		local alpha = 50 + math.abs((math.sin(CurTime() * 3) * 150))
 		local side_pos = self:GetPos() - self:GetForward() * 100
 		local left_pos = side_pos - self:GetRight() * 100
 
 		cam.Start3D2D(left_pos, self:GetAngles(), 0.5)
-			surface.SetDrawColor(225, 0, 50, alpha)
+			surface.SetDrawColor(255, 0, 0, alpha)
 			surface.DrawOutlinedRect(0, 0, 400, 400, 5)
 
-			surface.SetTextColor(225, 0, 50, alpha)
+			surface.SetDrawColor(200, 0, 0, alpha - 150)
+			surface.DrawRect(0, 0, 400, 400)
+
+			surface.SetTextColor(255, 0, 0, alpha)
 			surface.SetFont("DermaLarge")
 
 			local tw, th = surface.GetTextSize(text)
