@@ -185,11 +185,13 @@ if SERVER then
 		if next_heal > CurTime() then return end
 
 		for _, ply in ipairs(MTA.BadPlayers) do
+			local multiplier = MTA.GetPlayerStat(ply, "healing_multiplier")
+			local to_heal = math.ceil((multiplier * 1.6) / 2)
 			local cur_health = ply:Health()
 			if cur_health < 100 then
-				local multiplier = MTA.GetPlayerStat(ply, "healing_multiplier")
-				local to_heal = math.ceil((multiplier * 1.6) / 2)
 				ply:SetHealth(math.min(cur_health + to_heal, 100))
+			else
+				ply:SetArmor(math.min(ply:Armor() + to_heal, 100))
 			end
 		end
 
