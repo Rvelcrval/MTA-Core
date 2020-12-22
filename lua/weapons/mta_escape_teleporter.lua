@@ -13,11 +13,13 @@ SWEP.ViewModel = "models/weapons/c_medkit.mdl"
 SWEP.WorldModel = "models/weapons/w_medkit.mdl"
 SWEP.UseHands = true
 
+SWEP.Primary = {}
 SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = -1
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "none"
 
+SWEP.Secondary = {}
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Automatic = true
@@ -29,18 +31,27 @@ end
 function SWEP:SecondaryAttack()
 end
 
+function SWEP:Think()
+end
+
 function SWEP:Deploy()
 	self:SetHoldType("slam")
 end
 
 if CLIENT then
-	function SWEP:Initialize()
-		hook.Add("PreDrawViewModel", self, function(_, vm)
-			render.MaterialOverride("Models/props_combine/CombineThumper002")
-			vm:DrawModel()
-			render.MaterialOverride()
-			return true
-		end)
+	local mat = Material("Models/props_combine/CombineThumper002")
+	function SWEP:PreDrawViewModel(vm, ply, weapon)
+		render.MaterialOverride(mat)
+	end
+
+	function SWEP:PostDrawViewModel(vm, weapon)
+		render.MaterialOverride()
+
+		render.SetColorModulation(1, 1, 1)
+        local hands = LocalPlayer():GetHands()
+        if hands:IsValid() then
+            hands:DrawModel()
+        end
 	end
 end
 
