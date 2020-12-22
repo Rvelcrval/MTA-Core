@@ -35,8 +35,9 @@ end
 
 if CLIENT then
 	function SWEP:Think()
-		if self:IsCarriedByLocalPlayer() then
-			local vm = LocalPlayer():GetViewModel()
+		local lp = LocalPlayer()
+		if self:IsCarriedByLocalPlayer() and lp:GetActiveWeapon() == self then
+			local vm = lp:GetViewModel()
 			if IsValid(vm) then
 				vm:SetMaterial("Models/props_combine/CombineThumper002")
 			end
