@@ -31,10 +31,12 @@ end
 
 function SWEP:Deploy()
 	self:SetHoldType("slam")
-	if CLIENT then
-		local owner = self:GetOwner()
-		if owner == LocalPlayer() then
-			local vm = owner:GetViewModel()
+end
+
+if CLIENT then
+	function SWEP:Think()
+		if self:IsCarriedByLocalPlayer() then
+			local vm = LocalPlayer():GetViewModel()
 			if IsValid(vm) then
 				vm:SetMaterial("Models/props_combine/CombineThumper002")
 			end
@@ -62,7 +64,7 @@ if SERVER then
 		self:SetNextPrimaryFire(CurTime() + 120)
 
 		local teleporter_area = ents.Create("mta_teleporter_area")
-		teleporter_area:SetPos(owner:GetPos())
+		teleporter_area:SetPos(owner:GetPos() + Vector(0, 0, 5))
 		teleporter_area:Spawn()
 		teleporter_area:SetPlayer(owner)
 

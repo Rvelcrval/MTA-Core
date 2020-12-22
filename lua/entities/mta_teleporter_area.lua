@@ -63,9 +63,9 @@ if SERVER then
 		local filter = RecipientFilter()
 		filter:AddPlayer(ply)
 		self.LoopSound = CreateSound(self, "ambient/levels/labs/teleport_active_loop1.wav", filter)
-		self.LoopSound:Play()
 		self.LoopSound:ChangeVolume(0)
 		self.LoopSound:ChangePitch(75)
+		self.LoopSound:Play()
 
 		self.LoopSound:ChangeVolume(1, TIME_TO_TELEPORT)
 		self.LoopSound:ChangePitch(200, TIME_TO_TELEPORT)
@@ -136,10 +136,8 @@ if CLIENT then
 		if MTA.IsOptedOut() then return end
 
 		local alpha = 50 + math.abs((math.sin(CurTime() * 3) * 150))
-		local side_pos = self:GetPos() - self:GetForward() * 100
-		local left_pos = side_pos - self:GetRight() * 100
-
-		cam.Start3D2D(left_pos, self:GetAngles(), 0.5)
+		local pos = self:GetPos() - (self:GetForward()) * 100 - (self:GetRight() * 100)
+		cam.Start3D2D(pos, self:GetAngles(), 0.5)
 			surface.SetDrawColor(255, 0, 0, alpha)
 			surface.DrawOutlinedRect(0, 0, 400, 400, 5)
 
