@@ -75,8 +75,8 @@ function MTA.RegisterSkill(skill_id, skill_branch, skill_level, skill_name, skil
 end
 
 do -- load skills
-	for _, f in pairs((file.Find("mta_modules/skills/*.lua", "LUA"))) do
-		local path = "mta_modules/skills/" .. f
+	for _, f in pairs((file.Find("mta_skills/*.lua", "LUA"))) do
+		local path = "mta_skills/" .. f
 		AddCSLuaFile(path)
 		include(path)
 	end

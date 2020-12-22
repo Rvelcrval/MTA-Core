@@ -8,7 +8,7 @@ if is_refresh_lua then
 	_G.MTA.Reset()
 end
 
-local tag = "meta_theft_auto"
+local tag = "mta"
 local MTA = _G.MTA or {}
 _G.MTA = MTA
 
@@ -461,7 +461,7 @@ if SERVER then
 
 	function MTA.Initialize()
 		-- this is done here, because only here will the proper nodegraph be available
-		local far_combine, setup_combine = include("lib/far_combine.lua")
+		local far_combine, setup_combine = include("mta_libs/far_combine.lua")
 		if not far_combine or not setup_combine then
 			MTA.Print("Could not include far_combine.lua properly")
 			return
@@ -470,7 +470,7 @@ if SERVER then
 		MTA.FarCombine = far_combine
 		MTA.SetupCombine = setup_combine
 
-		local constrain_player, release_player = include("lib/wanted_constraints.lua")
+		local constrain_player, release_player = include("mta_libs/wanted_constraints.lua")
 		if not constrain_player or not release_player then
 			MTA.Print("Could not include wanted_constraints.lua properly")
 			return

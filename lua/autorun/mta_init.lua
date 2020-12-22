@@ -1,0 +1,13 @@
+AddCSLuaFile("mta/core.lua")
+AddCSLuaFile("mta/payday2_assault.lua")
+AddCSLuaFile("mta/upgrades.lua")
+AddCSLuaFile("mta/skill_tree.lua")
+AddCSLuaFile("mta/bounties.lua")
+AddCSLuaFile("mta/bombs.lua")
+
+include("mta/core.lua")
+include("mta/payday2_assault.lua")
+include("mta/upgrades.lua")
+include("mta/skill_tree.lua")
+include("mta/bounties.lua")
+include("mta/bombs.lua")
