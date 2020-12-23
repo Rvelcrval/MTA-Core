@@ -678,13 +678,17 @@ if SERVER then
 		end)
 	end)
 
-	hook.Add("PlayerShouldTakeDamage", tag, function(ply, ent)
-		if ent.MTAForceDamage and ply.MTABad then
+	hook.Add("PlayerShouldTakeDamage", tag, function(ply, atck)
+		if atck:IsPlayer() and atck.MTABad and ply.MTABad then
+			return false
+		end
+
+		if atck.MTAForceDamage and ply.MTABad then
 			ply.MTALastFactorIncrease = CurTime()
 			return true
 		end
 
-		if ent:GetNWBool("MTACombine") then
+		if atck:GetNWBool("MTACombine") then
 			if not ply.MTABad then return false end
 
 			ply.MTALastFactorIncrease = CurTime()
