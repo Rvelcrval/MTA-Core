@@ -85,10 +85,3 @@ if SERVER then
 		end
 	end
 end
-
-hook.Add("MTAPlayerWantedLevelIncreased", "mta_escape_teleporter", function(ply, factor)
-	if factor > 10 and not ply:HasWeapon("mta_escape_teleporter") then
-		local wep = ply:Give("mta_escape_teleporter")
-		wep.unrestricted_gun = true
-	end
-end)
