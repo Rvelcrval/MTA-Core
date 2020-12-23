@@ -114,7 +114,8 @@ if SERVER then
 		if self.TeleportTime >= TIME_TO_TELEPORT then
 			self:EmitSound("ambient/machines/teleport" .. math.random(1, 4) .. ".wav")
 			self.Player:ConCommand("aowl goto dealer")
-			MTA.ResetPlayerFactor(self.Player, false)
+			local internal_factor = self.Player:GetNWInt("MTAFactor") * 10
+			MTA.DecreasePlayerFactor(self.Player, internal_factor)
 			self.Player:EmitSound("ambient/machines/teleport" .. math.random(1, 4) .. ".wav")
 			self:Remove()
 		end
