@@ -103,7 +103,7 @@ if SERVER then
 
 		local targets = hunters[atck]
 		if atck:IsPlayer() and targets and table.HasValue(targets, ply) then
-			local point_amount = math.ceil(ply:GetNWInt("MTAFactor") / 2)
+			local point_amount = ply:GetNWInt("MTAFactor")
 			local total_points = MTA.GivePoints(atck, point_amount)
 
 			if atck.GiveCoins then
@@ -246,7 +246,7 @@ if CLIENT then
 			btn_accept:DockMargin(5, 5, 5, 5)
 
 			local label_gains = frame:Add("DLabel")
-			label_gains:SetText(("Potential Gains: %dpts"):format(math.ceil(bounty:GetNWInt("MTAFactor") / 2)))
+			label_gains:SetText(("Potential Gains: %dpts"):format(bounty:GetNWInt("MTAFactor")))
 			label_gains:SetTextColor(Color(244, 135, 2))
 			label_gains:Dock(TOP)
 			label_gains:DockPadding(10, 10, 10, 10)
