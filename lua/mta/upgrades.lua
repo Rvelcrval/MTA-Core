@@ -176,7 +176,11 @@ if SERVER then
 		if not attacker:GetNWBool("MTACombine") then return end
 
 		local multiplier = MTA.GetPlayerStat(attacker, "defense_multiplier")
-		local dmg = dmg_info:GetDamage()
+
+		-- we scale combine damage up depending on wanted level here because it needs to be done
+		-- before the resistance upgrade
+		local dmg = dmg_info:GetDamage() + (dmg_info:GetDamage() * (ply:GetNWInt("MTAFactor") / 20))
+
 		local dmg_blocked = ((dmg / 100) * (multiplier * 0.75)) -- up to 80% of the damages blocked
 		dmg_info:SetDamage(dmg - dmg_blocked)
 	end)
