@@ -87,9 +87,7 @@ if CLIENT then
 		There **should** only be one instance of this ever created at any given time
 		Should probably make it more obscure or something, I don't know quite yet.
 	]]
-	MTA.ShieldTextureManager.LoadLocalFromFileOrMemory()
-
-	local buffer_data = LocalPlayer().MTAShieldTextureEditing.data
+	local buffer_data = {}
 	local buffer_rt = GetRenderTargetEx("mta_shield_editor_buffer",
 											1024,
 											1024,
@@ -487,8 +485,12 @@ if CLIENT then
 		return true
 	end
 
-
 	function open_shield_gui()
+
+		-- LocalPlayer() should not be NULL/nil/wtf ever in here
+		MTA.ShieldTextureManager.LoadLocalFromFileOrMemory()
+		buffer_data = LocalPlayer().MTAShieldTextureEditing.data
+
 		local main_window = vgui.Create("DFrame")
 		main_window:SetTitle("MTA Shield Customization - Main")
 		main_window:SetSize(ScrW() * 0.4, ScrH() * 0.6)
