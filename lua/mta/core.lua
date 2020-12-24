@@ -512,6 +512,7 @@ if SERVER then
 		if not IsValid(ply) then return false end
 		if ply.MTAIgnore then return false end
 		if not ply:IsPlayer() then return false end
+		if not ply:Alive() then return false end
 		if not MTA.InLobby(ply) then return false end
 		if MTA.IsOptedOut(ply) then return false end
 

@@ -69,6 +69,7 @@ if SERVER then
 
 		if not MTA.CanPlayerEscape(owner) then
 			MTA.ChatPrint(owner, "You cannot currently teleport!")
+			self:SetNextPrimaryFire(CurTime() + 2)
 			return
 		end
 

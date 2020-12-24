@@ -40,6 +40,11 @@ if SERVER then
 				wep:SetClip2(2)
 			end
 		end
+
+		-- we check this because people can make scripts that auto revive 
+		-- themselves and get sent to other places on the map
+		-- its also possible if a friend brings you
+		if not MTA.ShouldIncreasePlayerFactor(ply) then return end
 		MTA.IncreasePlayerFactor(ply, ply_data.WantedLevel * 10)
 	end)
 
