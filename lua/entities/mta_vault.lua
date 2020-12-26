@@ -44,7 +44,7 @@ if SERVER then
 		self:SetNWBool("Drilling", true)
 		self:SetNWEntity("DrillingPlayer", ply)
 		ply:SetNWEntity("MTAVault", self)
-		ply.MTAVaultStreak = (ply.MTAVaultStreak or 0) + 1
+		ply.MTAVaultStreak = math.min((ply.MTAVaultStreak or 0) + 1, 3)
 		MTA.DisallowPlayerEscape(ply)
 		MTA.IncreasePlayerFactor(ply, 10)
 
@@ -109,7 +109,7 @@ if SERVER then
 					self:SetNWBool("CanDrill", false)
 					activator:SetNWEntity("MTAVault", NULL)
 					MTA.AllowPlayerEscape(activator)
-					MTA.GivePoints(activator, 100 * (activator.MTAVaultStreak or 1))
+					MTA.GivePoints(activator, 100 * math.min(activator.MTAVaultStreak or 1, 3))
 					timer.Simple(600, function()
 						if IsValid(self) then self:ResetDrill() end
 					end)
