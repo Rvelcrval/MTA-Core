@@ -111,7 +111,7 @@ if SERVER then
 
 		-- dont spam this
 		local account_id = ply:AccountID()
-		timer.Create(("MTAStatIncrease_%d_%s"):format(account_id, stat_name), 1, 5, function()
+		timer.Create(("MTAStatIncrease_%d_%s"):format(account_id, stat_name), 5, 1, function()
 			if should_log then
 				Msg("[MTA] ")
 				MsgC(color_white, ("%s %s: "):format(ply, stat_name), old_value_color,
