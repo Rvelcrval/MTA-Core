@@ -32,13 +32,13 @@ if SERVER then
 	    local forward = ply:WorldSpaceCenter() + ply:GetForward() * (maxs.y + margin)
 	    local backward = ply:WorldSpaceCenter() + ply:GetForward() * (-maxs.y + margin)
 
-	    if is_free_space(ply, left, bomb) then
+		if is_free_space(ply, forward, bomb) then
+	        return forward
+	    elseif is_free_space(ply, left, bomb) then
 	        return left
 	    elseif is_free_space(ply, right, bomb) then
 	        return right
-	    elseif is_free_space(ply, forward, bomb) then
-	        return forward
-		elseif is_free_space(ply, backward, bomb) then
+	    elseif is_free_space(ply, backward, bomb) then
 	    	return backward
 	    else
 	        return ply:GetPos() + Vector(0, 0, ply:OBBMaxs().z)

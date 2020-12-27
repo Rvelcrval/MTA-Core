@@ -71,6 +71,14 @@ if SERVER then
 		for _, trigger_name in ipairs(PLACES_TO_RESTRICT) do
 			local trigger = ms.GetTrigger(trigger_name)
 			if IsValid(trigger) then
+				if not trigger.pllist and trigger.EnablePlayerList then
+					trigger:EnablePlayerList()
+				end
+
+				if not trigger.entlist and trigger.EnableEntityList then
+					trigger:EnableEntityList()
+				end
+
 				local limiters = {}
 				for ent, _ in pairs(trigger:GetEntities() or {}) do
 					if ent:IsValid() and ent:GetClass() == "mta_area_limiter" then
