@@ -193,10 +193,11 @@ if SERVER then
 			local multiplier = MTA.GetPlayerStat(ply, "healing_multiplier")
 			local to_heal = math.ceil((multiplier * 1.6) / 2)
 			local cur_health = ply:Health()
-			if cur_health < 100 then
-				ply:SetHealth(math.min(cur_health + to_heal, 100))
-			else
-				ply:SetArmor(math.min(ply:Armor() + to_heal, 100))
+			ply:SetHealth(math.min(cur_health + to_heal, 100))
+
+			local remaining = to_heal - (100 - cur_health)
+			if remaining > 0 then
+				ply:SetArmor(math.min(ply:Armor() + remaining, 100))
 			end
 		end
 
