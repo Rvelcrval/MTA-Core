@@ -375,9 +375,14 @@ if CLIENT then
 			dealer_av:Dock(LEFT)
 			dealer_av:SetModel(npc:GetModel())
 
-			local headpos = dealer_av.Entity:GetBonePosition(dealer_av.Entity:LookupBone("ValveBiped.Bip01_Head1"))
-			dealer_av:SetLookAt(headpos)
-			dealer_av:SetCamPos(headpos - Vector(-13, 0, 0))
+			local bone_number = dealer_av.Entity:LookupBone("ValveBiped.Bip01_Head1")
+			if bone_number then
+				local head_pos = dealer_av.Entity:GetBonePosition(bone_number)
+				if head_pos then
+					dealer_av:SetLookAt(head_pos)
+					dealer_av:SetCamPos(head_pos - Vector(-13, 0, 0))
+				end
+			end
 
 			function dealer_av:LayoutEntity(ent)
 				ent:SetSequence(ent:LookupSequence("idle_subtle"))
