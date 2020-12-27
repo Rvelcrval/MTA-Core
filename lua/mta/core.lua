@@ -63,6 +63,7 @@ if SERVER then
 	local blocked_maps = {
 		gm_construct_m3_204 = true, -- broken triggers
 		gm_construct_m3_207 = true, -- same
+		gm_construct_m3_234 = true, -- same :)
 	}
 
 	local MTA_MODE = CreateConVar("mta_mode", "1", FCVAR_ARCHIVE, "Changes the mode for MTA: " .. mta_mode_help())
