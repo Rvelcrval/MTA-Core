@@ -94,6 +94,7 @@ if SERVER then
 
 	local old_value_color = Color(252, 71, 58)
 	local new_value_color = Color(58, 252, 113)
+	local old_values = {}
 	function MTA.IncreasePlayerStat(ply, stat_name, amount, should_log)
 		if not IsValid(ply) then return -1 end
 		if not can_db() then return -1 end
@@ -104,16 +105,18 @@ if SERVER then
 		local cur_value = ply:GetNWInt(nw_value_name, 0)
 		local new_value = cur_value + amount
 		ply:SetNWInt(nw_value_name, new_value)
+		old_values[ply] = old_values[ply] or cur_value
 
 		hook.Run("MTAStatIncrease", ply, stat_name, cur_value, new_value)
 
 		-- dont spam this
 		local account_id = ply:AccountID()
-		timer.Create(("MTAStatIncrease_%d_%s"):format(account_id, stat_name), 1, 1, function()
+		timer.Create(("MTAStatIncrease_%d_%s"):format(account_id, stat_name), 1, 5, function()
 			if should_log then
 				Msg("[MTA] ")
 				MsgC(color_white, ("%s %s: "):format(ply, stat_name), old_value_color,
-					cur_value, color_white, " -> ", new_value_color, new_value .. "\n")
+					old_values[ply], color_white, " -> ", new_value_color, new_value .. "\n")
+				old_values[ply] = nil
 			end
 
 			co(function()
