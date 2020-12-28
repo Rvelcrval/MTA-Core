@@ -105,22 +105,23 @@ if SERVER then
 		local cur_value = ply:GetNWInt(nw_value_name, 0)
 		local new_value = cur_value + amount
 		ply:SetNWInt(nw_value_name, new_value)
-		old_values[ply] = old_values[ply] or cur_value
 
 		hook.Run("MTAStatIncrease", ply, stat_name, cur_value, new_value)
 
 		-- dont spam this
 		local account_id = ply:AccountID()
-		timer.Create(("MTAStatIncrease_%d_%s"):format(account_id, stat_name), 5, 1, function()
+		local log_name = ("MTAStatIncrease_%d_%s"):format(account_id, stat_name)
+		old_values[log_name] = old_values[log_name] or cur_value
+		timer.Create(log_name, 5, 1, function()
 			if should_log then
 				Msg("[MTA] ")
 				MsgC(color_white, ("%s %s: "):format(ply, stat_name), old_value_color,
-					old_values[ply], color_white, " -> ", new_value_color, new_value .. "\n")
-				old_values[ply] = nil
+					old_values[log_name], color_white, " -> ", new_value_color, new_value .. "\n")
 			end
 
+			old_values[log_name] = nil
 			co(function()
-				db.Query(("UPDATE mta_stats SET %s = %d WHERE id = %d;"):format(stat_name, cur_value + amount, account_id))
+				db.Query(("UPDATE mta_stats SET %s = %d WHERE id = %d;"):format(stat_name, new_value, account_id))
 			end)
 		end)
 
