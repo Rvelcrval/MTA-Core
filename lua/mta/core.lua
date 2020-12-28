@@ -912,6 +912,11 @@ if CLIENT then
 			for _, child in pairs(ent:GetChildren()) do
 				dont_draw(child)
 			end
+
+			local wep = ent.GetActiveWeapon and ent:GetActiveWeapon()
+			if IsValid(wep) then
+				dont_draw(wep)
+			end
 		end)
 	end)
 end
