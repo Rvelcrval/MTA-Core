@@ -126,4 +126,8 @@ hook.Add("CanPlyGoto", tag, function(ply)
     end)
 end)
 
+hook.Add("ShouldShopNPCKill", tag, function(ply, atck)
+    if is_constrained(ply) or is_constrained(atck) then return false end
+end)
+
 return constrain, release
