@@ -517,6 +517,9 @@ if SERVER then
 		if not MTA.InLobby(ply) then return false end
 		if MTA.IsOptedOut(ply) then return false end
 
+		-- metastruct ban system
+		if banni and banni.isbanned(ply) then return false end
+
 		-- hide n seek minigame
 		if HnS and HnS.InGame(ply) then return false end
 
@@ -526,8 +529,10 @@ if SERVER then
 	function MTA.ShouldConsiderEntity(ent)
 		if not IsValid(ent) then return false end
 		if ent.MTAIgnore then return false end
-		if ent.IsBanned and ent:IsBanned() then return false end
 		if not MTA.HasCoeficients(ent) then return false end
+
+		-- dont count banned players
+		if banni and banni.isbanned(ent) then return false end
 
 		-- dont count things spawned by players
 		if ent.CPPIGetOwner and IsValid(ent:CPPIGetOwner()) then return false end
