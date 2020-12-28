@@ -4,6 +4,8 @@ local NET_MTA_ACCEPT_BOUNTY = "MTA_ACCEPT_BOUNTY"
 local NET_MTA_REMOVE_BOUNTY = "MTA_REMOVE_BOUNTY"
 
 local MINIMUM_LEVEL = 20
+local MAX_BOUNTIES_PER_HUNTER = 3
+local TIME_TO_BOUNTY_REFRESH = 60 * 60 * 2 -- 2 hours
 
 local color_white = Color(255, 255, 255)
 local header_col = Color(250, 58, 60)
@@ -27,6 +29,17 @@ if SERVER then
 
 	local bounties = {}
 	local hunters = {}
+	local blocked_hunters = {}
+
+	local function finish_bounty(hunter)
+		local steam_id = hunter:SteamID()
+		blocked_hunters[steam_id] = (blocked_hunters[steam_id] or 0) + 1
+		if blocked_hunters[steam_id] >= MAX_BOUNTIES_PER_HUNTER then
+			timer.Simple(TIME_TO_BOUNTY_REFRESH, function()
+				blocked_hunters[steam_id] = nil
+			end)
+		end
+	end
 
 	local function clear_bounty(ply)
 		bounties[ply] = nil
@@ -81,6 +94,7 @@ if SERVER then
 			MTA.GivePoints(atck, 15)
 			MTA.ChatPrint(ply, "You have ", header_col, "failed", color_white, " to collect the bounty for ", atck,
 				color_white, " you can try again in ", green_col, "30s")
+			finish_bounty(ply)
 
 			timer.Simple(30, function()
 				if not IsValid(ply) then return end
@@ -103,13 +117,14 @@ if SERVER then
 
 		local targets = hunters[atck]
 		if atck:IsPlayer() and targets and table.HasValue(targets, ply) then
-			local point_amount = ply:GetNWInt("MTAFactor")
+			local point_amount = math.floor(ply:GetNWInt("MTAFactor") / 2)
 			local total_points = MTA.GivePoints(atck, point_amount)
 
 			if atck.GiveCoins then
 				atck:GiveCoins(point_amount * 300)
 			end
 
+			finish_bounty(ply)
 			clear_bounty(ply)
 			timer.Simple(1, check_immunity)
 			announce_bounty_end(ply, true, atck, point_amount)
@@ -155,6 +170,11 @@ if SERVER then
 	net.Receive(NET_MTA_ACCEPT_BOUNTY, function(_, ply)
 		local target = net.ReadEntity()
 		if not IsValid(target) then return end
+
+		if blocked_hunters[ply:SteamID()] then
+			MTA.ChatPrint(ply, "Bounty quota ", header_col, "exceeded", color_white, " try again in ", green_col, "2 hours")
+			return
+		end
 
 		ply.MTAIgnore = true
 		hunters[ply] = hunters[ply] or {}
@@ -246,7 +266,7 @@ if CLIENT then
 			btn_accept:DockMargin(5, 5, 5, 5)
 
 			local label_gains = frame:Add("DLabel")
-			label_gains:SetText(("Potential Gains: %dpts"):format(bounty:GetNWInt("MTAFactor")))
+			label_gains:SetText(("Potential Gains: %dpts"):format(math.floor(bounty:GetNWInt("MTAFactor") / 2)))
 			label_gains:SetTextColor(Color(244, 135, 2))
 			label_gains:Dock(TOP)
 			label_gains:DockPadding(10, 10, 10, 10)
