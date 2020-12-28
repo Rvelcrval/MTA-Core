@@ -16,7 +16,7 @@ if SERVER then
 	hook.Add("KeyPress", tag, function(ply, key)
 		if not MTA.IsEnabled() then return end
 		if key ~= IN_RELOAD then return end
-		if MTA.ShouldIncreasePlayerFactor(ply) then return end
+		if not MTA.ShouldIncreasePlayerFactor(ply) then return end
 
 		local tr = ply:GetEyeTrace()
 		local target = tr.Entity
