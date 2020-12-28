@@ -56,6 +56,7 @@ if SERVER then
 
 	function MTA.TeleportBombToPlayer(ply)
 		local bomb = ents.Create("grenade_helicopter")
+		bomb:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 		bomb:Spawn()
 		bomb:SetNWBool("MTACombine", true)
 		bomb:SetNWBool("MTABomb", true)
