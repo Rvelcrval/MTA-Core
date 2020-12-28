@@ -56,6 +56,7 @@ if SERVER then
 		for ply, targets in pairs(hunters) do
 			if IsValid(ply) and #targets == 0 then
 				ply.MTAIgnore = nil
+				ply:SetNWBool("MTABountyHunter", false)
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
 			end
@@ -177,6 +178,7 @@ if SERVER then
 		end
 
 		ply.MTAIgnore = true
+		ply:SetNWBool("MTABountyHunter", true)
 		hunters[ply] = hunters[ply] or {}
 		table.insert(hunters[ply], target)
 
@@ -333,5 +335,16 @@ if CLIENT then
 		end
 
 		table.Empty(bounty_panels)
+	end)
+
+	local red_color = Color(255, 0, 0)
+	hook.Add("HUDPaint", tag, function()
+		if not MTA.IsWanted() then return end
+
+		for _, ply in ipairs(player.GetAll()) do
+			if ply:GetNWBool("MTABountyHunter") then
+				MTA.HighlightEntity(ply, "/// BOUNTY HUNTER ///", red_color)
+			end
+		end
 	end)
 end

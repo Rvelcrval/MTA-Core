@@ -748,6 +748,7 @@ end
 
 if CLIENT then
 	local MTA_OPT_OUT = CreateClientConVar("mta_opt_out", "0", true, true, "Disable criminal events in the lobby for yourself")
+	local MTA_SHOW_WANTEDS = CreateClientConVar("mta_show_wanteds", "1", true, false, "Displays other wanted players")
 	cvars.AddChangeCallback("mta_opt_out", function(_, _, new)
 		if tobool(new) and LocalPlayer():GetNWInt("MTAFactor", 0) > 0 then -- cba to network a reset fuck this
 			RunConsoleCommand("kill")
@@ -756,6 +757,10 @@ if CLIENT then
 
 	function MTA.IsOptedOut()
 		return MTA_OPT_OUT:GetBool()
+	end
+
+	function MTA.IsWanted()
+		return LocalPlayer():GetNWInt("MTAFactor") >= 1
 	end
 
 	surface.CreateFont("MTAIndicatorFont", {
@@ -780,7 +785,7 @@ if CLIENT then
 	})
 
 	local black_color = Color(0, 0, 0, 150)
-	local red_color = Color(255, 0, 0)
+	local orange_color = Color(244, 135, 2)
 
 	function MTA.HighlightPosition(pos, text, color)
 		if MTA.IsOptedOut() then return end
@@ -857,13 +862,14 @@ if CLIENT then
 	end
 
 	hook.Add("HUDPaint", tag, function()
-		if LocalPlayer():GetNWInt("MTAFactor") < 1 then return end
+		if not MTA_SHOW_WANTEDS:GetBool() then return end
+		if not MTA.IsWanted() then return end
 
 		for _, ply in ipairs(player.GetAll()) do
 			local ply_factor = ply:GetNWInt("MTAFactor")
 			if ply_factor >= 1 then
 				local text = ("/// WANTED LEVEL %d ///"):format(ply_factor)
-				MTA.HighlightEntity(ply, text, red_color)
+				MTA.HighlightEntity(ply, text, orange_color)
 			end
 		end
 	end)

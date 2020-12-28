@@ -163,7 +163,7 @@ end
 if CLIENT then
 	local red_color = Color(255, 0, 0)
 	hook.Add("HUDPaint", tag, function()
-		if LocalPlayer():GetNWInt("MTAFactor") < 1 then return end
+		if not MTA.IsWanted() then return end
 		for _, bomb in ipairs(ents.FindByClass("grenade_helicopter")) do
 			if bomb:GetNWBool("MTABomb") then
 				MTA.HighlightEntity(bomb, "Teleported Bomb", red_color)
