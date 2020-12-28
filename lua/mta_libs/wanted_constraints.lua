@@ -87,7 +87,7 @@ hook.Add("PhysgunPickup", tag, function(ply, ent)
 end)
 
 hook.Add("PlayerCanPickupItem", tag, function(ply, item)
-    if ply.MTABad then
+    if is_constrained(ply) then
         -- disallow picking up dissolving items
         for _, ent in ipairs(item:GetChildren()) do
             if ent:GetClass() == "env_entity_dissolver" then
@@ -98,7 +98,7 @@ hook.Add("PlayerCanPickupItem", tag, function(ply, item)
 end)
 
 hook.Add("PlayerCanPickupWeapon", tag, function(ply, wep)
-    if ply.MTABad then
+    if is_constrained(ply) then
         -- disallow picking up dissolving items
         for _, ent in ipairs(wep:GetChildren()) do
             if ent:GetClass() == "env_entity_dissolver" then
@@ -108,8 +108,8 @@ hook.Add("PlayerCanPickupWeapon", tag, function(ply, wep)
     end
 end)
 
-hook.Add("CanPlyUseMSItems", tag, function(ply, name, func)
-    if ply.MTABad then
+hook.Add("CanPlyUseMSItems", tag, function(ply, _, _)
+    if is_constrained(ply) then
         return false
     end
 end)
