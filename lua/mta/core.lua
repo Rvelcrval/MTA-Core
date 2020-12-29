@@ -258,7 +258,7 @@ if SERVER then
 	function MTA.UpdatePlayerBadge(ply, factor)
 		local succ, err = pcall(function()
 			if MetaBadges and factor >= 1 then
-				local new_level = math.Clamp(math.ceil(factor / 10), 1, 1000)
+				local new_level = math.Clamp(math.ceil(factor / 10), 1, 2000)
 				MetaBadges.UpgradeBadge(ply, "criminal", new_level)
 			end
 		end)
@@ -426,7 +426,8 @@ if SERVER then
 			{ Stages = 160, Title = L "Warlord" },
 			{ Stages = 320, Title = L "War Criminal" },
 			{ Stages = 369, Title = L "Evil Mastermind" },
-			{ Stages = 1, Title = L "Literally Hitler" },
+			{ Stages = 501, Title = L "Literally Hitler" },
+			{ Stages = 500, Title = L "Satan" },
 		}
 
 		do
