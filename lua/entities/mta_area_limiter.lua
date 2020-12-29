@@ -29,6 +29,7 @@ if SERVER then
         trigger:SetSolid(SOLID_BBOX)
 		trigger:SetNotSolid(true)
 		trigger:SetCollisionBounds(self:OBBMins() / 2, self:OBBMaxs() / 2)
+		trigger:SetPos(trigger:GetPos() - Vector(0, 0, 40))
 		trigger.Touch = function(_, ent) self:Touch(ent) end
 		self.Trigger = trigger
 	end
@@ -129,7 +130,14 @@ if SERVER then
 		end
 
 		local limiter = get_closest_ent(ply:GetPos(), triggers[place].Limiters)
-		if not IsValid(limiter) then return end
+		if not IsValid(limiter) then
+			local lobby_pos = landmark and landmark.get("lobby_3")
+			if lobby_pos then
+				ply:SetPos(lobby_pos)
+			end
+
+			return
+		end
 
 		limiter:Touch(ply)
 	end)
