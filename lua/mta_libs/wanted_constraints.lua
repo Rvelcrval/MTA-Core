@@ -114,6 +114,12 @@ hook.Add("CanPlyUseMSItems", tag, function(ply, _, _)
     end
 end)
 
+hook.Add("ShouldAllowSit", tag, function(ply)
+    if is_constrained(ply) then
+        return false
+    end
+end)
+
 -- I tried using PlayerTeleported but it's broken
 -- so we're hacking into this instead
 hook.Add("CanPlyGoto", tag, function(ply)
