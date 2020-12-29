@@ -96,6 +96,7 @@ hook.Add("PrePACConfigApply", tag, deny)
 hook.Add("PlayerFly", tag, deny)
 hook.Add("PlayerNoClip", tag, deny)
 hook.Add("CanSSJump", tag, deny)
+hook.Add("ShouldAllowSit", tag, deny)
 
 hook.Add("CanPlyCursedBullet", tag, function(ply, atck)
     if is_constrained(ply) or is_constrained(atck) then return false end
@@ -129,12 +130,6 @@ hook.Add("PlayerCanPickupWeapon", tag, function(ply, wep)
 end)
 
 hook.Add("CanPlyUseMSItems", tag, function(ply, _, _)
-    if is_constrained(ply) then
-        return false
-    end
-end)
-
-hook.Add("ShouldAllowSit", tag, function(ply)
     if is_constrained(ply) then
         return false
     end
