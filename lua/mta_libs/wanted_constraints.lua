@@ -1,7 +1,12 @@
 local tag = "wanted_constraints"
 
+local DEFAULT_GRAVITY = 1
 local DEFAULT_RUN_SPEED = 400
 local DEFAULT_WALK_SPEED = 200
+local DEFAULT_SLOW_WALK_SPEED = 100
+local DEFAULT_DUCK_SPEED = 0.1
+local DEFAULT_JUMP_POWER = 200
+local DEFAULT_STEP_SIZE = 18
 
 local players = {}
 
@@ -21,9 +26,13 @@ local function constrain(ply, constraint_reason)
         ply:ExitVehicle()
     end
 
-    ply:SetGravity(1)
+    ply:SetGravity(DEFAULT_GRAVITY)
     ply:SetWalkSpeed(DEFAULT_WALK_SPEED)
     ply:SetRunSpeed(DEFAULT_RUN_SPEED)
+    ply:SetSlowWalkSpeed(DEFAULT_SLOW_WALK_SPEED)
+    ply:SetDuckSpeed(DEFAULT_DUCK_SPEED)
+    ply:SetJumpPower(DEFAULT_JUMP_POWER)
+    ply:SetStepSize(DEFAULT_STEP_SIZE)
 
     do -- fuck you pac :)
         ply.pac_movement = nil
