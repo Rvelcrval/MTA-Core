@@ -2,6 +2,8 @@ if not SERVER then
 	return function() end
 end
 
+local MAX_SPAWN_DISTANCE = 2048
+
 local IsValid = _G.IsValid
 
 local tag = "far_combine"
@@ -154,7 +156,6 @@ local function get_nearest_node(ply, maxd)
 	for k, candidate in next, nodes do
 		if candidate.type == NODE_TYPE_GROUND then
 			local curd = candidate.pos:DistToSqr(pos)
-
 			if curd < d and ply:VisibleVec(candidate.pos) then
 				d = curd
 				node = candidate
@@ -394,7 +395,7 @@ local function setup_combine(combine, target, players)
 			last_teleport = curtime
 			teleports = teleports + 1
 			local oldpos = combine:GetPos()
-			local n_new = get_nearest_node(target, 1024)
+			local n_new = get_nearest_node(target, MAX_SPAWN_DISTANCE)
 
 			if n_new then
 				n = n_new
@@ -494,7 +495,7 @@ local function setup_combine(combine, target, players)
 		end
 
 		-- purge ancient NPCs
-		if age > 60 and not target:TestPVS(combine:GetPos())  then
+		if age > 60 and not target:TestPVS(combine:GetPos()) then
 			combine:Remove()
 		end
 	end)
@@ -505,7 +506,7 @@ local function far_combine(players)
 	local target = players[math.random(#players)]
 	if not IsValid(target) then return end
 
-	local nearest_node = get_nearest_node(target, 1024)
+	local nearest_node = get_nearest_node(target, MAX_SPAWN_DISTANCE)
 	if not nearest_node then return false, "could not get nearest node" end
 
 	local node, pos = find_cadidate_node(target, nearest_node)
