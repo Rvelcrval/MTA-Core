@@ -30,8 +30,8 @@ if SERVER then
 		trigger:SetNotSolid(true)
 
 		local maxs = self:OBBMaxs()
-		trigger:SetCollisionBounds(self:OBBMins() / 2, Vector(maxs.x / 2, maxs.y / 2, maxs.z))
-		trigger:SetPos(trigger:GetPos() - Vector(0, 0, maxs.z / 2))
+		trigger:SetCollisionBounds(self:OBBMins() / 2, Vector(100, 100, 100))
+		trigger:SetPos(trigger:GetPos() - Vector(0, 0, 50))
 		trigger.Touch = function(_, ent) self:Touch(ent) end
 		self.Trigger = trigger
 	end
@@ -176,10 +176,7 @@ if SERVER then
 		end
 
 		local limiter = get_closest_ent(ply:WorldSpaceCenter(), valid_limiters)
-		if not IsValid(limiter) then
-			teleport_to_lobby(ply)
-			return
-		end
+		if not IsValid(limiter) then return end
 
 		limiter:Touch(ply)
 	end)
