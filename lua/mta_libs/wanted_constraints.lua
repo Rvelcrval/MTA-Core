@@ -1,5 +1,8 @@
 local tag = "wanted_constraints"
 
+local DEFAULT_RUN_SPEED = 400
+local DEFAULT_WALK_SPEED = 200
+
 local players = {}
 
 local ply_ents_to_remove = {
@@ -18,9 +21,16 @@ local function constrain(ply, constraint_reason)
         ply:ExitVehicle()
     end
 
-    -- fuck you pac :)
-    if pacx and pacx.SetPlayerSize then
-        pacx.SetPlayerSize(ply, 1, true)
+    ply:SetGravity(1)
+    ply:SetWalkSpeed(DEFAULT_WALK_SPEED)
+    ply:SetRunSpeed(DEFAULT_RUN_SPEED)
+
+    do -- fuck you pac :)
+        ply.pac_movement = nil
+
+        if pacx and pacx.SetPlayerSize then
+            pacx.SetPlayerSize(ply, 1, true)
+        end
     end
 
     if ply.SetSuperJumpMultiplier then
