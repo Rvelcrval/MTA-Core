@@ -28,8 +28,10 @@ if SERVER then
         trigger:SetTrigger(true)
         trigger:SetSolid(SOLID_BBOX)
 		trigger:SetNotSolid(true)
-		trigger:SetCollisionBounds(self:OBBMins() / 2, self:OBBMaxs() / 2)
-		trigger:SetPos(trigger:GetPos() - Vector(0, 0, 40))
+
+		local maxs = self:OBBMaxs()
+		trigger:SetCollisionBounds(self:OBBMins() / 2, Vector(maxs.x / 2, maxs.y / 2, maxs.z))
+		trigger:SetPos(trigger:GetPos() - Vector(0, 0, maxs.z / 2))
 		trigger.Touch = function(_, ent) self:Touch(ent) end
 		self.Trigger = trigger
 	end
@@ -120,6 +122,13 @@ if SERVER then
 		return false
 	end
 
+	local function teleport_to_lobby(ply)
+		local lobby_pos = landmark and landmark.get("lobby_3")
+		if lobby_pos then
+			ply:SetPos(lobby_pos)
+		end
+	end
+
 	hook.Add("PlayerEnteredTrigger", tag, function(ply, place)
 		lazy_init()
 
@@ -131,11 +140,7 @@ if SERVER then
 
 		local limiter = get_closest_ent(ply:GetPos(), triggers[place].Limiters)
 		if not IsValid(limiter) then
-			local lobby_pos = landmark and landmark.get("lobby_3")
-			if lobby_pos then
-				ply:SetPos(lobby_pos)
-			end
-
+			teleport_to_lobby(ply)
 			return
 		end
 
@@ -147,6 +152,8 @@ if SERVER then
 			local limiter = get_closest_ent(ent:WorldSpaceCenter(), ents.FindByClass("mta_area_limiter"))
 			if IsValid(limiter) then
 				limiter:Touch(ent)
+			else
+				teleport_to_lobby(ply)
 			end
 		end
 	end)
@@ -169,7 +176,10 @@ if SERVER then
 		end
 
 		local limiter = get_closest_ent(ply:WorldSpaceCenter(), valid_limiters)
-		if not IsValid(limiter) then return end
+		if not IsValid(limiter) then
+			teleport_to_lobby(ply)
+			return
+		end
 
 		limiter:Touch(ply)
 	end)
