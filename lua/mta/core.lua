@@ -42,6 +42,8 @@ end
 local NET_WANTED_STATE = "MTA_WANTED_STATE"
 
 if SERVER then
+	resource.AddFile("materials/metabadges/criminal/s1/default.vmt")
+
 	util.AddNetworkString(NET_WANTED_STATE)
 
 	local mta_mode_lookup = {
