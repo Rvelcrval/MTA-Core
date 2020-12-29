@@ -86,6 +86,20 @@ if SERVER then
 					trigger:EnableEntityList()
 				end
 
+				trigger.old_Touching = trigger.old_Touching or trigger.Touching or function() end
+				function trigger:Touching(ent)
+					if ent:IsPlayer() and MTA.IsWanted(ent) then
+						local limiter = get_closest_ent(ent:WorldSpaceCenter(), ents.FindByClass("mta_area_limiter"))
+						if IsValid(limiter) then
+							limiter:Touch(ent)
+						else
+							teleport_to_lobby(ent)
+						end
+					else
+						self:old_Touching(ent)
+					end
+				end
+
 				local limiters = {}
 				for ent, _ in pairs(trigger:GetEntities() or {}) do
 					if ent:IsValid() and ent:GetClass() == "mta_area_limiter" then
@@ -153,7 +167,7 @@ if SERVER then
 			if IsValid(limiter) then
 				limiter:Touch(ent)
 			else
-				teleport_to_lobby(ply)
+				teleport_to_lobby(ent)
 			end
 		end
 	end)
