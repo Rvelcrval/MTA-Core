@@ -58,8 +58,12 @@ if SERVER then
 		return ret
 	end
 
-	-- deal or no deal, arcade, core relay room, core entrance
-	local PLACES_TO_RESTRICT = { "mg", "arcade", "relay_cntl", "coretele" }
+	local PLACES_TO_RESTRICT = {
+		-- deal or no deal, arcade, core relay room, core entrance
+		"mg", "arcade", "relay_cntl", "coretele",
+		-- msa backroom, msa offices
+		"msa_garage_anteroom", "msa_restricted"
+	}
 
 	local triggers = {}
 	local has_initialized = false
