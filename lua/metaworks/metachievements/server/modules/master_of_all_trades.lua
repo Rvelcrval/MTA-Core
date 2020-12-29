@@ -7,7 +7,7 @@ local id = "master_of_all_trades"
 
 MetAchievements.RegisterAchievement(id, {
 	title = "Master of all Trades",
-	description = "Upgrades all your MTA branches to the maximum!"
+	description = "Upgrade all your MTA branches to the maximum!"
 })
 
 local MAX_LEVEL = 100
