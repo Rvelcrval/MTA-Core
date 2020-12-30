@@ -40,11 +40,13 @@ function MTA.InLobby(ply)
 end
 
 local NET_WANTED_STATE = "MTA_WANTED_STATE"
+local NET_SOUND_HACK = "MTA_SOUND_HACK"
 
 if SERVER then
 	resource.AddFile("materials/metabadges/criminal/s1/default.vmt")
 
 	util.AddNetworkString(NET_WANTED_STATE)
+	util.AddNetworkString(NET_SOUND_HACK)
 
 	local mta_mode_lookup = {
 		[0] = "Disabled",
@@ -741,6 +743,38 @@ if SERVER then
 		end)
 	end)
 
+	local function should_sound_hack(ent)
+		if ent:GetNWBool("MTACombine") then return true end
+
+		if not ent:IsPlayer() and IsValid(ent:GetParent()) then
+			ent = ent:GetParent()
+		end
+
+		if ent:GetNWBool("MTACombine") then return true end -- check twice in-game of parent
+		if ent:IsPlayer() and MTA.IsWanted(ent) then return true end
+
+		return false
+	end
+
+	hook.Add("EntityEmitSound", tag, function(data)
+		if not IsValid(data.Entity) then return end
+
+		local ent = data.Entity
+		if should_sound_hack(ent) then
+			local plys = {}
+			for _, ply in ipairs(player.GetAll()) do
+				if MTA.InLobby(ply) and not MTA.IsOptedOut(ply) then
+					table.insert(plys, ply)
+				end
+			end
+
+			net.Start(tag, true)
+			net.WriteTable(data)
+			net.Send(plys)
+			return false
+		end
+	end)
+
 	hook.Add("InitPostEntity", tag, MTA.Initialize)
 	hook.Add("PostCleanupMap", tag, spawn_lobby_persistent_ents)
 
@@ -896,6 +930,14 @@ if CLIENT then
 		local is_wanted = net.ReadBool()
 
 		hook.Run("MTAWantedStateUpdate", ply, is_wanted)
+	end)
+
+	net.Receive(NET_WANTED_STATE, function()
+		local data = net.ReadTable()
+		if IsValid(data.Entity) and data.Entity ~= LocalPlayer() then
+			data.Entity:EmitSound(data.SoundName, data.SoundLevel, data.Pitch,
+				data.Volume, data.Channel, data.Flags, data.DSP)
+		end
 	end)
 
 	local function dont_draw(ent)
