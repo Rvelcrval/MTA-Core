@@ -7,6 +7,7 @@ local DEFAULT_SLOW_WALK_SPEED = 100
 local DEFAULT_DUCK_SPEED = 0.1
 local DEFAULT_JUMP_POWER = 200
 local DEFAULT_STEP_SIZE = 18
+local DEFAULT_LAGGED_MOVEMENT = 1
 
 local players = {}
 
@@ -33,6 +34,7 @@ local function constrain(ply, constraint_reason)
     ply:SetDuckSpeed(DEFAULT_DUCK_SPEED)
     ply:SetJumpPower(DEFAULT_JUMP_POWER)
     ply:SetStepSize(DEFAULT_STEP_SIZE)
+    ply:SetLaggedMovementValue(DEFAULT_LAGGED_MOVEMENT)
 
     do -- fuck you pac :)
         ply.pac_movement = nil
