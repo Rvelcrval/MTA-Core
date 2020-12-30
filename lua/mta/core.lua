@@ -768,7 +768,7 @@ if SERVER then
 				end
 			end
 
-			net.Start(tag, true)
+			net.Start(NET_SOUND_HACK, true)
 			net.WriteTable(data)
 			net.Send(plys)
 			return false
