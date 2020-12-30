@@ -932,7 +932,7 @@ if CLIENT then
 		hook.Run("MTAWantedStateUpdate", ply, is_wanted)
 	end)
 
-	net.Receive(NET_WANTED_STATE, function()
+	net.Receive(NET_SOUND_HACK, function()
 		local data = net.ReadTable()
 		if IsValid(data.Entity) and data.Entity ~= LocalPlayer() then
 			data.Entity:EmitSound(data.SoundName, data.SoundLevel, data.Pitch,
