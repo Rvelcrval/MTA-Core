@@ -744,10 +744,17 @@ if SERVER then
 	end)
 
 	local function should_sound_hack(ent)
+		if whitelist[ent:GetClass()] then return true end
 		if ent:GetNWBool("MTACombine") then return true end
 
-		if not ent:IsPlayer() and IsValid(ent:GetParent()) then
-			ent = ent:GetParent()
+		if not ent:IsPlayer() then
+			if ent.CPPIGetOwner and IsValid(ent:CPPIGetOwner()) then
+				ent = ent:CPPIGetOwner()
+			elseif ent:IsWeapon() and IsValid(ent:GetOwner()) then
+				ent = ent:GetOwner()
+			elseif IsValid(ent:GetParent()) then
+				ent = ent:GetParent()
+			end
 		end
 
 		if ent:GetNWBool("MTACombine") then return true end -- check twice in-game of parent
