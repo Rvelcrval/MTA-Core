@@ -103,6 +103,7 @@ if SERVER then
 				if not bounties[atck] then return end
 
 				ply.MTAIgnore = nil
+				ply:SetNWBool("MTABountyHunter", false)
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
 
