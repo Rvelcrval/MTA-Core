@@ -61,6 +61,13 @@ if SERVER then
 		return ret
 	end
 
+	local function teleport_to_lobby(ply)
+		local lobby_pos = landmark and landmark.get("lobby_3")
+		if lobby_pos then
+			ply:SetPos(lobby_pos)
+		end
+	end
+
 	local PLACES_TO_RESTRICT = {
 		-- deal or no deal, arcade, core relay room, core entrance
 		"mg", "arcade", "relay_cntl", "coretele",
