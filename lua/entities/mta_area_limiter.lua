@@ -1,5 +1,4 @@
 AddCSLuaFile()
-
 local tag = "mta_limiters"
 
 ENT.Type = "anim"
@@ -16,22 +15,23 @@ ENT.dont_televate = true
 if SERVER then
 	function ENT:Initialize()
 		self:SetMoveType(MOVETYPE_NONE)
-        self:SetSolid(SOLID_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
 		self:SetUnFreezable(true)
 		self:SetModel("models/hunter/blocks/cube4x4x025.mdl")
 		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 		self:DrawShadow(false)
 
 		local trigger = ents.Create("base_brush")
-        trigger:SetPos(self:GetPos())
-        trigger:SetParent(self)
-        trigger:SetTrigger(true)
-        trigger:SetSolid(SOLID_BBOX)
+		trigger:SetPos(self:GetPos())
+		trigger:SetAngles(self:GetAngles())
+		trigger:SetParent(self)
+		trigger:SetTrigger(true)
+		trigger:SetSolid(SOLID_BBOX)
 		trigger:SetNotSolid(true)
 
-		local maxs = self:OBBMaxs()
 		trigger:SetCollisionBounds(self:OBBMins() / 2, Vector(100, 100, 100))
-		trigger:SetPos(trigger:GetPos() - Vector(0, 0, 50))
+		trigger:SetPos(trigger:GetPos() - Vector(0, 0, 50) - self:GetForward() * 25 - self:GetUp() * 65)
+		trigger.StartTouch = function(_, ent) self:Touch(ent) end
 		trigger.Touch = function(_, ent) self:Touch(ent) end
 		self.Trigger = trigger
 	end
@@ -134,13 +134,6 @@ if SERVER then
 		end
 
 		return false
-	end
-
-	local function teleport_to_lobby(ply)
-		local lobby_pos = landmark and landmark.get("lobby_3")
-		if lobby_pos then
-			ply:SetPos(lobby_pos)
-		end
 	end
 
 	hook.Add("PlayerEnteredTrigger", tag, function(ply, place)
