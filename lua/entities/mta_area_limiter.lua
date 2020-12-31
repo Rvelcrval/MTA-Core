@@ -72,7 +72,9 @@ if SERVER then
 		-- deal or no deal, arcade, core relay room, core entrance
 		"mg", "arcade", "relay_cntl", "coretele",
 		-- msa backroom, msa offices
-		"msa_garage_anteroom", "msa_restricted"
+		"msa_garage_anteroom", "msa_restricted",
+		-- lobby train spawn area right and left
+		"spawntrainr", "spawntrainl"
 	}
 
 	local triggers = {}
