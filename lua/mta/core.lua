@@ -68,7 +68,25 @@ if SERVER then
 		gm_construct_m3_204 = true, -- broken triggers
 		gm_construct_m3_207 = true, -- same
 		gm_construct_m3_234 = true, -- same :)
+		gm_construct_m3_239 = true, -- another one bites the dust
 	}
+
+	local function map_has_broken_triggers()
+		local max = 0
+		for _, trigger in pairs(ents.FindByClass("lua_trigger")) do
+			local mdl = trigger:GetModel()
+				if mdl then
+				if not mdl:match("^%*") then return false end
+
+				local num = mdl:match("^%*(%d+)") or 0
+				if num > max then
+					max = num
+				end
+			end
+		end
+
+		return max >= 256
+	end
 
 	local MTA_MODE = CreateConVar("mta_mode", "1", FCVAR_ARCHIVE, "Changes the mode for MTA: " .. mta_mode_help())
 	cvars.RemoveChangeCallback(MTA_MODE:GetName(), "mta")
@@ -507,6 +525,10 @@ if SERVER then
 		end
 
 		spawn_lobby_persistent_ents()
+
+		if map_has_broken_triggers() then
+			MTA.Print("MAP HAS POTENTIALLY BROKEN TRIGGERS!")
+		end
 
 		if blocked_maps[game.GetMap()] then
 			MTA.Print("BAD MAP DETECTED DISABLING")
