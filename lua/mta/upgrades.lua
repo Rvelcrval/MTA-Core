@@ -5,27 +5,28 @@ local NET_CONVERT_POINTS = "MTA_CONVERT_POINTS"
 local NET_UPGRADE = "MTA_UPGRADE"
 local NET_GIVE_WEAPON = "MTA_GIVE_WEAPON"
 local NET_REFILL_WEAPON = "MTA_REFILL_WEAPON"
+local NET_PRESTIGE = "MTA_PRESTIGE"
 
+local MAX_LEVEL = 100
 local COIN_MULTIPLIER = 300
 local POINT_MULTIPLIER = 5 / 110
 
 -- DB SCHEME
 --[[
-CREATE TABLE MTA_STATS (
+CREATE TABLE mta_stats (
 	id integer NOT NULL PRIMARY KEY,
 	points integer DEFAULT 0,
 	killed_cops integer DEFAULT 0,
 	criminal_count integer DEFAULT 0,
 	damage_multiplier double precision DEFAULT 1.00,
-	defense_multiplier double precision DEFAULT 1.00
-	healing_multiplier double precision DEFAULT 1.00
+	defense_multiplier double precision DEFAULT 1.00,
+	healing_multiplier double precision DEFAULT 1.00,
+	prestige_level integer DEFAULT 0,
 )
 ]]--
 
 -- TODO IDEAS:
 --[[
-- getting back your old weapons with coins
-- use points to revive with your current wanted level
 - skill to scare metrocops away if grenade explodes or whatever
 ]]--
 
@@ -38,6 +39,7 @@ local valid_stats = {
 	damage_multiplier = 1,
 	defense_multiplier = 1,
 	healing_multiplier = 1,
+	prestige_level = 0,
 }
 
 local weapon_prices = {
@@ -54,12 +56,26 @@ local weapon_prices = {
 	mta_escape_teleporter = 4,
 }
 
+local prestige_stats = { "damage_multiplier", "defense_multiplier", "healing_multiplier" }
+local function can_prestige_upgrade(ply)
+	for _, stat_name in ipairs(prestige_stats) do
+		if SERVER and MTA.GetPlayerStat(ply, stat_name) < MAX_LEVEL then return false end
+		if CLIENT and MTA.GetPlayerStat(stat_name) < MAX_LEVEL then return false end
+	end
+
+	return true
+end
+
 if SERVER then
+	resource.AddFile("sound/mta/prestige.ogg")
+	util.PrecacheSound("mta/prestige.ogg")
+
 	util.AddNetworkString(NET_MTA_GUI)
 	util.AddNetworkString(NET_CONVERT_POINTS)
 	util.AddNetworkString(NET_UPGRADE)
 	util.AddNetworkString(NET_GIVE_WEAPON)
 	util.AddNetworkString(NET_REFILL_WEAPON)
+	util.AddNetworkString(NET_PRESTIGE)
 
 	local MAX_NPC_DIST = 300 * 300
 	hook.Add("KeyPress", tag, function(ply, key)
@@ -281,7 +297,7 @@ if SERVER then
 		local cur_value = MTA.GetPlayerStat(ply, stat_name)
 		local upgrade_price = math.Round(math.exp(cur_value * POINT_MULTIPLIER))
 		if MTA.GetPlayerStat(ply, "points") < upgrade_price then return end
-		if cur_value >= 100 then return end -- lock at level 100
+		if cur_value >= MAX_LEVEL then return end -- lock at level 100
 
 		MTA.IncreasePlayerStat(ply, "points", -upgrade_price, true)
 		MTA.IncreasePlayerStat(ply, stat_name, 1)
@@ -309,7 +325,7 @@ if SERVER then
 		wep.PhysgunDisabled = true
 		wep.dont_televate = true
 		wep:SetClip1(wep:GetMaxClip1())
-		wep:SetClip2(2)
+		wep:SetClibeam_point_origin_2(2)
 		ply:SelectWeapon(weapon_class)
 	end)
 
@@ -321,9 +337,30 @@ if SERVER then
 			end
 
 			if wep.GetSecondaryAmmoType and wep:GetSecondaryAmmoType() ~= -1 then
-				ply:GiveAmmo(wep:GetMaxClip2() / 2, wep:GetSecondaryAmmoType())
+				ply:GiveAmmo(wep:GetMaxClibeam_point_origin_2() / 2, wep:GetSecondaryAmmoType())
 			end
 		end
+	end)
+
+	local stats_to_reset = { "points", "damage_multiplier", "defense_multiplier", "healing_multiplier" }
+	net.Receive(NET_PRESTIGE, function(_, ply)
+		if not can_prestige_upgrade(ply) then
+			MTA.ChatPrint(ply, "You cannot level up your prestige yet")
+			return
+		end
+
+		local new_prestige = MTA.IncreasePlayerStat(ply, "prestige_level", 1, true)
+
+		for _, stat_name in ipairs(stats_to_reset) do
+			MTA.IncreasePlayerStat(ply, stat_name, -MTA.GetPlayerStat(ply, stat_name), true)
+		end
+
+		MTA.ChatPrint(player.GetAll(), ply, "'s ", new_value_color, "Criminal Prestige", color_white, " is growing! ", total_value_color, ("(Prestige Level %d)"):format(new_prestige))
+		timer.Simple(0, function()
+			net.Start(NET_PRESTIGE)
+			net.WriteEntity(ply)
+			net.Broadcast()
+		end)
 	end)
 end
 
@@ -448,7 +485,22 @@ if CLIENT then
 				return btn
 			end
 
-			add_action("Convert points to coins", "Convert", function(btn)
+			local btn_prestige = add_action("Upgrade your \"Criminal Prestige\"", "Upgrade", function()
+				Derma_Query(
+					"To upgrade your Criminal Prestige your stats will be reset along with your points, are you sure that you want to upgrade?",
+					"Criminal Prestige",
+					"Confirm", function()
+						net.Start(NET_PRESTIGE)
+						net.SendToServer()
+					end,
+					"Cancel", function()
+					end)
+			end)
+			function btn_prestige:Think()
+				self:SetDisabled(not can_prestige_upgrade())
+			end
+
+			add_action("Convert points to coins", "Convert", function()
 				Derma_StringRequest("Convert Points to Coins", "Amount of points to convert", "0", function(text)
 					local amount = tonumber(text)
 					if not amount then return end
@@ -654,5 +706,78 @@ if CLIENT then
 	net.Receive(NET_MTA_GUI, function()
 		local dealer = net.ReadEntity()
 		show_dealer_frame(dealer)
+	end)
+
+	local CANNON_AMT = 50
+	local PARTICLES_AMT = 25
+	local orange_color = Color(244, 135, 2)
+	local function do_prestige_effects(ply)
+		local beam_point_origin_1 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		beam_point_origin_1:SetNoDraw(true)
+		SafeRemoveEntityDelayed(beam_point_origin_1, 10)
+
+		local beam_point_origin_2 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		beam_point_origin_2:SetNoDraw(true)
+		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
+
+		for i=1, CANNON_AMT do
+			local ang = ((i * 36) * math.pi) / 180
+			local turn = Vector(math.sin(ang), math.cos(ang), 0) * 2
+			timer.Simple(i / CANNON_AMT, function()
+				if not IsValid(ply) then return end
+				beam_point_origin_1:SetPos(ply:GetPos() + Vector(0, 0,1000) + turn)
+				beam_point_origin_2:SetPos(ply:GetPos() + Vector(0, 0,1000 * (CANNON_AMT - i) / CANNON_AMT) + turn)
+				ply:CreateParticleEffect("Weapon_Combine_Ion_Cannon", {
+					{ entity = beam_point_origin_1, attachtype = PATTACH_ABSORIGIN_FOLLOW }
+					{ entity = beam_point_origin_2, attachtype = PATTACH_ABSORIGIN_FOLLOW }
+				})
+			end)
+		end
+
+		timer.Simple(1,function()
+			if not IsValid(ply) then return end
+
+			ParticleEffectAttach("Weapon_Combine_Ion_Cannon_Explosion", PATTACH_ABSORIGIN_FOLLOW, ply, 0)
+			ply:EmitSound("npc/env_headcrabcanister/explosion.wav")
+		end)
+
+		timer.Simple(2, function()
+			if not IsValid(ply) then return end
+
+			local center = ply:GetPos() - Vector(0,0,50)
+			local emitter = ParticleEmitter(center)
+			for i=1, PARTICLES_AMT do
+			local part = emitter:Add("sprites/light_glow02_add", center + Vector(math.sin(i / PARTICLES_AMT * 2 * math.pi), math.cos(i / PARTICLES_AMT * 2 * math.pi), 0) * 50)
+				if part then
+					local c = orange_color
+					part:SetColor(c.r, c.g, c.b, c.a)
+					part:SetVelocity(Vector(0, 0, 100))
+					part:SetDieTime(3)
+					part:SetLifeTime(0)
+					part:SetStartSize(10)
+					part:SetEndSize(0)
+				end
+			end
+			emitter:Finish()
+
+			ParticleEffectAttach("bday_confetti", PATTACH_ABSORIGIN_FOLLOW, ply, 0)
+			local data = EffectData()
+			data:SetOrigin(ply:GetPos())
+			util.Effect("HelicopterMegaBomb",data)
+
+			timer.Create("mta_prestige_particles_" .. ply:EntIndex(), 0.5, 5, function()
+				ParticleEffectAttach("bday_confetti", PATTACH_ABSORIGIN_FOLLOW, ply, 0)
+				util.Effect("cball_explode", data)
+			end)
+
+			ply:EmitSound("mta/prestige.ogg", 300)
+		end)
+	end
+
+	net.Receive(NET_PRESTIGE, function()
+		local ply = net.ReadEntity()
+		if IsValid(ply) then
+			do_prestige_effects(ply)
+		end
 	end)
 end

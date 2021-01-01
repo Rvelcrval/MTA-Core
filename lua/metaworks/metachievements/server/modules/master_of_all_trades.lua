@@ -13,6 +13,8 @@ MetAchievements.RegisterAchievement(id, {
 local MAX_LEVEL = 100
 local stat_names = { "damage_multiplier", "defense_multiplier", "healing_multiplier" }
 local function check_stats(ply)
+	if MetAchievements.HasAchievement(ply, id) then return end
+
 	for _, stat_name in ipairs(stat_names) do
 		if MTA.GetPlayerStat(ply, stat_name) < MAX_LEVEL then return end
 	end
@@ -22,4 +24,4 @@ end
 
 local hook_name = ("%s_%s"):format(tag, id)
 hook.Add("MTAStatIncrease", hook_name, check_stats)
-hook.Add("PlayerInitialSpawn", hook_name, check_stats)
+hook.Add("PlayerSpawn", hook_name, check_stats)
