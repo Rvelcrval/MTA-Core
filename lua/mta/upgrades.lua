@@ -728,8 +728,8 @@ if CLIENT then
 				beam_point_origin_1:SetPos(ply:GetPos() + Vector(0, 0,1000) + turn)
 				beam_point_origin_2:SetPos(ply:GetPos() + Vector(0, 0,1000 * (CANNON_AMT - i) / CANNON_AMT) + turn)
 				ply:CreateParticleEffect("Weapon_Combine_Ion_Cannon", {
-					{ entity = beam_point_origin_1, attachtype = PATTACH_ABSORIGIN_FOLLOW }
-					{ entity = beam_point_origin_2, attachtype = PATTACH_ABSORIGIN_FOLLOW }
+					{ entity = beam_point_origin_1, attachtype = PATTACH_ABSORIGIN_FOLLOW },
+					{ entity = beam_point_origin_2, attachtype = PATTACH_ABSORIGIN_FOLLOW },
 				})
 			end)
 		end
