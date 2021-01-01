@@ -635,7 +635,7 @@ if SERVER then
 		end
 	end
 
-	local function combine_weapon_drop(npc)
+	local function combine_drops(npc)
 		local dissolving = false
 		for _, ent in ipairs(npc:GetChildren()) do
 			if ent:GetClass() == "env_entity_dissolver" then
@@ -645,7 +645,7 @@ if SERVER then
 		end
 
 		local wep = npc:GetActiveWeapon()
-		if IsValid(wep) then
+		if IsValid(wep) and not dissolving then
 			local dropped_wep = ents.Create(wep:GetClass())
 			dropped_wep.lobbyok = true
 			dropped_wep.unrestricted_gun = true
@@ -654,18 +654,6 @@ if SERVER then
 			dropped_wep:SetPos(npc:WorldSpaceCenter())
 			dropped_wep:Spawn()
 			dropped_wep:SetClip1(dropped_wep:GetMaxClip1() / 2)
-
-			if dissolving then
-				dropped_wep:SetName("mta_disolve_" .. tostring(dropped_wep:EntIndex()))
-
-				local dissolver = ents.Create("env_entity_dissolver")
-				dissolver:SetKeyValue("target", "mta_disolve_" .. tostring(dropped_wep:EntIndex()))
-				dissolver:SetKeyValue("dissolvetype", "0")
-				dissolver:Spawn()
-				dissolver:Activate()
-				dissolver:Fire("Dissolve", dropped_wep:GetName(), 0)
-				SafeRemoveEntityDelayed(dissolver, 0.1)
-			end
 
 			SafeRemoveEntity(wep)
 			timer.Simple(5, function()
@@ -676,12 +664,30 @@ if SERVER then
 				dropped_wep:Remove()
 			end)
 		end
+
+		local health_vial = ents.Create(math.random(0, 100) >= 75 and "item_healthkit" or "item_healthvial")
+		health_vial.lobbyok = true
+		health_vial.PhysgunDisabled = true
+		health_vial.dont_televate = true
+		health_vial:SetPos(npc:WorldSpaceCenter())
+		health_vial:Spawn()
+		SafeRemoveEntityDelayed(health_vial, 5)
+
+		if math.random(0, 100) <= 30 then
+			local armor_battery = ents.Create("item_battery")
+			armor_battery.lobbyok = true
+			armor_battery.PhysgunDisabled = true
+			armor_battery.dont_televate = true
+			armor_battery:SetPos(npc:WorldSpaceCenter())
+			armor_battery:Spawn()
+			SafeRemoveEntity(armor_battery, 5)
+		end
 	end
 
 	hook.Add("OnNPCKilled", tag, function(npc)
 		if not npc:GetNWBool("MTACombine") then return end
 
-		combine_weapon_drop(npc)
+		combine_drops(npc)
 		ensure_combine_removal(npc)
 	end)
 
