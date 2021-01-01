@@ -5,7 +5,10 @@ require("bsp")
 pcall(include, "autorun/translation.lua")
 local L = translation and translation.L or function(s) return s end
 
-local static_props = game.OpenBSP():GetStaticProps().entries
+local static_props = {}
+pcall(function() static_props = game.OpenBSP():GetStaticProps().entries end)
+if table.Count(static_props) then return end
+
 local trash_models = {
 	["models/props_trainstation/trashcan_indoor001a.mdl"] = true,
 	["models/props_trainstation/trashcan_indoor001b.mdl"] = true,
