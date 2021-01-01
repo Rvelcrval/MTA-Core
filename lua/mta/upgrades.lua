@@ -325,7 +325,7 @@ if SERVER then
 		wep.PhysgunDisabled = true
 		wep.dont_televate = true
 		wep:SetClip1(wep:GetMaxClip1())
-		wep:SetClibeam_point_origin_2(2)
+		wep:SetClip2(2)
 		ply:SelectWeapon(weapon_class)
 	end)
 
@@ -337,7 +337,7 @@ if SERVER then
 			end
 
 			if wep.GetSecondaryAmmoType and wep:GetSecondaryAmmoType() ~= -1 then
-				ply:GiveAmmo(wep:GetMaxClibeam_point_origin_2() / 2, wep:GetSecondaryAmmoType())
+				ply:GiveAmmo(wep:GetMaxClip2() / 2, wep:GetSecondaryAmmoType())
 			end
 		end
 	end)
