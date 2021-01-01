@@ -94,7 +94,7 @@ if SERVER then
 		local cur_value = MTA_MODE:GetInt()
 		if cur_value == tonumber(old_value) then return end
 
-		if cur_value ~= 0 and blocked_maps[game.GetMap()] then
+		if cur_value ~= 0 and (blocked_maps[game.GetMap()] or map_has_broken_triggers()) then
 			MTA.Print("Blocked MTA mode change, the map is blocked")
 			MTA_MODE:SetInt(0)
 			return
@@ -527,10 +527,9 @@ if SERVER then
 		spawn_lobby_persistent_ents()
 
 		if map_has_broken_triggers() then
-			MTA.Print("MAP HAS POTENTIALLY BROKEN TRIGGERS!")
-		end
-
-		if blocked_maps[game.GetMap()] then
+			MTA.Print("BROKEN TRIGGERS DETECTED DISABLING")
+			MTA_MODE:SetInt(0)
+		elseif blocked_maps[game.GetMap()] then
 			MTA.Print("BAD MAP DETECTED DISABLING")
 			MTA_MODE:SetInt(0)
 		end
