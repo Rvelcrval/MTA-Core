@@ -78,7 +78,7 @@ if SERVER then
 				if mdl then
 				if not mdl:match("^%*") then return false end
 
-				local num = mdl:match("^%*(%d+)") or 0
+				local num = tonumber(mdl:match("^%*(%d+)")) or 0
 				if num > max then
 					max = num
 				end
