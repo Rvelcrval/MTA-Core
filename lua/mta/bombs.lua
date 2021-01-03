@@ -57,7 +57,6 @@ if SERVER then
 	function MTA.TeleportBombToPlayer(ply)
 		local bomb = ents.Create("grenade_helicopter")
 		bomb:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-		bomb:SetNotSolid(true)
 		bomb:Spawn()
 		bomb:SetNWBool("MTACombine", true)
 		bomb:SetNWBool("MTABomb", true)
@@ -71,11 +70,16 @@ if SERVER then
 		do_effect(pos, "ThumperDust")
 		do_effect(pos, "VortDispel", 10)
 
+		timer.Simple(0, function()
+			if not IsValid(bomb) then return end
+			bomb:SetCollisionGroup(COLLISION_GROUP_WORLD)
+		end)
+
 		timer.Simple(2, function()
 			if not IsValid(bomb) then return end
 
 			local phys = bomb:GetPhysicsObject()
-			if phys:IsValid() then
+			if IsValid(phys) then
 				phys:Wake()
 				phys:EnableMotion(false)
 			end
