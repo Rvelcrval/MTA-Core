@@ -16,6 +16,7 @@ local FRONT_ROTATION_MARKER = 50
 
 local function get_rotation(ply, pos)
 	local diff = pos - ply:GetShootPos()
+	diff.z = 0
 	diff:Normalize()
 
 	return math.abs(math.deg(math.acos(ply:EyeAngles():Forward():Dot(diff))))

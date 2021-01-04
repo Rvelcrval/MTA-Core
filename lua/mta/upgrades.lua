@@ -54,6 +54,7 @@ local weapon_prices = {
 	weapon_plasmanade = 6,
 	weapon_slam = 4,
 	mta_escape_teleporter = 4,
+	weapon_riot_shield = 2,
 }
 
 local prestige_stats = { "damage_multiplier", "defense_multiplier", "healing_multiplier" }
@@ -544,7 +545,8 @@ if CLIENT then
 					weapon_asmd = { Name = "ASMD Shock Rifle", Model = "models/weapons/w_ut2k4_shock_rifle.mdl" },
 					weapon_plasmanade = { Name = "Plasma Grenade", Model = "models/weapons/w_grenade.mdl" },
 					weapon_slam = { Name = "SLAM", Model = "models/weapons/w_slam.mdl" },
-					mta_escape_teleporter = { Name = "Escape Teleporter", Model = "models/weapons/w_medkit.mdl", Material = "Models/props_combine/CombineThumper002" }
+					mta_escape_teleporter = { Name = "Escape Teleporter", Model = "models/weapons/w_medkit.mdl", Material = "Models/props_combine/CombineThumper002" },
+					weapon_riot_shield = { Name = "Riot Shield", Model = "models/cloud/ballisticshield_mod.mdl" }
 				}
 				local weapon_x, weapon_y = 5, 30
 				local i = 0
