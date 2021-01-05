@@ -4,7 +4,7 @@ local NET_MTA_ACCEPT_BOUNTY = "MTA_ACCEPT_BOUNTY"
 local NET_MTA_REMOVE_BOUNTY = "MTA_REMOVE_BOUNTY"
 
 local MINIMUM_LEVEL = 20
-local MAX_BOUNTIES_PER_HUNTER = 3
+local MAX_BOUNTIES_PER_HUNTER = 4
 local TIME_TO_BOUNTY_REFRESH = 60 * 60 * 2 -- 2 hours
 
 local color_white = Color(255, 255, 255)
@@ -64,7 +64,7 @@ if SERVER then
 	end
 
 	hook.Add("MTAPlayerWantedLevelIncreased", tag, function(ply, wanted_level)
-		if wanted_level < MINIMUM_LEVEL then return end
+		if wanted_level < (MINIMUM_LEVEL + (MTA.GetPlayerStat(ply, "prestige_level") * 10)) then return end
 		if bounties[ply] then return end
 
 		bounties[ply] = true
