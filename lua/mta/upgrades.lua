@@ -362,6 +362,8 @@ if SERVER then
 			net.WriteEntity(ply)
 			net.Broadcast()
 		end)
+
+		hook.Run("MTAPlayerPrestige", ply, new_prestige)
 	end)
 end
 
