@@ -1,7 +1,7 @@
 local ENT = {}
 ENT.Base = "base_anim"
 ENT.PrintName = "Riot Shield"
-ENT.Author = "Earu"
+ENT.Author = "Earu & Mavain"
 ENT.Editable = false
 ENT.Spawnable = false
 ENT.AdminOnly = false
