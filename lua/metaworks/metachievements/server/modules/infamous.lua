@@ -21,7 +21,7 @@ end
 
 MetAchievements.RegisterAchievement(id, {
 	title = "Infamous",
-	description = string.format("Reach the MTA Criminak Prestige %d", PRESTIGE_LEVEL),
+	description = string.format("Reach the MTA Criminal Prestige %d", PRESTIGE_LEVEL),
 	statistics = get_statistics,
 	progress = get_progress,
 })
@@ -30,7 +30,7 @@ local function on_prestige(ply)
 	local observable = MetAchievements.GetStat_ASYNC(ply, id, "count")
 	if not observable then return end
 	observable = observable:defaultIfEmpty(0)
-		:map(function(c) return math.Clamp(c + 1, 0, PRESTIGE_LEVEL) end)
+		:map(function(c) return math.Clamp(MTA.GetPlayerStat(ply, "prestige_level"), 0, PRESTIGE_LEVEL) end)
 
 	observable
 		:subscribe(function(c)
@@ -44,4 +44,10 @@ local function on_prestige(ply)
 		end)
 end
 
-hook.Add("MTAPlayerPrestige", ("%s_%s"):format(tag, id), on_prestige)
+local hook_name = ("%s_%s"):format(tag, id)
+hook.Add("MTAPlayerPrestige", hook_name, on_prestige)
+hook.Add("PlayerSpawn", hook_name, function(ply)
+	if MTA.GetPlayerStat(ply, "prestige_level") >= PRESTIGE_LEVEL then
+		MetAchievements.UnlockAchievement(ply, id)
+	end
+end)
