@@ -179,6 +179,10 @@ local function StartAssault()
 		station = music
 		station:Play()
 		station:SetVolume(SONG_VOLUME)
+
+		if ms and ms.SetNonRoomMusicPlaying then
+			ms.SetNonRoomMusicPlaying(true)
+		end
 	end)
 end
 
@@ -196,6 +200,10 @@ local function EndAssault(instant)
 	end
 
 	is_assault = nil
+
+	if ms and ms.SetNonRoomMusicPlaying then
+		ms.SetNonRoomMusicPlaying(false)
+	end
 end
 
 local function FetchSong(id)
