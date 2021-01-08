@@ -270,11 +270,13 @@ if SERVER then
 
 	hook.Add("EntityTakeDamage", "mta_riot_shield", function(ent, dmg_info)
 		if not ent:IsPlayer() then return end
+		if dmg_info:IsExplosionDamage() then return end
+		if dmg_info:IsFallDamage() then return end
 
 		local wep = ent:GetActiveWeapon()
 		if IsValid(wep) and wep:GetClass() == "weapon_riot_shield" then
 			local atck = dmg_info:GetAttacker()
-			if dmg_info:IsExplosionDamage() and get_rotation(ent, atck:WorldSpaceCenter()) < FRONT_ROTATION_MARKER then
+			if get_rotation(ent, atck:WorldSpaceCenter()) < FRONT_ROTATION_MARKER then
 				return true
 			else
 				dmg_info:ScaleDamage(0.1)
