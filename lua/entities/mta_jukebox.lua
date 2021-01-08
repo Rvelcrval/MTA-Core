@@ -22,11 +22,9 @@ if SERVER then
 
 	function ENT:Initialize()
 		self:SetModel("models/fallout3/jukebox.mdl")
-		self:SetModelScale(0.75)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
-		self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 		self:SetUseType(SIMPLE_USE)
 
 		local phys = self:GetPhysicsObject()
@@ -34,6 +32,8 @@ if SERVER then
 			phys:Wake()
 			phys:EnableMotion(false)
 		end
+
+		self:Activate()
 	end
 
 	function ENT:Use(activator)
@@ -60,7 +60,7 @@ if CLIENT then
 			if not bind then return end
 
 			local text = ("/// %s [%s] ///"):format(verb, bind)
-			MTA.ManagedHighlightEntity(self, text, color_white)
+			MTA.HighlightEntity(self, text, color_white)
 		end)
 	end
 
@@ -194,7 +194,7 @@ if CLIENT then
 			surface.SetDrawColor(255, 150, 0, 255)
 			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
 
-			if not self:HasFocus() and self:GetText():trim() == "" then
+			if not self:HasFocus() and self:GetText():Trim() == "" then
 				self:SetText(self:GetPlaceholderText())
 			end
 
@@ -272,4 +272,61 @@ if CLIENT then
 	end
 
 	net.Receive(NET_JUKEBOX, show_jukebox_ui)
+end
+
+if SERVER then
+	-- DB SCHEME
+	--[[
+	CREATE TABLE mta_stats (
+		id INTEGER NOT NULL PRIMARY KEY,
+		urls TEXT NOT NULL DEFAULT ''
+	)
+	]]--
+
+	local function can_db()
+		return _G.db and _G.co
+	end
+
+	MTA.Songs = {
+
+	}
+
+	function MTA.Songs.Save(ply, songs)
+		local prestige_lvl = MTA.GetPlayerStat(ply, "prestige_level")
+		local urls = table.concat(songs, ";", 1, #songs >= prestige_lvl and prestige_lvl or #songs)
+
+		for i = 1, prestige_lvl do
+			ply:SetNWString(("MTAUserSong_%d"):format(i), songs[i] or "")
+		end
+
+		if not can_db() then return end
+		co(function()
+			db.Query(("UPDATE mta_user_songs SET urls = '%s' WHERE id = %d"):format(urls, ply:AccountID()))
+		end)
+	end
+
+	function MTA.Songs.Init(ply)
+		if not can_db() then return {} end
+		co(function()
+			local ret = db.Query(("SELECT * FROM mta_user_songs WHERE id = %d;"):format(ply:AccountID()))[1]
+			if ret then
+				local prestige_lvl = MTA.GetPlayerStat(ply, "prestige_level")
+				local songs = ret.urls:Split(";")
+				for i = 1, prestige_lvl do
+					ply:SetNWString(("MTAUserSong_%d"):format(i), songs[i] or "")
+				end
+			end
+		end)
+	end
+
+	function MTA.Songs.Get(ply)
+		local urls = {}
+		local prestige_lvl = MTA.GetPlayerStat(ply, "prestige_level")
+		for i = 1, prestige_lvl do
+			local url = ply:GetNWString(("MTAUserSong_%d"):format(i))
+			table.insert(urls, url)
+		end
+
+		return urls
+	end
 end

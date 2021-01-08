@@ -911,7 +911,7 @@ if CLIENT then
 			local tr = util.TraceLine({
 				start = lp:EyePos(),
 				endpos = ent:WorldSpaceCenter(),
-				filter = lp
+				filter = lp,
 			})
 			if tr.Entity ~= ent then
 				ent.ShouldHighlight = false
