@@ -276,6 +276,8 @@ if SERVER then
 			local atck = dmg_info:GetAttacker()
 			if dmg_info:IsExplosionDamage() and get_rotation(ent, atck:WorldSpaceCenter()) < FRONT_ROTATION_MARKER then
 				return true
+			else
+				dmg_info:ScaleDamage(0.1)
 			end
 		end
 	end)
