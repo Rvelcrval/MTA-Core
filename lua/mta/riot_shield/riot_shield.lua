@@ -9,10 +9,7 @@ ENT.PhysgunDisabled = true
 ENT.lobbyok = true
 
 local MTA_SHIELD_TEXTURE_UPDATE = "MTA_SHIELD_TEXTURE_UPDATE"
-
-local ZOFFSET = Vector(0, 0, 35)
-local FORWARD_OFFSET = -20
-local FRONT_ROTATION_MARKER = 50
+local FRONT_ROTATION_MARKER = 80
 
 local function get_rotation(ply, pos)
 	local diff = pos - ply:GetShootPos()
@@ -21,26 +18,6 @@ local function get_rotation(ply, pos)
 
 	return math.abs(math.deg(math.acos(ply:EyeAngles():Forward():Dot(diff))))
 end
-
-local function compute_params(ply)
-	local ang = ply:EyeAngles()
-	ang.pitch = 0
-	ang.yaw = ang.yaw + 180
-
-	local pos = ply:WorldSpaceCenter() + ang:Right() * 5 - ZOFFSET
-	local vel = ply:GetVelocity()
-	if vel:Length2DSqr() == 0 then
-		pos = pos + ang:Forward() * FORWARD_OFFSET
-	else
-		if get_rotation(ply, pos + vel) < FRONT_ROTATION_MARKER then
-			local multiplier = SERVER and 40 or 20 -- account for server delay
-			pos = pos + (vel:GetNormalized() * multiplier)
-		end
-	end
-
-	return pos, ang
-end
-
 
 if SERVER then
 	resource.AddFile("materials/models/cloud/ballshield.vmt")
@@ -51,50 +28,35 @@ if SERVER then
 	function ENT:Initialize()
 		self:SetModel("models/cloud/ballisticshield_mod.mdl")
 
-		self:EnableCustomCollisions()
-
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
 
-		self:MakePhysicsObjectAShadow()
-		self:StartMotionController()
-
 		self:PhysWake()
 
 		local ply = self:GetOwner()
-	end
-
-	function ENT:Think()
-		local ply = self:GetOwner()
 		if not IsValid(ply) then return end
 
-		if self:WorldSpaceCenter():Distance(ply:WorldSpaceCenter()) >= 300 then
-			local pos, ang = compute_params(ply)
-			self:SetPos(pos)
-			self:SetAngles(ang)
+		local spine = ply:LookupBone("ValveBiped.Bip01_Spine")
+		if spine and spine ~= -1 then
+			self:FollowBone(ply, spine)
+		else
+			-- yikes
+			self:SetParent(ply)
 		end
 
-		self:NextThink(CurTime() + 1)
-		return true
+		self:SetLocalAngles(Angle(0,-85,-90))
+		self:SetLocalPos(Vector(-35, 20, 4))
 	end
 
-	function ENT:PhysicsSimulate(phys, delta)
-		local ply = self:GetOwner()
-		if not IsValid(ply) then return end
-
-		phys:EnableCollisions(ply:GetMoveType() ~= MOVETYPE_NOCLIP)
-		phys:Wake()
-
-		local pos, ang = compute_params(ply)
-		phys:UpdateShadow(pos, ang, delta)
-	end
+	function ENT:Think() end
+	function ENT:PhysicsSimulate(phys, delta) end
 end
 
 if CLIENT then
 
 	function ENT:Initialize()
-		self:EnableCustomCollisions()
+		self:SetPredictable(true)
 
 		if not self.CachedTexture then
 			self.CachedTexture = {
@@ -125,6 +87,7 @@ if CLIENT then
 			render.OverrideAlphaWriteEnable(false)
 			render.PopRenderTarget()
 		end
+
 		if not self.CustomMaterial then
 			self.CustomMaterial = CreateMaterial("weapon_riot_shield_material" .. (self:GetOwner():SteamID64() or "_BOT"), "UnlitGeneric", {
 				["$basetexture"] = self.CustomTexture:GetName(),
@@ -134,11 +97,9 @@ if CLIENT then
 		end
 
 		if cached_texture ~= self.CachedTexture then
-
 			self.CachedTexture = cached_texture
 
 			local tex_data = self.CachedTexture
-
 			render.PushRenderTarget(self.CustomTexture)
 			render.OverrideAlphaWriteEnable(true, true)
 			render.ClearDepth()
@@ -156,7 +117,6 @@ if CLIENT then
 				cam.End2D()
 			render.OverrideAlphaWriteEnable(false)
 			render.PopRenderTarget()
-
 		end
 
 		local cam_pos_local = Vector(-1.2, 16.2, 43.6) --ang:Forward() + ang:Up() * 44 - ang:Right() * 16
@@ -188,18 +148,8 @@ if CLIENT then
 	end
 
 	function ENT:Draw()
-		local ply = self:GetOwner()
-		if not IsValid(ply) then
-			self:DrawModel()
-			return
-		end
-
-		local pos, ang = compute_params(ply)
-		self:SetRenderOrigin(pos)
-		self:SetRenderAngles(ang)
-
 		self:DrawModel()
-		self:DrawCustomTexture(pos, ang)
+		self:DrawCustomTexture(self:GetPos() + self:GetForward() * -0.2, self:GetAngles())
 	end
 end
 
@@ -237,10 +187,6 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:SecondaryAttack()
-end
-
-function SWEP:Deploy()
-	self:SetHoldType("duel")
 end
 
 if SERVER then
@@ -321,10 +267,55 @@ if SERVER then
 		remove_shield(self)
 		return true
 	end
+
+	hook.Add("EntityTakeDamage", "mta_riot_shield", function(ent, dmg_info)
+		if not ent:IsPlayer() then return end
+
+		local wep = ent:GetActiveWeapon()
+		if IsValid(wep) and wep:GetClass() == "weapon_riot_shield" then
+			local atck = dmg_info:GetAttacker()
+			if dmg_info:IsExplosionDamage() and get_rotation(ent, atck:WorldSpaceCenter()) < FRONT_ROTATION_MARKER then
+				return true
+			end
+		end
+	end)
 end
 
 if CLIENT then
+	local is_held = false
+
+	function SWEP:Deploy()
+		self:SetHoldType("duel")
+
+		if self:IsCarriedByLocalPlayer() then
+			is_held = true
+		end
+	end
+
+	function SWEP:OnDrop()
+		if self:IsCarriedByLocalPlayer() then
+			is_held = false
+		end
+	end
+
+	function SWEP:OnRemove()
+		if self:IsCarriedByLocalPlayer() then
+			is_held = false
+		end
+	end
+
+	function SWEP:Holster()
+		if self:IsCarriedByLocalPlayer() then
+			is_held = false
+		end
+		return true
+	end
+
 	function SWEP:Draw() end
+
+	hook.Add("HUDShouldDraw", "mta_riot_shield", function(element)
+		if element == "CHudDamageIndicator" and is_held then return false end
+	end)
 end
 
 weapons.Register(SWEP, "weapon_riot_shield")
