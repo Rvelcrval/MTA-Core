@@ -483,6 +483,12 @@ if SERVER then
 		end
 	end
 
+	local function trigger_hurt_fix()
+		for _, trigger_hurt in ipairs(ents.FindByClass("trigger_hurt")) do
+			trigger_hurt.MTAForceDamage = true
+		end
+	end
+
 	function MTA.Initialize()
 		-- this is done here, because only here will the proper nodegraph be available
 		local far_combine, setup_combine = include("mta_libs/far_combine.lua")
@@ -525,6 +531,7 @@ if SERVER then
 		end
 
 		spawn_lobby_persistent_ents()
+		trigger_hurt_fix()
 
 		if map_has_broken_triggers() then
 			MTA.Print("BROKEN TRIGGERS DETECTED DISABLING")
