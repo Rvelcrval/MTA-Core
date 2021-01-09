@@ -90,6 +90,7 @@ local function deny(ply)
     end
 end
 
+hook.Add("CanPlayerEnterVehicle", tag, deny)
 hook.Add("CanPlyTeleport", tag, deny)
 hook.Add("CanPlyGoBack", tag, deny)
 hook.Add("OnPlayerSit", tag , deny)
