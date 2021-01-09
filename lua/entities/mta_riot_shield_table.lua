@@ -1,6 +1,5 @@
 AddCSLuaFile()
 
-local ENT = {}
 ENT.Type = "anim"
 ENT.Base = "base_anim"
 ENT.RenderGroup = RENDERGROUP_OPAQUE
@@ -573,5 +572,3 @@ if CLIENT then
 		open_shield_gui()
 	end)
 end
-
-scripted_ents.Register(ENT, "mta_riot_shield_table")

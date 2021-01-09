@@ -1,3 +1,5 @@
+AddCSLuaFile()
+
 SWEP.PrintName = "Escape Teleporter"
 SWEP.Author = "Earu"
 SWEP.Spawnable = false
