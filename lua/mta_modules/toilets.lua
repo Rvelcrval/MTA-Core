@@ -10,9 +10,6 @@ if SERVER then
 		if ent:GetNWBool("ToiletInUse") then return end
 		if ply:GetPos():Distance(ent:GetPos()) > 128 then return end
 
-		ent:SetNWBool("ToiletInUse", true)
-		ply:SetNWBool("IsDefecating", true)
-
 		local seat = ents.Create("prop_vehicle_prisoner_pod")
 		seat:SetModel("models/nova/jeep_seat.mdl")
 		seat:SetPos(ent:GetPos() - ent:GetUp() * 35)
@@ -24,6 +21,15 @@ if SERVER then
 		seat.ms_notouch = true
 		seat.IsToiletSeat = true
 		seat.Toilet = ent
+
+		local ret = hook.Run("CanPlayerEnterVehicle", ply, seat, 0)
+		if ret == false then
+			SafeRemoveEntity(seat)
+			return
+		end
+
+		ent:SetNWBool("ToiletInUse", true)
+		ply:SetNWBool("IsDefecating", true)
 
 		ply:EnterVehicle(seat)
 	end
