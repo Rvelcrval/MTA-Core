@@ -17,7 +17,6 @@ local CUSTOM_TEXTURE_WIDTH = 64
 local CUSTOM_TEXTURE_HEIGHT = 108
 
 if SERVER then
-
 	util.AddNetworkString(MTA_SHIELD_GUI_OPEN)
 
 	function ENT:Initialize()

@@ -30,6 +30,16 @@ end
 function SWEP:SecondaryAttack()
 end
 
+local FRONT_ROTATION_MARKER = 60
+
+local function get_rotation(ply, pos)
+	local diff = pos - ply:GetShootPos()
+	diff.z = 0
+	diff:Normalize()
+
+	return math.abs(math.deg(math.acos(ply:EyeAngles():Forward():Dot(diff))))
+end
+
 if SERVER then
 	function SWEP:PrimaryAttack()
 		self:SetNextPrimaryFire(CurTime() + 0.75)

@@ -10,15 +10,6 @@ ENT.PhysgunDisabled = true
 ENT.lobbyok = true
 
 local MTA_SHIELD_TEXTURE_UPDATE = "MTA_SHIELD_TEXTURE_UPDATE"
-local FRONT_ROTATION_MARKER = 60
-
-local function get_rotation(ply, pos)
-	local diff = pos - ply:GetShootPos()
-	diff.z = 0
-	diff:Normalize()
-
-	return math.abs(math.deg(math.acos(ply:EyeAngles():Forward():Dot(diff))))
-end
 
 if SERVER then
 	resource.AddFile("materials/models/cloud/ballshield.vmt")
