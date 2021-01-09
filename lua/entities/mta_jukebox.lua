@@ -22,9 +22,9 @@ if SERVER then
 
 	function ENT:Initialize()
 		self:SetModel("models/fallout3/jukebox.mdl")
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetSolid(SOLID_VPHYSICS)
+		self:PhysicsInit(SOLID_BBOX)
+		self:SetMoveType(MOVETYPE_NONE)
+		self:SetSolid(SOLID_BBOX)
 		self:SetUseType(SIMPLE_USE)
 
 		local phys = self:GetPhysicsObject()

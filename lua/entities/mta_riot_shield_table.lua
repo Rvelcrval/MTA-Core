@@ -23,9 +23,8 @@ if SERVER then
 	function ENT:Initialize()
 		self:SetModel("models/cloud/ballisticshield_mod.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
+		self:SetMoveType(MOVETYPE_NONE)
 		self:SetSolid(SOLID_VPHYSICS)
-		self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 		self:SetUseType(SIMPLE_USE)
 
 		local phys = self:GetPhysicsObject()

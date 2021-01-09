@@ -18,7 +18,7 @@ if SERVER then
 	function ENT:Initialize()
 		self:SetModel("models/props_combine/combine_interface001.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
+		self:SetMoveType(MOVETYPE_NONE)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 		self:SetUseType(SIMPLE_USE)
