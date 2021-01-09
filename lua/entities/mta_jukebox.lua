@@ -11,7 +11,7 @@ ENT.lobbyok = true
 ENT.PhysgunDisabled = true
 ENT.dont_televate = true
 
-local NET_JUKEBOX = "MTA_JUKEBOX"
+local NET_JUKEBOX = "MTA_JUKEBOX_UI"
 
 if SERVER then
 	resource.AddFile("models/fallout3/jukebox.mdl")
