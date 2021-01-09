@@ -897,13 +897,14 @@ if CLIENT then
 		MTA.HighlightPosition(ent:WorldSpaceCenter(), text, color)
 	end
 
-	local MIN_DIST = 300
+	local MIN_DIST_TO_SHOW = 300
+	local DIST_TO_ENT = 50
 	function MTA.ManagedHighlightEntity(ent, text, color)
 		if CurTime() >= (ent.NextHighlightCheck or 0) then
 			ent.NextHighlightCheck = CurTime() + 1
 
 			local lp = LocalPlayer()
-			if lp:WorldSpaceCenter():Distance(ent:WorldSpaceCenter()) > MIN_DIST then
+			if lp:WorldSpaceCenter():Distance(ent:WorldSpaceCenter()) > MIN_DIST_TO_SHOW then
 				ent.ShouldHighlight = false
 				return
 			end
@@ -914,7 +915,7 @@ if CLIENT then
 				filter = lp,
 			})
 			if tr.Entity ~= ent then
-				ent.ShouldHighlight = false
+				ent.ShouldHighlight = tr.HitWorld and tr.HitPos:Distance(ent:WorldSpaceCenter()) <= DIST_TO_ENT or false
 				return
 			end
 
