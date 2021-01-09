@@ -20,7 +20,8 @@ if SERVER then
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_NONE)
 		self:SetSolid(SOLID_VPHYSICS)
-		self:SetCollisionGroup(COLLISION_GROUP_WORLD)
+		self:SetCollisionGroup(COLLISION_GROUP_NONE)
+		self:SetNotSolid(false)
 		self:SetUseType(SIMPLE_USE)
 
 		self.Screen = ents.Create("prop_physics")

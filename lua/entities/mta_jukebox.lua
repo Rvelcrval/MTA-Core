@@ -26,6 +26,8 @@ if SERVER then
 		self:SetMoveType(MOVETYPE_NONE)
 		self:SetSolid(SOLID_BBOX)
 		self:SetUseType(SIMPLE_USE)
+		self:SetCollisionGroup(COLLISION_GROUP_NONE)
+		self:SetNotSolid(false)
 
 		local phys = self:GetPhysicsObject()
 		if IsValid(phys) then
