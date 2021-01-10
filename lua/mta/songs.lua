@@ -95,12 +95,11 @@ if CLIENT then
 
 		if not file.Exists("mta/" .. name, "DATA") then
 			http.Fetch(url, function(body, _, _, code)
-				assert(code == 200, body)
-
-				file.Write("mta/" .. name, body)
-
-				cb()
-			end, error)
+				if code == 200 and body then
+					file.Write("mta/" .. name, body)
+					cb()
+				end
+			end)
 		else
 			cb()
 		end
@@ -280,6 +279,11 @@ if CLIENT then
 		end
 
 		is_assault = nil
+
+		if IsValid(MTA.SongStation) then
+			MTA.SongStation:Stop()
+			MTA.SongStation = nil
+		end
 
 		if ms and ms.SetNonRoomMusicPlaying then
 			ms.SetNonRoomMusicPlaying(false)
