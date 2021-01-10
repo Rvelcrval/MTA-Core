@@ -242,7 +242,7 @@ if SERVER then
 				end
 			end
 
-			hook.Run("MTAPlayerStatInitialized", ply)
+			hook.Run("MTAPlayerStatsInitialized", ply)
 		end)
 
 		if aowl then
