@@ -252,7 +252,7 @@ if CLIENT then
 			MTA.SongStation = nil
 		end
 
-		local song_path = ("data/mta/%s.dat"):format(song_file_name)
+		local song_path = ("data/mta/%s"):format(song_file_name)
 		sound.PlayFile(song_path, "", function(music)
 			if not IsValid(music) then print("not valid?", music, song_path) return end -- how#3
 
