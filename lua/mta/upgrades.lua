@@ -241,6 +241,8 @@ if SERVER then
 					MTA.IncreasePlayerStat(ply, stat_name, ret[stat_name] or default_value)
 				end
 			end
+
+			hook.Run("MTAPlayerStatInitialized", ply)
 		end)
 
 		if aowl then
