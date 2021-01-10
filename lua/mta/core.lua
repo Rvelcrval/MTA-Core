@@ -934,6 +934,14 @@ if CLIENT then
 		end
 	end
 
+	local registered_ents = {}
+	function MTA.RegisterEntityForHighlight(ent, text, color)
+		registered_ents[ent] = {
+			Text = text,
+			Color = color,
+		}
+	end
+
 	function MTA.GetBindKey(binding)
 		local bind = input.LookupBinding(binding, true)
 		if not bind then return end
@@ -941,6 +949,14 @@ if CLIENT then
 	end
 
 	hook.Add("HUDPaint", tag, function()
+		for ent, draw_info in pairs(registered_ents) do
+			if IsValid(ent) then
+				MTA.ManagedHighlightEntity(ent, draw_info.Text, draw_info.Color)
+			else
+				registered_ents[ent] = nil
+			end
+		end
+
 		if not MTA_SHOW_WANTEDS:GetBool() then return end
 		if not MTA.IsWanted() then return end
 

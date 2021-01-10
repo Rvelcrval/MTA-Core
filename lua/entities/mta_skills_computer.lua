@@ -63,14 +63,10 @@ if CLIENT then
 	local color_white = Color(255, 255, 255)
 	local verb = L"Upgrades"
 	function ENT:Initialize()
-		hook.Add("HUDPaint", self, function()
-			if MTA.IsOptedOut() then return end
+		local bind = MTA.GetBindKey("+use")
+		if not bind then return end
 
-			local bind = MTA.GetBindKey("+use")
-			if not bind then return end
-
-			local text = ("/// %s [%s] ///"):format(verb, bind)
-			MTA.ManagedHighlightEntity(self, text, color_white)
-		end)
+		local text = ("/// %s [%s] ///"):format(verb, bind)
+		MTA.RegisterEntityForHighlight(self, text, color_white)
 	end
 end
