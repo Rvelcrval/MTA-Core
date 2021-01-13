@@ -42,12 +42,14 @@ function SWEP:Obliterate(ent)
 	ent:TakeDamageInfo(dmg)
 end
 
+local core_color = Color(200, 20, 75)
 function SWEP:AttachCore(parent)
 	local core = ents.Create("meta_core")
 	core:SetPos(parent:GetPos())
 	core:SetParent(parent)
 	core:Spawn()
-	--core:SetColor(Color(200,20,100))
+	core.lobbyok = true
+	core:SetColor(core_color)
 	core:SetSize(10)
 	if core.CPPISetOwner then
 		core:CPPISetOwner(self:GetOwner())
@@ -71,7 +73,6 @@ function SWEP:AttachCore(parent)
 			return
 		end
 
-		self:SetSize(self:GetSize() + 2)
 		local phys = parent:GetPhysicsObject()
 		if not IsValid(phys) then return end
 		local vel = phys:GetVelocity()
