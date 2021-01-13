@@ -3,6 +3,7 @@ local tag = "mta_fever"
 local FEVER_TIME = 20
 local FEVER_TRESHOLD = 5
 local FEVER_INTERVAL = 10
+local FEVER_TIMEOUT = 180
 
 if SERVER then
 	util.AddNetworkString(tag)
@@ -25,6 +26,7 @@ if SERVER then
 
 		local data = fever_data[atck] or {}
 		table.insert(data, CurTime())
+
 		if #data >= FEVER_TRESHOLD then
 			table.remove(data, 1)
 
@@ -42,20 +44,19 @@ if SERVER then
 				net.WriteBool(true)
 				net.Send(atck)
 
+				atck.MTAInFever = true
+				atck.MTANextFever = CurTime() + FEVER_TIMEOUT
+
 				timer.Simple(FEVER_TIME, function()
 					if not IsValid(atck) then return end
 					stop_fever(atck)
 				end)
 
-				atck.MTAInFever = true
-				atck.MTANextFever = CurTime() + (3 * FEVER_INTERVAL)
-				fever_data[atck] = nil
-			else
-				fever_data[atck] = data
+
 			end
-		else
-			fever_data[atck] = data
 		end
+
+		fever_data[atck] = data
 	end)
 
 	hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
