@@ -54,6 +54,7 @@ function SWEP:AttachCore(parent)
 	if core.CPPISetOwner then
 		core:CPPISetOwner(self:GetOwner())
 	end
+	parent.lobbyok = true
 	parent.IsThrownCore = true
 
 	core.Dissolver:SetKeyValue("dissolvetype", "2")
