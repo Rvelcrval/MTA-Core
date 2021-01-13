@@ -60,13 +60,8 @@ function SWEP:AttachCore(parent)
 		if not IsValid(self) then return end
 		if IsValid(self:GetOwner()) and ent == self:GetOwner() then return end
 		local dist = ent:WorldSpaceCenter():Distance(core:GetPos()) / 2 / 4
-		if dist <= core:GetSize() then
-			if ent:IsPlayer() or ent:IsNPC() then
-				self:Obliterate(ent)
-			else
-				constraint.RemoveAll(ent)
-				core:EnterBeam(ent)
-			end
+		if dist <= core:GetSize() and ent:IsNPC() then
+			self:Obliterate(ent)
 		end
 	end
 
@@ -116,4 +111,14 @@ end
 
 function SWEP:Deploy()
 	self:SetHoldType("rpg")
+end
+
+if SERVER then
+	hook.Add("EntityTakeDamage", "mta_weapon_core_thrower", function(ent, dmg)
+		if not ent:IsPlayer() then return end
+		local inflictor = dmg:GetInflictor()
+		if IsValid(inflictor) and inflictor:GetClass() == "meta_core" and inflictor.IsThrownCore then
+			return true
+		end
+	end)
 end
