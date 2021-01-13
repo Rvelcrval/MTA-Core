@@ -11,6 +11,7 @@ if SERVER then
 	local fever_data = {}
 
 	local function stop_fever(ply)
+		ply:StripWeapon("weapon_core_thrower")
 		ply.MTAInFever = nil
 		fever_data[ply] = nil
 		net.Start(tag)
@@ -48,7 +49,6 @@ if SERVER then
 
 				timer.Simple(FEVER_TIME, function()
 					if not IsValid(atck) then return end
-					if IsValid(wep) then atck:StripWeapon(wep) end
 					stop_fever(atck)
 				end)
 			end
