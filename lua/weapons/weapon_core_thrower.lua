@@ -1,3 +1,5 @@
+AddCSLuaFile()
+
 SWEP.PrintName = "Core Thrower"
 SWEP.Author = "Earu"
 SWEP.Instructions = "Left mouse to fire a core!"

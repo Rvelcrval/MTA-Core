@@ -780,6 +780,7 @@ if SERVER then
 	local function should_sound_hack(ent)
 		if whitelist[ent:GetClass()] then return true end
 		if ent:GetNWBool("MTACombine") then return true end
+		if ent:GetClass() == "lua_npc" then return true end
 
 		if not ent:IsPlayer() then
 			if ent.CPPIGetOwner and IsValid(ent:CPPIGetOwner()) then
