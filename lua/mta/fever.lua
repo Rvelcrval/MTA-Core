@@ -1,7 +1,7 @@
 local tag = "mta_fever"
 
 local FEVER_TIME = 20
-local FEVER_TRESHOLD = 5
+local FEVER_TRESHOLD = 10
 local FEVER_INTERVAL = 10
 local FEVER_TIMEOUT = 180
 
@@ -38,7 +38,6 @@ if SERVER then
 				wep.PhysgunDisabled = true
 				wep.dont_televate = true
 				atck:SelectWeapon("weapon_core_thrower")
-				SafeRemoveEntityDelayed(wep, FEVER_TIME)
 
 				net.Start(tag)
 				net.WriteBool(true)
@@ -49,10 +48,9 @@ if SERVER then
 
 				timer.Simple(FEVER_TIME, function()
 					if not IsValid(atck) then return end
+					if IsValid(wep) then atck:StripWeapon(wep) end
 					stop_fever(atck)
 				end)
-
-
 			end
 		end
 
