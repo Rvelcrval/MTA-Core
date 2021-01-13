@@ -124,10 +124,7 @@ local function create_combine(pos)
 	npc:SetKeyValue("spawnflags", tostring(bit.bor(SF_NPC_LONG_RANGE, SF_NPC_NO_WEAPON_DROP, SF_NPC_NO_PLAYER_PUSHAWAY)))
 	npc:SetKeyValue("squadname", "combine")
 
-	npc:AddRelationship("lua_npc D_LI 99")
 	npc:AddRelationship("player D_LI 99")
-	npc:AddRelationship("npc_citizen D_LI 99")
-	npc:AddRelationship("lua_npc_wander D_LI 99")
 
 	npc:Spawn()
 	npc:Activate()
@@ -447,11 +444,7 @@ local function setup_combine(combine, target, players)
 
 			-- teleportation possibility in case of no enemy
 			-- fix hating other things
-			if enemy then
-				if not enemy:IsPlayer() then
-					combine:AddRelationship(enemy:GetClass() .. " D_LI 99")
-				end
-
+			if enemy and not enemy:IsPlayer() then
 				combine:AddEntityRelationship(enemy, D_LI, 99)
 				combine:MarkEnemyAsEluded()
 			end
