@@ -86,4 +86,10 @@ if CLIENT then
 		surface.SetDrawColor(255, 0, 0, 35)
 		surface.DrawRect(0, 0, ScrW(), ScrH())
 	end)
+
+	hook.Add("EntityEmitSound", tag, function(data)
+		if not in_fever then return end
+		data.DSP = 6
+		return true
+	end)
 end

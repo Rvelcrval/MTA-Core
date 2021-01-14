@@ -179,8 +179,6 @@ local function get_nearest_node(ply, maxd)
 	return node, pvsonly
 end
 
-local NODE_TYPE_GROUND = NODE_TYPE_GROUND
-
 local function find_invisible_near(ply, node, collected)
 	collected = collected or {}
 	if collected[node] then
@@ -444,7 +442,7 @@ local function setup_combine(combine, target, players)
 
 			-- teleportation possibility in case of no enemy
 			-- fix hating other things
-			if enemy and not enemy:IsPlayer() then
+			if enemy then
 				combine:AddEntityRelationship(enemy, D_LI, 99)
 				combine:MarkEnemyAsEluded()
 			end
