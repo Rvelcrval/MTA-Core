@@ -139,6 +139,7 @@ if SERVER then
 	end
 
 	function MTA.IsOptedOut(ply)
+		if banni and banni.isbanned(ply) then return true end
 		return ply:GetInfoNum("mta_opt_out", 0) ~= 0
 	end
 
@@ -835,6 +836,7 @@ if CLIENT then
 	end)
 
 	function MTA.IsOptedOut()
+		if banni and banni.isbanned(LocalPlayer()) then return true end
 		return MTA_OPT_OUT:GetBool()
 	end
 
