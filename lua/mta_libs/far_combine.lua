@@ -2,7 +2,7 @@ if not SERVER then
 	return function() end
 end
 
-local MAX_SPAWN_DISTANCE = 2048
+local MAX_SPAWN_DISTANCE = 1024
 
 local IsValid = _G.IsValid
 
