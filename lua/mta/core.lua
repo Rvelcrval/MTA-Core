@@ -1,5 +1,6 @@
 AddCSLuaFile()
 
+pcall(require, "metalog")
 pcall(include, "autorun/translation.lua")
 local L = translation and translation.L or function(s) return s end
 
@@ -13,8 +14,13 @@ local MTA = _G.MTA or {}
 _G.MTA = MTA
 
 function MTA.Print(...)
-	Msg("[MTA] ")
-	print(...)
+	if not metalog then
+		Msg("[MTA] ")
+		print(...)
+		return
+	end
+
+	metalog.info("MTA", nil, ...)
 end
 
 function MTA.Reset()

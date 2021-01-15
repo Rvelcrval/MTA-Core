@@ -131,9 +131,13 @@ if SERVER then
 		old_values[log_name] = old_values[log_name] or cur_value
 		timer.Create(log_name, 5, 1, function()
 			if should_log then
-				Msg("[MTA] ")
-				MsgC(color_white, ("%s %s: "):format(ply, stat_name), old_value_color,
-					old_values[log_name], color_white, " -> ", new_value_color, new_value .. "\n")
+				if metalog then
+					metalog.info("MTA", nil, ("%s %s: %d -> %d"):format(ply, stat_name, old_values[log_name], new_value))
+				else
+					Msg("[MTA] ")
+					MsgC(color_white, ("%s %s: "):format(ply, stat_name), old_value_color,
+						old_values[log_name], color_white, " -> ", new_value_color, new_value .. "\n")
+				end
 			end
 
 			old_values[log_name] = nil
