@@ -13,10 +13,23 @@ local tag = "mta"
 local MTA = _G.MTA or {}
 _G.MTA = MTA
 
+local function default_log(...)
+	Msg("[MTA] ")
+	print(...)
+end
+
+local function warn_log(...)
+	if not metalog then
+		default_log(...)
+		return
+	end
+
+	metalog.warn("MTA", nil, ...)
+end
+
 function MTA.Print(...)
 	if not metalog then
-		Msg("[MTA] ")
-		print(...)
+		default_log(...)
 		return
 	end
 
@@ -101,7 +114,7 @@ if SERVER then
 		if cur_value == tonumber(old_value) then return end
 
 		if cur_value ~= 0 and (blocked_maps[game.GetMap()] or map_has_broken_triggers()) then
-			MTA.Print("Blocked MTA mode change, the map is blocked")
+			warn_log("Blocked MTA mode change, the map is blocked")
 			MTA_MODE:SetInt(0)
 			return
 		end
@@ -234,7 +247,7 @@ if SERVER then
 
 			timer.Create("MTASpawnFails", 5, 1, function()
 				local fail_reason_display = table.concat(table.GetKeys(spawn_fails), " & ")
-				MTA.Print(("Failed to spawn combines %d times: %s"):format(spawn_fail_reps, fail_reason_display))
+				warn_log(("Failed to spawn combines %d times: %s"):format(spawn_fail_reps, fail_reason_display))
 
 				spawn_fails = {}
 				spawn_fail_reps = 0
@@ -291,7 +304,7 @@ if SERVER then
 		end)
 
 		if not succ then
-			MTA.Print("Failed to update badge for:", ply, err)
+			warn_log("Failed to update badge for:", ply, err)
 		end
 	end
 
@@ -336,7 +349,7 @@ if SERVER then
 		ply.MTABad = nil
 		local removed = remove_ent_from_table(ply, MTA.BadPlayers)
 		if not removed then
-			MTA.Print(("failed to reset citizenship of %s properly, cleaning up data."):format(tostring(ply)))
+			warn_log(("failed to reset citizenship of %s properly, cleaning up data."):format(tostring(ply)))
 			timer.Simple(1, function()
 				for i, ply in pairs(MTA.BadPlayers) do
 					if not ply.MTABad or not IsValid(ply) then
@@ -500,7 +513,7 @@ if SERVER then
 		-- this is done here, because only here will the proper nodegraph be available
 		local far_combine, setup_combine = include("mta_libs/far_combine.lua")
 		if not far_combine or not setup_combine then
-			MTA.Print("Could not include far_combine.lua properly")
+			warn_log("Could not include far_combine.lua properly")
 			return
 		end
 
@@ -509,7 +522,7 @@ if SERVER then
 
 		local constrain_player, release_player = include("mta_libs/wanted_constraints.lua")
 		if not constrain_player or not release_player then
-			MTA.Print("Could not include wanted_constraints.lua properly")
+			warn_log("Could not include wanted_constraints.lua properly")
 			return
 		end
 
@@ -534,17 +547,17 @@ if SERVER then
 
 		local succ, err = pcall(create_badge)
 		if not succ then
-			MTA.Print("Could not create badge:", err)
+			warn_log("Could not create badge:", err)
 		end
 
 		spawn_lobby_persistent_ents()
 		trigger_hurt_fix()
 
 		if map_has_broken_triggers() then
-			MTA.Print("BROKEN TRIGGERS DETECTED DISABLING")
+			warn_log("BROKEN TRIGGERS DETECTED DISABLING")
 			MTA_MODE:SetInt(0)
 		elseif blocked_maps[game.GetMap()] then
-			MTA.Print("BAD MAP DETECTED DISABLING")
+			warn_log("BAD MAP DETECTED DISABLING")
 			MTA_MODE:SetInt(0)
 		end
 	end
