@@ -224,6 +224,26 @@ if SERVER then
 		MTA.Combines = {}
 	end
 
+	local function dont_transmit_combine(combine)
+		local combine_ents = {}
+		table.insert(combine_ents, combine)
+		table.Add(combine_ents, combine:GetChildren())
+
+		local wep = combine:GetActiveWeapon()
+		if IsValid(wep) then
+			table.Add(combine_ents, wep)
+		end
+
+		local plys = player.GetAll()
+		for _, ent in ipairs(combine_ents) do
+			for _, ply in ipairs(plys) do
+				if MTA.IsOptedOut() then
+					ent:SetPreventTransmit(ply, true)
+				end
+			end
+		end
+	end
+
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
 	function MTA.SpawnCombine()
@@ -236,6 +256,7 @@ if SERVER then
 			table.insert(MTA.Combines, ret)
 			ret:SetNWBool("MTACombine", true)
 			ret.ms_notouch = true
+			dont_transmit_combine(ret)
 
 			MTA.ToSpawn = MTA.ToSpawn - 1
 		else
@@ -1025,6 +1046,8 @@ if CLIENT then
 		ent:AddEffects(EF_NODRAW)
 		ent:AddEffects(EF_NOSHADOW)
 		ent:AddEffects(EF_NORECEIVESHADOW)
+		ent:DrawShadow(false)
+		ent:SetNoDraw(true)
 		ent.RenderOverride = function() end
 	end
 
