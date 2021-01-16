@@ -38,7 +38,7 @@ if SERVER then
 		net.WriteString(urls)
 		net.Send(ply)
 
-		MTA.Songs.URLs[ply] = MTA.Songs.URLs[ply] or {}
+		MTA.Songs.URLs[ply] = {}
 		for i = 1, count do
 			table.insert(MTA.Songs.URLs[ply], songs[i])
 		end
@@ -57,7 +57,7 @@ if SERVER then
 				local prestige_lvl = MTA.GetPlayerStat(ply, "prestige_level")
 				local songs = ret.urls:Split(";")
 				local count = #songs >= prestige_lvl and prestige_lvl or #songs
-				MTA.Songs.URLs[ply] = MTA.Songs.URLs[ply] or {}
+				MTA.Songs.URLs[ply] = {}
 				for i = 1, count do
 					table.insert(MTA.Songs.URLs[ply], songs[i])
 				end
