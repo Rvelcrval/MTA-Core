@@ -66,7 +66,8 @@ if CLIENT then
 		cb = cb or function() end
 
 		if file.Exists("mta/" .. name, "DATA") then
-			file.Delete("mta/" .. name)
+			cb()
+			return
 		end
 
 		http.Fetch(url, function(body, _, _, code)
@@ -156,8 +157,19 @@ if CLIENT then
 		songs_combobox:SetTextColor(Color(255, 255, 255))
 		songs_combobox:SetSortItems(false)
 
+		local custom_songs_amount = #MTA.Songs
 		for i, url in pairs(MTA.Songs) do
-			songs_combobox:AddChoice(("Song - %d"):format(i), { URL = url, ID = i })
+			songs_combobox:AddChoice(("Song - %d"):format(i), { URL = url, ID = i }, i == 1)
+		end
+
+		function songs_combobox:Think()
+			if custom_songs_amount ~= #MTA.Songs then
+				custom_songs_amount = #MTA.Songs
+				self:Clear()
+				for i, url in pairs(MTA.Songs) do
+					songs_combobox:AddChoice(("Song - %d"):format(i), { URL = url, ID = i }, i == 1)
+				end
+			end
 		end
 
 		function songs_combobox:Paint(w, h)
@@ -180,10 +192,11 @@ if CLIENT then
 		function songs_preview_btn:DoClick()
 			if not preview_is_playing then
 				local _, data = songs_combobox:GetSelected()
-				local file_path = ("song_slot_%d.dat"):format(data.ID)
-				get_song(data.URL, file_path, function()
-					sound.PlayFile(file_path, "", function(music, code, err)
-						print("song", code, err)
+				if not data then return end
+
+				local file_name = ("custom_song_slot_%d.dat"):format(data.ID)
+				get_song(data.URL, file_name, function()
+					sound.PlayFile("data/mta/" .. file_name, "", function(music, code, err)
 						if not IsValid(music) then return end
 						UI_STATION = music
 						UI_STATION:Play()
@@ -240,8 +253,10 @@ if CLIENT then
 
 			net.Start(NET_SONGS_TRANSMIT)
 			net.WriteString("delete")
-			net.WriteString(data.URL)
+			net.WriteString(data.URL:Trim())
 			net.SendToServer()
+
+			notification.AddLegacy("Removed custom song", NOTIFY_UNDO, 5)
 		end
 
 		local songs_customs_textentry = songs:Add("DTextEntry")
@@ -297,8 +312,11 @@ if CLIENT then
 
 			net.Start(NET_SONGS_TRANSMIT)
 			net.WriteString("add")
-			net.WriteString(url)
+			net.WriteString(url:Trim())
 			net.SendToServer()
+
+			notification.AddLegacy("Added custom song", NOTIFY_GENERIC, 5)
+			songs_customs_textentry:SetText("")
 		end
 
 		function songs_customs_textentry:OnEnter()
