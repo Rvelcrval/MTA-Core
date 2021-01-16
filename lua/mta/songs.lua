@@ -8,6 +8,14 @@ CREATE TABLE mta_stats (
 
 local tag = "mta_songs"
 
+local function clear_empty_urls(tbl)
+	for i, url in pairs(tbl) do
+		if url:Trim() == "" then
+			table.remove(tbl, i)
+		end
+	end
+end
+
 local NET_SONGS_TRANSMIT = "MTA_SONGS_TRANSMIT"
 if SERVER then
 	util.AddNetworkString(NET_SONGS_TRANSMIT)
@@ -20,6 +28,8 @@ if SERVER then
 	MTA.Songs.URLs = {}
 
 	function MTA.Songs.Save(ply, songs)
+		clear_empty_urls(songs)
+
 		local prestige_lvl = MTA.GetPlayerStat(ply, "prestige_level")
 		local count = #songs >= prestige_lvl and prestige_lvl or #songs
 		local urls = table.concat(songs, ";", 1, count)
@@ -135,7 +145,9 @@ if CLIENT then
 			file.Delete(file_path)
 		end
 
-		MTA.Songs = urls == "" and {} or urls:Split(";")
+		MTA.Songs = urls:Split(";")
+		clear_empty_urls(MTA.Songs)
+
 		for i, _ in pairs(MTA.Songs) do
 			local file_name = ("custom_song_slot_%d.dat"):format(i)
 			get_custom_content(url, file_name)
