@@ -67,6 +67,8 @@ if SERVER then
 	net.Receive(NET_SONGS_TRANSMIT, function(_, ply)
 		local mode = net.ReadString()
 		local url = net.ReadString()
+		if url:Trim() == "" then return end
+
 		local cur_songs = MTA.Songs.Get(ply)
 
 		if mode == "add" then
@@ -125,11 +127,16 @@ if CLIENT then
 
 	net.Receive(NET_SONGS_TRANSMIT, function()
 		local urls = net.ReadString()
-		MTA.Songs = urls:Split(";")
-		for i, url in pairs(MTA.Songs) do
-			local file_name = ("custom_song_slot_%d.dat"):format(i)
-			local file_path = ("mta/%s"):format(file_name)
+
+		-- remove previous songs
+		for i, _ in pairs(MTA.Songs) do
+			local file_path = ("mta/custom_song_slot_%d.dat"):format(i)
 			file.Delete(file_path)
+		end
+
+		MTA.Songs = urls == "" and {} or urls:Split(";")
+		for i, _ in pairs(MTA.Songs) do
+			local file_name = ("custom_song_slot_%d.dat"):format(i)
 			get_custom_content(url, file_name)
 		end
 	end)
