@@ -65,9 +65,19 @@ if SERVER then
 	end
 
 	net.Receive(NET_SONGS_TRANSMIT, function(_, ply)
-		local new_url = net.ReadString()
+		local mode = net.ReadString()
+		local url = net.ReadString()
 		local cur_songs = MTA.Songs.Get(ply)
-		table.insert(cur_songs, new_url)
+
+		if mode == "add" then
+			table.insert(cur_songs, url)
+		elseif mode == "delete" then
+			table.RemoveByValue(cur_songs, url)
+		else
+			-- funny client hijacking ??
+			return
+		end
+
 		MTA.Songs.Save(ply, cur_songs)
 	end)
 
