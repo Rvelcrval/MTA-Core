@@ -46,6 +46,7 @@ if SERVER then
 			if ret and ret.urls then
 				local prestige_lvl = MTA.GetPlayerStat(ply, "prestige_level")
 				local songs = ret.urls:Split(";")
+				local count = #songs >= prestige_lvl and prestige_lvl or #songs
 				MTA.Songs.URLs[ply] = MTA.Songs.URLs[ply] or {}
 				for i = 1, count do
 					table.insert(MTA.Songs.URLs[ply], songs[i])
