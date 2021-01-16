@@ -62,8 +62,9 @@ if CLIENT then
 	end
 
 	file.CreateDir("mta")
-	local function get_song(url, name, cb)
+	local function get_song(url, name, cb, cb_error)
 		cb = cb or function() end
+		cb_error = cb_error or function() end
 
 		if file.Exists("mta/" .. name, "DATA") then
 			cb()
@@ -74,8 +75,10 @@ if CLIENT then
 			if code == 200 and body then
 				file.Write("mta/" .. name, body)
 				cb()
+			else
+				cb_error()
 			end
-		end)
+		end, cb_error)
 	end
 
 	local UI_STATION
@@ -189,20 +192,28 @@ if CLIENT then
 			local col = (self:IsHovered()) and Color(255, 200, 100) or Color(255, 255, 255)
 			self:SetTextColor(col)
 		end
+
+		local is_loading = false
 		function songs_preview_btn:DoClick()
+			if is_loading then return end
+
 			if not preview_is_playing then
 				local _, data = songs_combobox:GetSelected()
 				if not data then return end
 
+				is_loading = true
 				local file_name = ("custom_song_slot_%d.dat"):format(data.ID)
 				get_song(data.URL, file_name, function()
-					sound.PlayFile("data/mta/" .. file_name, "", function(music, code, err)
+					sound.PlayFile("data/mta/" .. file_name, "", function(music)
+						is_loading = false
+
+						if not IsValid(frame) then return end
 						if not IsValid(music) then return end
 						UI_STATION = music
 						UI_STATION:Play()
 						UI_STATION:SetVolume(1)
 					end)
-				end)
+				end, function() is_loading = false end)
 			else
 				if IsValid(UI_STATION) then
 					UI_STATION:Stop()
