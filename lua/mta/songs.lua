@@ -35,7 +35,7 @@ if SERVER then
 
 		if not can_db() then return end
 		co(function()
-			db.Query(("UPDATE mta_user_songs SET urls = '%s' WHERE id = %d"):format(urls, ply:AccountID()))
+			db.Query(("UPDATE mta_user_songs SET urls = '%s' WHERE id = %d;"):format(urls, ply:AccountID()))
 		end)
 	end
 
@@ -54,6 +54,8 @@ if SERVER then
 				net.Start(NET_SONGS_TRANSMIT)
 				net.WriteString(ret.urls)
 				net.Send(ply)
+			else
+				db.Query(("INSERT INTO mta_user_songs(id, urls) VALUES(%d, '');"):format(ply:AccountID()))
 			end
 		end)
 	end
@@ -74,20 +76,12 @@ if SERVER then
 end
 
 if CLIENT then
-	MTA.Songs = MTA.Songs or {}
-	MTA.SongStation = nil
+	local MTA_PAYDAY = CreateClientConVar("mta_payday", "1", true, false, "Enable the payday assault")
 
-	net.Receive(NET_SONGS_TRANSMIT, function()
-		local urls = net.ReadString()
-		MTA.Songs = urls:Split(";")
-	end)
-
-	if IsValid(_G.payday_assault) then
-		_G.payday_assault:Remove()
-		_G.payday_assault = nil
-	end
-
-	local shouldplay_convar = CreateClientConVar("mta_payday", "1", true, false, "Enable the payday assault")
+	local BASE_SONG_AMOUNT = 14
+	local SONG_VOLUME = 0.65
+	local WIDTH = ScrW() * 0.24
+	local is_assault = false
 
 	file.CreateDir("mta")
 	local function get_custom_content(url, name, cb)
@@ -105,16 +99,30 @@ if CLIENT then
 		end
 	end
 
-	if shouldplay_convar:GetBool() then
+	if MTA_PAYDAY:GetBool() then
 		get_custom_content("https://cdn.zeni.space/meta/policeassault.png", "policeassault.png")
 		get_custom_content("https://cdn.zeni.space/meta/policeassault_corners.png", "policeassault_corners.png")
 		get_custom_content("https://cdn.zeni.space/meta/policeassault_icon.png", "policeassault_icon.png")
 	end
 
-	local BASE_SONG_AMOUNT = 14
-	local SONG_VOLUME = 0.65
-	local WIDTH = ScrW() * 0.24
-	local is_assault = false
+	if IsValid(_G.payday_assault) then
+		_G.payday_assault:Remove()
+		_G.payday_assault = nil
+	end
+
+	MTA.Songs = MTA.Songs or {}
+	MTA.SongStation = nil
+
+	net.Receive(NET_SONGS_TRANSMIT, function()
+		local urls = net.ReadString()
+		MTA.Songs = urls:Split(";")
+		for i, url in pairs(MTA.Songs) do
+			local file_name = ("custom_song_slot_%d.dat"):format(i)
+			local file_path = ("mta/%s"):format(file_name)
+			file.Delete(file_path)
+			get_custom_content(url, file_name)
+		end
+	end)
 
 	local PANEL = {}
 	function PANEL:Init()
@@ -299,7 +307,7 @@ if CLIENT then
 
 		if #MTA.Songs > 0 then
 			local index = get_rand_song_index(id, #MTA.Songs)
-			local file_name = ("song_slot_%d.dat"):format(index)
+			local file_name = ("custom_song_slot_%d.dat"):format(index)
 			get_custom_content(MTA.Songs[index], file_name, function()
 				if not on_going_assault() then return end
 				start_assault(file_name)
@@ -325,7 +333,7 @@ if CLIENT then
 			return end_assault()
 		end
 
-		if not shouldplay_convar:GetBool() then return end
+		if not MTA_PAYDAY:GetBool() then return end
 
 		if not on_going_assault() and is_wanted then
 			fetch_song()
