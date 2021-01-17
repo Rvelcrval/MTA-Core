@@ -237,7 +237,7 @@ if SERVER then
 		local plys = player.GetAll()
 		for _, ent in ipairs(combine_ents) do
 			for _, ply in ipairs(plys) do
-				if MTA.IsOptedOut() then
+				if MTA.IsOptedOut(ply) then
 					ent:SetPreventTransmit(ply, true)
 				end
 			end
