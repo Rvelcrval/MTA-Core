@@ -67,6 +67,10 @@ if SERVER then
 	hook.Add("PlayerShouldTakeDamage", tag, function(ply)
 		if ply.MTAInFever then return false end
 	end)
+
+	hook.Add("PlayerSwitchWeapon", tag, function(ply)
+		if ply.MTAInFever then return true end
+	end)
 end
 
 if CLIENT then

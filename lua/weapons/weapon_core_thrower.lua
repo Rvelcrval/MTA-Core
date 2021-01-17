@@ -115,6 +115,14 @@ function SWEP:Deploy()
 	self:SetHoldType("rpg")
 end
 
+function SWEP:OnDrop()
+	SafeRemoveEntity(self)
+end
+
+function SWEP:Equip()
+	SafeRemoveEntity(self)
+end
+
 if SERVER then
 	hook.Add("EntityTakeDamage", "mta_weapon_core_thrower", function(ent, dmg)
 		if not ent:IsPlayer() then return end
