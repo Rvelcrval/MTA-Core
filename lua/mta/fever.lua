@@ -38,7 +38,7 @@ if SERVER then
 				wep.lobbyok = true
 				wep.PhysgunDisabled = true
 				wep.dont_televate = true
-				atck:SelectWeapon("weapon_core_thrower")
+				atck:SetActiveWeapon("weapon_core_thrower")
 
 				net.Start(tag)
 				net.WriteBool(true)
@@ -68,8 +68,10 @@ if SERVER then
 		if ply.MTAInFever then return false end
 	end)
 
-	hook.Add("PlayerSwitchWeapon", tag, function(ply)
-		if ply.MTAInFever then return true end
+	hook.Add("PlayerSwitchWeapon", tag, function(ply, old_wep)
+		if ply.MTAInFever and IsValid(old_wep) and old_wep:GetClass() == "weapon_core_thrower" then
+			return true
+		end
 	end)
 end
 
