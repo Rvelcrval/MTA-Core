@@ -38,7 +38,7 @@ if SERVER then
 				wep.lobbyok = true
 				wep.PhysgunDisabled = true
 				wep.dont_televate = true
-				atck:SetActiveWeapon("weapon_core_thrower")
+				atck:SetActiveWeapon(wep)
 
 				net.Start(tag)
 				net.WriteBool(true)
