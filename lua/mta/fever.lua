@@ -4,6 +4,7 @@ local FEVER_TIME = 20
 local FEVER_TRESHOLD = 10
 local FEVER_INTERVAL = 10
 local FEVER_TIMEOUT = 180
+local FEVER_WEAPON_CLASS = "weapon_core_thrower"
 
 if SERVER then
 	util.AddNetworkString(tag)
@@ -33,7 +34,7 @@ if SERVER then
 
 			local oldest_kill = data[1]
 			if oldest_kill > (CurTime() - FEVER_INTERVAL) then
-				local wep = atck:Give("weapon_core_thrower")
+				local wep = atck:Give(FEVER_WEAPON_CLASS)
 				wep.unrestricted_gun = true
 				wep.lobbyok = true
 				wep.PhysgunDisabled = true
@@ -69,8 +70,14 @@ if SERVER then
 	end)
 
 	hook.Add("PlayerSwitchWeapon", tag, function(ply, old_wep)
-		if ply.MTAInFever and IsValid(old_wep) and old_wep:GetClass() == "weapon_core_thrower" then
+		if ply.MTAInFever and IsValid(old_wep) and old_wep:GetClass() == FEVER_WEAPON_CLASS then
 			return true
+		end
+	end)
+
+	hook.Add("PlayerDroppedWeapon", tag, function(_, wep)
+		if wep:GetClass() == FEVER_WEAPON_CLASS then
+			SafeRemoveEntityDelayed(wep, 0)
 		end
 	end)
 end
