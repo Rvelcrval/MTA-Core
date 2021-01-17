@@ -991,6 +991,49 @@ if CLIENT then
 		return bind:upper()
 	end
 
+	local function draw_instable_rect(x, y, w, h, neg, fill)
+		local sign = neg and -1 or 1
+		local matrix = Matrix()
+		local time = SysTime()
+		local size = 1 + (math.sin(time) / 100)
+		local scale, angle = Vector(size, size, size), Angle(0, math.sin((time / 2) * sign) * 2, 0)
+		local translation = Vector(x + w / 2, y + h / 2)
+
+		matrix:Translate(translation)
+		matrix:SetAngles(angle)
+		matrix:Scale(scale)
+		matrix:Translate(-translation)
+
+		x = x + math.sin(time * sign)
+		y = y + math.sin(time * sign)
+
+		cam.PushModelMatrix(matrix)
+			if fill then
+				surface.DrawRect(x, y, w, h)
+			else
+				surface.DrawOutlinedRect(x, y, w, h, 1)
+			end
+		cam.PopModelMatrix()
+	end
+
+	local function draw_hud()
+		surface.SetTextColor(orange_color)
+		surface.SetFont("DermaLarge")
+		local text = ("/// WANTED LEVEL %d ///"):format(LocalPlayer():GetNWInt("MTAFactor"))
+		local tw, th = surface.GetTextSize(text)
+		local pos_x, pos_y = ScrW() / 2 - tw / 2, (ScrH() / 2 - th / 2) - 200
+		surface.SetTextPos(pos_x, pos_y)
+
+		surface.SetDrawColor(black_color)
+		surface.DrawRect(pos_x - 10, pos_y - 10, tw + 20, th + 20)
+
+		surface.SetDrawColor(orange_color)
+		draw_instable_rect(pos_x - 10, pos_y - 10, tw + 20, th + 20, false)
+		draw_instable_rect(pos_x - 10, pos_y - 10, tw + 20, th + 20, true)
+
+		surface.DrawText(text)
+	end
+
 	hook.Add("HUDPaint", tag, function()
 		for ent, draw_info in pairs(registered_ents) do
 			if IsValid(ent) then
@@ -1000,12 +1043,13 @@ if CLIENT then
 			end
 		end
 
-		if not MTA_SHOW_WANTEDS:GetBool() then return end
 		if not MTA.IsWanted() then return end
+		draw_hud()
 
+		if not MTA_SHOW_WANTEDS:GetBool() then return end
 		for _, ply in ipairs(player.GetAll()) do
 			local ply_factor = ply:GetNWInt("MTAFactor")
-			if ply_factor >= 1 then
+			if ply_factor >= 1 and ply ~= LocalPlayer() then
 				local text = ("/// WANTED LEVEL %d ///"):format(ply_factor)
 				MTA.HighlightEntity(ply, text, orange_color)
 			end
