@@ -18,6 +18,10 @@ end
 
 local NET_SONGS_TRANSMIT = "MTA_SONGS_TRANSMIT"
 if SERVER then
+	resource.AddFile("materials/mta/policeassault_corners.png")
+	resource.AddFile("materials/mta/policeassault_icon.png")
+	resource.AddFile("materials/mta/policeassault.png")
+
 	util.AddNetworkString(NET_SONGS_TRANSMIT)
 
 	local function can_db()
@@ -122,12 +126,6 @@ if CLIENT then
 		end
 	end
 
-	if MTA_PAYDAY:GetBool() then
-		get_custom_content("https://cdn.zeni.space/meta/policeassault.png", "policeassault.png")
-		get_custom_content("https://cdn.zeni.space/meta/policeassault_corners.png", "policeassault_corners.png")
-		get_custom_content("https://cdn.zeni.space/meta/policeassault_icon.png", "policeassault_icon.png")
-	end
-
 	if IsValid(_G.payday_assault) then
 		_G.payday_assault:Remove()
 		_G.payday_assault = nil
@@ -164,8 +162,8 @@ if CLIENT then
 			self.size = 0
 			self.realtime = RealTime()
 
-			self.material = Material("data/mta/policeassault.png")
-			self.material2 = Material("data/mta/policeassault_corners.png")
+			self.material = Material("mta/policeassault.png")
+			self.material2 = Material("mta/policeassault_corners.png")
 		end
 
 		local offset = 0
@@ -280,7 +278,7 @@ if CLIENT then
 		local icon = payday_assault.icon
 
 		icon.should_draw = true
-		icon.material = Material("data/mta/policeassault_icon.png")
+		icon.material = Material("mta/policeassault_icon.png")
 		icon.flash_amount = 10
 		icon.last_flash = 0
 

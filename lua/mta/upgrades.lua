@@ -204,7 +204,7 @@ if SERVER then
 
 		-- we scale combine damage up depending on wanted level here because it needs to be done
 		-- before the resistance upgrade
-		local dmg = dmg_info:GetDamage() + (dmg_info:GetDamage() * (ply:GetNWInt("MTAFactor") / 40))
+		local dmg = dmg_info:GetDamage() + (dmg_info:GetDamage() * (ply:GetNWInt("MTAFactor") / 30))
 
 		local dmg_blocked = ((dmg / 100) * (multiplier * 0.75)) -- up to 80% of the damages blocked
 		dmg_info:SetDamage(dmg - dmg_blocked)
