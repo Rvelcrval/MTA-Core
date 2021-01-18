@@ -1021,7 +1021,7 @@ if CLIENT then
 		surface.SetFont("DermaLarge")
 		local text = ("/// WANTED LEVEL %d ///"):format(LocalPlayer():GetNWInt("MTAFactor"))
 		local tw, th = surface.GetTextSize(text)
-		local pos_x, pos_y = ScrW() / 2 - tw / 2, (ScrH() / 2 - th / 2) - (100 * (ScrH() / 1080))
+		local pos_x, pos_y = ScrW() / 2 - tw / 2, (ScrH() / 2 - th / 2) - (450 * (ScrH() / 1080))
 		surface.SetTextPos(pos_x, pos_y)
 
 		surface.SetDrawColor(black_color)
