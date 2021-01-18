@@ -18,7 +18,7 @@ if SERVER then
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetUnFreezable(true)
 		self:SetModel("models/hunter/blocks/cube4x4x025.mdl")
-		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+		self:SetSolidFlags(12)
 		self:DrawShadow(false)
 
 		local trigger = ents.Create("base_brush")
