@@ -1124,7 +1124,9 @@ if CLIENT then
 		return false
 	end
 
-	hook.Add("DeathNotice", tag, function(atck, _, inflictor, target)
+	-- funny hook that can pass nil because death notices are gay and will always be
+	-- you CANNOT change my mind :)
+	hook.Add("DeathNotice", tag, function(atck, inflictor, target)
 		if is_mta_ent(atck) or is_mta_ent(target) or is_mta_ent(inflictor) then
 			-- TODO? : Epic MTA kill feed here ?
 			return false
