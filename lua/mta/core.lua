@@ -634,8 +634,6 @@ if SERVER then
 
 		-- dont account damage by yourself
 		local atck = dmg_info:GetAttacker()
-		if ent == atck then return end
-
 		if ent:GetNWBool("MTACombine") then
 			-- dont let combines hurt each others
 			if atck:GetNWBool("MTACombine") then return true end
@@ -646,6 +644,7 @@ if SERVER then
 			end
 		end
 
+		if ent == atck then return end
 		if not MTA.ShouldConsiderEntity(ent) then return end
 		if not MTA.ShouldIncreasePlayerFactor(atck) then return end
 
