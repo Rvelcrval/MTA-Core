@@ -1111,6 +1111,25 @@ if CLIENT then
 			end
 		end)
 	end)
+
+	local function is_mta_ent(ent)
+		if not isentity(ent) then return false end
+		if not IsValid(ent) then return false end
+
+		if ent:GetNWBool("MTACombine") then return true end
+		if ent:GetNWBool("MTABountyHunter") then return true end
+		if ent:GetNWBool("MTAFactor") > 0 then return true end
+		if ent:GetNWBool("MTABomb") then return true end
+
+		return false
+	end
+
+	hook.Add("DeathNotice", tag, function(atck, _, inflictor, target)
+		if is_mta_ent(atck) or is_mta_ent(target) or is_mta_ent(inflictor) then
+			-- TODO? : Epic MTA kill feed here ?
+			return false
+		end
+	end)
 end
 
 for _, f in pairs((file.Find("mta_modules/*.lua", "LUA"))) do
