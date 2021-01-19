@@ -1117,7 +1117,7 @@ if CLIENT then
 
 		if ent:GetNWBool("MTACombine") then return true end
 		if ent:GetNWBool("MTABountyHunter") then return true end
-		if ent:GetNWBool("MTAFactor") > 0 then return true end
+		if ent:GetNWInt("MTAFactor") > 0 then return true end
 		if ent:GetNWBool("MTABomb") then return true end
 
 		return false
