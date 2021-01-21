@@ -906,6 +906,7 @@ if CLIENT then
 
 	local black_color = Color(0, 0, 0, 150)
 	local orange_color = Color(244, 135, 2)
+	local red_color = Color(255, 0, 0)
 
 	function MTA.HighlightPosition(pos, text, color)
 		if MTA.IsOptedOut() then return end
@@ -1031,7 +1032,33 @@ if CLIENT then
 		draw_instable_rect(pos_x - 10, pos_y - 10, tw + 20, th + 20, true)
 
 		surface.DrawText(text)
+
+		local lp = LocalPlayer()
+		local health, armor = lp:Health(), lp:Armor()
+		surface.SetFont("DermaDefaultBold")
+
+		surface.SetDrawColor(health < 30 and red_color or orange_color)
+		surface.SetTextColor(health < 30 and red_color or orange_color)
+		surface.DrawRect(pos_x - 10, pos_y + th + 25, (tw / 100) * health, 5, true)
+		surface.SetTextPos(pos_x + (tw / 100) * health, pos_y + th + 20)
+		surface.DrawText(("%d HPs"):format(math.Clamp(health, 0, 100)))
+
+		surface.SetDrawColor(orange_color)
+		surface.SetTextColor(orange_color)
+		surface.DrawRect(pos_x - 10, pos_y + th + 40, (tw / 100) * armor, 5, true)
+		surface.SetTextPos(pos_x + (tw / 100) * armor, pos_y + th + 35)
+		surface.DrawText(("%d SUIT"):format(math.Clamp(armor, 0, 100)))
+
+		hook.Run("MTAPaint", pos_x, pos_y, tw, th)
 	end
+
+	local hud_elements = {
+		["CHudHealth"] = true,
+		["CHudBattery"] = true
+	}
+	hook.Add("HUDShouldDraw", tag, function(element)
+		if hud_elements[element] and MTA.IsWanted() then return false end
+	end)
 
 	hook.Add("HUDPaint", tag, function()
 		for ent, draw_info in pairs(registered_ents) do
