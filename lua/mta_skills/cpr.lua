@@ -1,6 +1,6 @@
 local tag = "MTASkill_CPR"
 
-local REVIVE_COST = 50
+local REVIVE_COST = 25
 
 if SERVER then
 	util.AddNetworkString(tag)
