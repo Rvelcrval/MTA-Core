@@ -1126,10 +1126,9 @@ if CLIENT then
 	-- funny hook that can pass nil because death notices are gay and will always be
 	-- you CANNOT change my mind :)
 	hook.Add("DeathNotice", tag, function(atck, inflictor, target)
-		if not MTA.InLobby(LocalPlayer()) then return false end
-
-		if MTA.IsOptedOut() and (is_mta_ent(atck) or is_mta_ent(target) or is_mta_ent(inflictor)) then
-			return false
+		if is_mta_ent(atck) or is_mta_ent(target) or is_mta_ent(inflictor) then
+			if MTA.IsOptedOut() then return false end
+			if not MTA.InLobby(LocalPlayer()) then return false end
 		end
 	end)
 end
