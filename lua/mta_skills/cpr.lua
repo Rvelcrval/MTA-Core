@@ -53,8 +53,10 @@ if SERVER then
 	end)
 
 	-- we do this here, because PlayerDeath is too late
-	hook.Add("DoPlayerDeath", tag, function(ply)
-		if MTA.IsWanted(ply) and MTA.HasSkill(ply, "healing_multiplier", "cpr") then
+	hook.Add("MTAPlayerFailed", tag, function(ply, _, wanted_level, is_death)
+		if not is_death then return end
+
+		if MTA.HasSkill(ply, "healing_multiplier", "cpr") then
 			local wep_class_names = {}
 			for _, wep in pairs(ply:GetWeapons()) do
 				table.insert(wep_class_names, wep:GetClass())
@@ -62,7 +64,7 @@ if SERVER then
 
 			dead_players[ply] = {
 				Weapons = wep_class_names,
-				WantedLevel = ply:GetNWInt("MTAFactor")
+				WantedLevel = wanted_level
 			}
 
 			net.Start(tag)

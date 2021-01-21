@@ -329,7 +329,7 @@ if SERVER then
 		end
 	end
 
-	function MTA.ResetPlayerFactor(ply, should_pay)
+	function MTA.ResetPlayerFactor(ply, should_pay, is_death)
 		local old_factor = MTA.Factors[ply] or 0
 		local max_factor = ply.MTAMaxSessionFactor or 0
 		MTA.Factors[ply] = nil -- under 1 of factor
@@ -358,7 +358,7 @@ if SERVER then
 				end
 			end
 
-			hook.Run("MTAPlayerFailed", ply, max_factor)
+			hook.Run("MTAPlayerFailed", ply, max_factor, old_factor / 10, is_death)
 		end
 
 		hook.Run("MTAWantedStateUpdate", ply, false)
@@ -441,7 +441,7 @@ if SERVER then
 
 		if factor < 1 then
 			hook.Run("MTAPlayerEscaped", ply, ply.MTAMaxSessionFactor or 0)
-			MTA.ResetPlayerFactor(ply, false)
+			MTA.ResetPlayerFactor(ply, false, false)
 		end
 
 		MTA.UpdatePlayerBadge(ply, old_factor)
@@ -744,14 +744,14 @@ if SERVER then
 		end
 	end)
 
-	hook.Add("PlayerDisconnected", tag, function(ply) MTA.ResetPlayerFactor(ply, true) end)
-	hook.Add("PlayerDeath", tag, function(ply) MTA.ResetPlayerFactor(ply, true) end)
-	hook.Add("PlayerSilentDeath", tag, function(ply) MTA.ResetPlayerFactor(ply, true) end)
+	hook.Add("PlayerDisconnected", tag, function(ply) MTA.ResetPlayerFactor(ply, true, false) end)
+	hook.Add("PlayerDeath", tag, function(ply) MTA.ResetPlayerFactor(ply, true, true) end)
+	hook.Add("PlayerSilentDeath", tag, function(ply) MTA.ResetPlayerFactor(ply, true, true) end)
 
 	hook.Add("InstanceChanged", tag, function(ent, id)
 		if not ent:IsPlayer() then return end
 		if id ~= 0 then
-			MTA.ResetPlayerFactor(ent, true)
+			MTA.ResetPlayerFactor(ent, true, false)
 		end
 	end)
 
@@ -759,7 +759,7 @@ if SERVER then
 		timer.Simple(1, function()
 			if not IsValid(ply) then return end
 			if not MTA.InLobby(ply) then
-				MTA.ResetPlayerFactor(ply, true)
+				MTA.ResetPlayerFactor(ply, true, false)
 			end
 		end)
 	end)
