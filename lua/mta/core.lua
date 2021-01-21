@@ -1111,24 +1111,12 @@ if CLIENT then
 		end)
 	end)
 
-	local function is_mta_ent(ent)
-		if not isentity(ent) then return false end
-		if not IsValid(ent) then return false end
-
-		if ent:GetNWBool("MTACombine") then return true end
-		if ent:GetNWBool("MTABountyHunter") then return true end
-		if ent:GetNWBool("MTAFactor") > 0 then return true end
-		if ent:GetNWBool("MTABomb") then return true end
-
-		return false
-	end
-
 	-- funny hook that can pass nil because death notices are gay and will always be
 	-- you CANNOT change my mind :)
 	hook.Add("DeathNotice", tag, function(atck, inflictor, target)
-		if is_mta_ent(LocalPlayer()) then return end
-		if is_mta_ent(atck) or is_mta_ent(target) or is_mta_ent(inflictor) then
-			-- TODO? : Epic MTA kill feed here ?
+		if not MTA.InLobby(LocalPlayer()) then return false end
+
+		if MTA.IsOptedOut() and (is_mta_ent(atck) or is_mta_ent(target) or is_mta_ent(inflictor)) then
 			return false
 		end
 	end)
