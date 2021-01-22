@@ -99,15 +99,16 @@ if CLIENT then
 	-- doing this here not to draw above MTAPaint stuff
 	hook.Add("HUDPaint", tag, function()
 		if not in_fever then return end
+		local scrw, scrh = ScrW(), ScrH()
 		surface.SetDrawColor(255, 0, 0, 35)
-		surface.DrawRect(0, 0, scrw, srch)
+		surface.DrawRect(0, 0, scrw, scrh)
 	end)
 
 	local orange_color = Color(244, 135, 2)
 	hook.Add("MTAPaint", tag, function()
 		if not in_fever then return end
 
-		local scrw, srch = ScrW(), ScrH()
+		local scrw, scrh = ScrW(), ScrH()
 		surface.SetTextColor(orange_color)
 		surface.SetFont("DermaLarge")
 		local time_left = ("%ds left"):format(math.max(fever_end_time - CurTime(), 0))
