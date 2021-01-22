@@ -84,9 +84,11 @@ end
 
 if CLIENT then
 	local in_fever = false
+	local fever_end_time = 0
 	local cmds = { "pp_sobel", "pp_bloom", "pp_sharpen", "pp_toytown " }
 	net.Receive(tag, function()
 		in_fever = net.ReadBool()
+		fever_end_time = CurTime() + FEVER_TIME
 
 		local cmd_arg = in_fever and 1 or 0
 		for _, cmd in pairs(cmds) do
@@ -94,10 +96,24 @@ if CLIENT then
 		end
 	end)
 
+	-- doing this here not to draw above MTAPaint stuff
 	hook.Add("HUDPaint", tag, function()
 		if not in_fever then return end
 		surface.SetDrawColor(255, 0, 0, 35)
-		surface.DrawRect(0, 0, ScrW(), ScrH())
+		surface.DrawRect(0, 0, scrw, srch)
+	end)
+
+	local orange_color = Color(244, 135, 2)
+	hook.Add("MTAPaint", tag, function()
+		if not in_fever then return end
+
+		local scrw, srch = ScrW(), ScrH()
+		surface.SetTextColor(orange_color)
+		surface.SetFont("DermaLarge")
+		local time_left = ("%ds left"):format(math.max(fever_end_time - CurTime(), 0))
+		local tw, th = surface.GetTextSize(time_left)
+		surface.SetTextPos(scrw / 2 - tw / 2, scrh / 2 - th / 2)
+		surface.DrawText(time_left)
 	end)
 
 	hook.Add("EntityEmitSound", tag, function(data)
