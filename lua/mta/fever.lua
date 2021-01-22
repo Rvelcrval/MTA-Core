@@ -105,15 +105,24 @@ if CLIENT then
 	end)
 
 	local orange_color = Color(244, 135, 2)
+	local black_color = Color(0, 0, 0, 150)
 	hook.Add("MTAPaint", tag, function()
 		if not in_fever then return end
 
 		local scrw, scrh = ScrW(), ScrH()
 		surface.SetTextColor(orange_color)
 		surface.SetFont("DermaLarge")
-		local time_left = ("%ds left"):format(math.max(fever_end_time - CurTime(), 0))
+		local time_left = ("/// %ds LEFT ///"):format(math.max(fever_end_time - CurTime(), 0))
 		local tw, th = surface.GetTextSize(time_left)
-		surface.SetTextPos(scrw / 2 - tw / 2, scrh / 2 - th / 2)
+		local pos_x, pos_y = scrw / 2 - tw / 2, scrh / 2 - th / 2
+
+		surface.SetDrawColor(black_color)
+		surface.DrawRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
+
+		surface.SetDrawColor(orange_color)
+		surface.DrawOutlinedRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
+
+		surface.SetTextPos(pos_x, pos_y)
 		surface.DrawText(time_left)
 	end)
 
