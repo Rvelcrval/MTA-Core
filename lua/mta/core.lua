@@ -605,8 +605,11 @@ if SERVER then
 		if ent.MTAIgnore then return false end
 		if not MTA.HasCoeficients(ent) then return false end
 
-		-- dont count banned players
-		if banni and banni.isbanned(ent) then return false end
+		if ent:IsPlayer() then
+			if not ent:Alive() then return false end
+			-- dont count banned players
+			if banni and banni.isbanned(ent) then return false end
+		end
 
 		-- dont count things spawned by players
 		if ent.CPPIGetOwner and IsValid(ent:CPPIGetOwner()) then return false end
