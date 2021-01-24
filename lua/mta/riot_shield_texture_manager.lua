@@ -32,7 +32,7 @@ local function net_table_to_colors(colors)
 
     local number_string = ""
     for index = 0, CUSTOM_TEXTURE_WIDTH * CUSTOM_TEXTURE_HEIGHT - 1 do
-        local color = colors[index]
+        local color = colors[index] or Color(0, 0, 0, 0)
         number_string = number_string .. string.char(color.r, color.g, color.b, color.a)
     end
 
