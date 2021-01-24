@@ -168,8 +168,8 @@ if CLIENT then
     end
 
     hook.Add("InitPostEntity", MTA_SHIELD_TEXTURE_MANAGER_CONNECT, function()
-        MTA.ShieldTextureManager.LoadLocalFromFileOrMemory(LocalPlayer().MTAShieldTextureEditing.data)
-        MTA.ShieldTextureManager.UploadDirect()
+        MTA.ShieldTextureManager.LoadLocalFromFileOrMemory()
+        MTA.ShieldTextureManager.UploadDirect(LocalPlayer().MTAShieldTextureEditing.data)
     end)
 
 end
