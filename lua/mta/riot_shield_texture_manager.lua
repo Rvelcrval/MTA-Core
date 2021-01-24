@@ -1,17 +1,42 @@
-
 local MTA_SHIELD_TEXTURE_REQUEST = "MTA_SHIELD_TEXTURE_REQUEST"
 local MTA_SHIELD_TEXTURE_UPDATE_BROADCAST = "MTA_SHIELD_TEXTURE_UPDATE_BROADCAST"
 local MTA_SHIELD_TEXTURE_UPDATE = "MTA_SHIELD_TEXTURE_UPDATE"
+local MTA_SHIELD_TEXTURE_MANAGER_DISCONNECT = "MTAShieldTextureManagerDisconnect"
+local MTA_SHIELD_TEXTURE_MANAGER_CONNECT = "MTAShieldTextureManagerConnect"
 
 local CUSTOM_TEXTURE_WIDTH = 64
 local CUSTOM_TEXTURE_HEIGHT = 108
 
 local function net_colors_to_table()
     local size = net.ReadUInt(32)
-    return util.JSONToTable(util.Decompress(net.ReadData(size)))
+    local data = util.Decompress(net.ReadData(size))
+
+    if SERVER then
+        MTA.Print("Received shield data, length: " .. size)
+    end
+
+    local colors = {}
+    
+    for index = 0, CUSTOM_TEXTURE_WIDTH * CUSTOM_TEXTURE_HEIGHT - 1 do
+        local red = string.byte(data[index * 4 + 1]) or 0
+        local green = string.byte(data[index * 4 + 2]) or 0
+        local blue = string.byte(data[index * 4 + 3]) or 0
+        local alpha = string.byte(data[index * 4 + 4]) or 0
+
+        colors[index] = Color(red, green, blue, alpha)
+    end
+
+    return colors
 end
 local function net_table_to_colors(colors)
-    local raw_string = util.Compress(util.TableToJSON(colors))
+
+    local number_string = ""
+    for index = 0, CUSTOM_TEXTURE_WIDTH * CUSTOM_TEXTURE_HEIGHT - 1 do
+        local color = colors[index]
+        number_string = number_string .. string.char(color.r, color.g, color.b, color.a)
+    end
+
+    local raw_string = util.Compress(number_string)
     net.WriteUInt(#raw_string, 32)
     net.WriteData(raw_string, #raw_string)
 end
@@ -23,11 +48,21 @@ if SERVER then
     util.AddNetworkString(MTA_SHIELD_TEXTURE_UPDATE_BROADCAST)
     util.AddNetworkString(MTA_SHIELD_TEXTURE_UPDATE)
 
+    local players_first_upload = {}
+
+    hook.Add("PlayerDisconnected", MTA_SHIELD_TEXTURE_MANAGER_DISCONNECT, function(ply)
+        players_first_upload[ply] = nil
+    end)
+
     net.Receive(MTA_SHIELD_TEXTURE_UPDATE_BROADCAST, function(len, ply)
 		local data = net_colors_to_table()
 
-        if ply:GetCoins() < 5000 then return end
-        ply:TakeCoins(5000)
+        if not players_first_upload[ply] then
+            players_first_upload[ply] = true
+        else
+            if ply:GetCoins() < 5000 then return end
+            ply:TakeCoins(5000)
+        end
 
 		cached_textures[ply] = {
 			width = CUSTOM_TEXTURE_WIDTH,
@@ -85,11 +120,15 @@ if CLIENT then
         return nil
     end
 
+    function MTA.ShieldTextureManager.UploadDirect(data)
+        net.Start(MTA_SHIELD_TEXTURE_UPDATE_BROADCAST)
+        net_table_to_colors(data)
+        net.SendToServer()
+    end
+
     function MTA.ShieldTextureManager.Upload(data)
         Derma_Query("Upload Shield to server?", "MTA Shield Customization - Upload", "Yes", function()
-            net.Start(MTA_SHIELD_TEXTURE_UPDATE_BROADCAST)
-            net_table_to_colors(data)
-            net.SendToServer()
+            MTA.ShieldTextureManager.UploadDirect(data)
         end, "No")
     end
 
@@ -127,5 +166,10 @@ if CLIENT then
             }
         end
     end
+
+    hook.Add("InitPostEntity", MTA_SHIELD_TEXTURE_MANAGER_CONNECT, function()
+        MTA.ShieldTextureManager.LoadLocalFromFileOrMemory(LocalPlayer().MTAShieldTextureEditing.data)
+        MTA.ShieldTextureManager.UploadDirect()
+    end)
 
 end
