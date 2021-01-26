@@ -39,8 +39,15 @@ local function constrain(ply, constraint_reason)
     do -- fuck you pac :)
         ply.pac_movement = nil
 
-        if pacx and pacx.SetPlayerSize then
-            pacx.SetPlayerSize(ply, 1, true)
+        if pacx then
+            -- seems to be legacy now but keeping it here because "we never know"
+            if pacx.SetPlayerSize then
+                pacx.SetPlayerSize(ply, 1, true)
+            end
+
+            if pacx.SetEntitySizeMultiplier then
+                pacx.SetEntitySizeMultiplier(ply, 1)
+            end
         end
     end
 
