@@ -245,23 +245,19 @@ if SERVER then
 		end
 	end
 
-	local function should_spawn_combine()
-		if MTA.ToSpawn < 1 then return false end
-		if #MTA.Combines >= MAX_COMBINES then return false end
-		if #MTA.BadPlayers == 0 then return false end
-
-		return true
-	end
-
+	local spawning = 0
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
 	function MTA.SpawnCombine()
-		if not should_spawn_combine() then return end
+		local spawning_wait_count = math.max(spawning, 0)
+		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
+		if (#MTA.Combines + spawning_wait_count) >= MAX_COMBINES then return end
+		if #MTA.BadPlayers == 0 then return end
 
 		local succ, ret = MTA.FarCombine(MTA.BadPlayers, function(combine)
 			if not IsValid(combine) then return end
 
-			if not should_spawn_combine() then
+			if #MTA.BadPlayers == 0 then
 				SafeRemoveEntity(combine)
 				return
 			end
@@ -272,9 +268,12 @@ if SERVER then
 			dont_transmit_combine(combine)
 
 			MTA.ToSpawn = MTA.ToSpawn - 1
+			spawning = spawning - 1
 		end)
 
-		if not succ then
+		if succ then
+			spawning = spawning + 1
+		else
 			local reason = ret or "???"
 			spawn_fail_reps = spawn_fail_reps + 1
 			spawn_fails[reason] = true

@@ -5,10 +5,10 @@ if CLIENT then
 	local PARTICLES_AMT = 25
 	local function do_spawn_effect(pos)
 		local spawn_pos_ent = ents.CreateClientProp("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
-		spawn_pos_ent:SetNoDraw(true)
-		spawn_pos_ent:SetPos(pos)
 		spawn_pos_ent:Spawn()
-		SafeRemoveEntity(spawn_pos_ent, 10)
+		spawn_pos_ent:SetPos(pos)
+		spawn_pos_ent:SetNoDraw(true)
+		SafeRemoveEntityDelayed(spawn_pos_ent, 10)
 
 		local beam_point_origin_1 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
 		beam_point_origin_1:SetNoDraw(true)
@@ -18,7 +18,7 @@ if CLIENT then
 		beam_point_origin_2:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
 
-		spawn_pos_ent:EmitSound(")ambient/machines/teleport1.wav", 30)
+		spawn_pos_ent:EmitSound(")ambient/machines/teleport1.wav", 40)
 
 		for i=1, CANNON_AMT do
 			local ang = ((i * 36) * math.pi) / 180
@@ -32,11 +32,6 @@ if CLIENT then
 				})
 			end)
 		end
-
-		timer.Simple(1,function()
-			ParticleEffectAttach("Weapon_Combine_Ion_Cannon_Exlposion_c", PATTACH_ABSORIGIN_FOLLOW, spawn_pos_ent, 0)
-			ParticleEffectAttach("Dust_Ceiling_Inn", PATTACH_ABSORIGIN_FOLLOW, spawn_pos_ent, 0)
-		end)
 	end
 
 	net.Receive(NET_FAR_COMBINE_SPAWN_EFFECT, function()
@@ -561,7 +556,7 @@ local function far_combine(players, callback)
 	net.WriteVector(pos)
 	net.Broadcast()
 
-	timer.Simple(2, function()
+	timer.Simple(1, function()
 		local combine = create_combine(pos)
 		setup_combine(combine, target, players)
 		callback(combine)
