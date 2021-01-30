@@ -1,4 +1,5 @@
 AddCSLuaFile()
+AddCSLuaFile("mta_libs/far_combine.lua")
 
 pcall(require, "metalog")
 pcall(include, "autorun/translation.lua")
@@ -244,22 +245,36 @@ if SERVER then
 		end
 	end
 
+	local function should_spawn_combine()
+		if MTA.ToSpawn < 1 then return false end
+		if #MTA.Combines >= MAX_COMBINES then return false end
+		if #MTA.BadPlayers == 0 then return false end
+
+		return true
+	end
+
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
 	function MTA.SpawnCombine()
-		if MTA.ToSpawn < 1 then return end
-		if #MTA.Combines >= MAX_COMBINES then return end
-		if #MTA.BadPlayers == 0 then return end
+		if not should_spawn_combine() then return end
 
-		local succ, ret = MTA.FarCombine(MTA.BadPlayers)
-		if succ and IsValid(ret) then -- should never be NULL or nil but what do I know
-			table.insert(MTA.Combines, ret)
-			ret:SetNWBool("MTACombine", true)
-			ret.ms_notouch = true
-			dont_transmit_combine(ret)
+		local succ, ret = MTA.FarCombine(MTA.BadPlayers, function(combine)
+			if not IsValid(combine) then return end
+
+			if not should_spawn_combine() then
+				SafeRemoveEntity(combine)
+				return
+			end
+
+			table.insert(MTA.Combines, combine)
+			combine:SetNWBool("MTACombine", true)
+			combine.ms_notouch = true
+			dont_transmit_combine(combine)
 
 			MTA.ToSpawn = MTA.ToSpawn - 1
-		else
+		end)
+
+		if not succ then
 			local reason = ret or "???"
 			spawn_fail_reps = spawn_fail_reps + 1
 			spawn_fails[reason] = true

@@ -1,6 +1,52 @@
-if not SERVER then
-	return function() end
+local NET_FAR_COMBINE_SPAWN_EFFECT = "FAR_COMBINE_SPAWN_EFFECT"
+
+if CLIENT then
+	local CANNON_AMT = 50
+	local PARTICLES_AMT = 25
+	local function do_spawn_effect(pos)
+		local spawn_pos_ent = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		spawn_pos_ent:SetNoDraw(true)
+		spawn_pos_ent:SetPos(pos)
+		SafeRemoveEntity(spawn_pos_ent, 10)
+
+		local beam_point_origin_1 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		beam_point_origin_1:SetNoDraw(true)
+		SafeRemoveEntityDelayed(beam_point_origin_1, 10)
+
+		local beam_point_origin_2 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		beam_point_origin_2:SetNoDraw(true)
+		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
+
+		EmitSound(")ambient/machines/teleport3.wav", pos)
+
+		for i=1, CANNON_AMT do
+			local ang = ((i * 36) * math.pi) / 180
+			local turn = Vector(math.sin(ang), math.cos(ang), 0) * 2
+			timer.Simple(i / CANNON_AMT, function()
+				beam_point_origin_1:SetPos(pos + Vector(0, 0,1000) + turn)
+				beam_point_origin_2:SetPos(pos + Vector(0, 0,1000 * (CANNON_AMT - i) / CANNON_AMT) + turn)
+				spawn_pos_ent:CreateParticleEffect("Weapon_Combine_Ion_Cannon", {
+					{ entity = beam_point_origin_1, attachtype = PATTACH_ABSORIGIN_FOLLOW },
+					{ entity = beam_point_origin_2, attachtype = PATTACH_ABSORIGIN_FOLLOW },
+				})
+			end)
+		end
+
+		timer.Simple(1,function()
+			ParticleEffectAttach("Weapon_Combine_Ion_Cannon_Exlposion_c", PATTACH_ABSORIGIN_FOLLOW, spawn_pos_ent, 0)
+			ParticleEffectAttach("Dust_Ceiling_Inn", PATTACH_ABSORIGIN_FOLLOW, spawn_pos_ent, 0)
+		end)
+	end
+
+	net.Receive(NET_FAR_COMBINE_SPAWN_EFFECT, function()
+		local pos = net.ReadVector()
+		do_spawn_effect(pos)
+	end)
+
+	return function() end, function() end
 end
+
+util.AddNetworkString(NET_FAR_COMBINE_SPAWN_EFFECT)
 
 local MAX_SPAWN_DISTANCE = 1024
 
@@ -492,7 +538,7 @@ local function setup_combine(combine, target, players)
 	end)
 end
 
-local function far_combine(players)
+local function find_node(players)
 	if #players == 0 then return false, "no players to use" end
 	local target = players[math.random(#players)]
 	if not IsValid(target) then return end
@@ -503,10 +549,24 @@ local function far_combine(players)
 	local node, pos = find_cadidate_node(target, nearest_node)
 	if not node then return false, "could not find suitable node" end
 
-	local combine = create_combine(node.pos)
-	setup_combine(combine, target, players)
+	return true, node.pos
+end
 
-	return true, combine
+local function far_combine(players, callback)
+	local succ, ret = find_node(players)
+	if not succ then return false, ret end
+
+	net.Start(NET_FAR_COMBINE_SPAWN_EFFECT)
+	net.WriteVector(ret)
+	net.Broadcast()
+
+	timer.Simple(2, function()
+		local combine = create_combine(ret)
+		setup_combine(combine, target, players)
+		callback(combine)
+	end)
+
+	return true
 end
 
 return far_combine, setup_combine
