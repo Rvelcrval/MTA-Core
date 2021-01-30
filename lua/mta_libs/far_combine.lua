@@ -18,8 +18,6 @@ if CLIENT then
 		beam_point_origin_2:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
 
-		spawn_pos_ent:EmitSound(")ambient/machines/teleport1.wav", 40)
-
 		for i=1, CANNON_AMT do
 			local ang = ((i * 36) * math.pi) / 180
 			local turn = Vector(math.sin(ang), math.cos(ang), 0) * 2
@@ -559,6 +557,7 @@ local function far_combine(players, callback)
 	timer.Simple(1, function()
 		local combine = create_combine(pos)
 		setup_combine(combine, target, players)
+		combine:EmitSound("ambient/machines/teleport1.wav", 40)
 		callback(combine)
 	end)
 
