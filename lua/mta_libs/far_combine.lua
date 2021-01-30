@@ -4,9 +4,10 @@ if CLIENT then
 	local CANNON_AMT = 50
 	local PARTICLES_AMT = 25
 	local function do_spawn_effect(pos)
-		local spawn_pos_ent = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		local spawn_pos_ent = ents.CreateClientProp("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
 		spawn_pos_ent:SetNoDraw(true)
 		spawn_pos_ent:SetPos(pos)
+		spawn_pos_ent:Spawn()
 		SafeRemoveEntity(spawn_pos_ent, 10)
 
 		local beam_point_origin_1 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
@@ -17,7 +18,7 @@ if CLIENT then
 		beam_point_origin_2:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
 
-		spawn_pos_ent:EmitSound(")ambient/machines/teleport3.wav", 100)
+		spawn_pos_ent:EmitSound(")ambient/machines/teleport1.wav", 30)
 
 		for i=1, CANNON_AMT do
 			local ang = ((i * 36) * math.pi) / 180
