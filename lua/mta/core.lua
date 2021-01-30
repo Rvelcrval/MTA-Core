@@ -884,6 +884,8 @@ if SERVER then
 end
 
 if CLIENT then
+	include("mta_libs/far_combine.lua")
+
 	local MTA_OPT_OUT = CreateClientConVar("mta_opt_out", "0", true, true, "Disable criminal events in the lobby for yourself")
 	local MTA_SHOW_WANTEDS = CreateClientConVar("mta_show_wanteds", "1", true, false, "Displays other wanted players")
 	cvars.AddChangeCallback("mta_opt_out", function(_, _, new)

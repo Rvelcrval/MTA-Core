@@ -549,19 +549,19 @@ local function find_node(players)
 	local node, pos = find_cadidate_node(target, nearest_node)
 	if not node then return false, "could not find suitable node" end
 
-	return true, node.pos
+	return true, node.pos, target
 end
 
 local function far_combine(players, callback)
-	local succ, ret = find_node(players)
-	if not succ then return false, ret end
+	local succ, pos, target = find_node(players)
+	if not succ then return false, pos end
 
 	net.Start(NET_FAR_COMBINE_SPAWN_EFFECT)
-	net.WriteVector(ret)
+	net.WriteVector(pos)
 	net.Broadcast()
 
 	timer.Simple(2, function()
-		local combine = create_combine(ret)
+		local combine = create_combine(pos)
 		setup_combine(combine, target, players)
 		callback(combine)
 	end)
