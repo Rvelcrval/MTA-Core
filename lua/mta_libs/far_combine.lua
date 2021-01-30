@@ -550,7 +550,7 @@ local function far_combine(players, callback)
 	local succ, pos, target = find_node(players)
 	if not succ then return false, pos end
 
-	net.Start(NET_FAR_COMBINE_SPAWN_EFFECT)
+	net.Start(NET_FAR_COMBINE_SPAWN_EFFECT, true)
 	net.WriteVector(pos)
 	net.Broadcast()
 
