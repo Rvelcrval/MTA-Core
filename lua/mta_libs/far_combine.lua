@@ -17,7 +17,7 @@ if CLIENT then
 		beam_point_origin_2:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
 
-		EmitSound(")ambient/machines/teleport3.wav", pos)
+		spawn_pos_ent:EmitSound(")ambient/machines/teleport3.wav", 100)
 
 		for i=1, CANNON_AMT do
 			local ang = ((i * 36) * math.pi) / 180
