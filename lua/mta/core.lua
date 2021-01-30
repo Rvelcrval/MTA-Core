@@ -1149,6 +1149,15 @@ if CLIENT then
 		ent:DrawShadow(false)
 		ent:SetNoDraw(true)
 		ent.RenderOverride = function() end
+
+		for _, child in pairs(ent:GetChildren()) do
+			dont_draw(child)
+		end
+
+		local wep = ent.GetActiveWeapon and ent:GetActiveWeapon()
+		if IsValid(wep) then
+			dont_draw(wep)
+		end
 	end
 
 	local mta_classes = {
@@ -1159,13 +1168,15 @@ if CLIENT then
 	local debug_white = Material("models/debug/debugwhite")
 	local function mta_render_override(self)
 		if MTA.IsWanted() and LocalPlayer():Health() <= LOW_HEALTH then
-			render.SetLightingMode(2)
-				render.SetColorModulation(1,0,0)
-					render.MaterialOverride(debug_white)
-						self:DrawModel()
-					render.MaterialOverride()
-				render.SetColorModulation(1, 1, 1)
-			render.SetLightingMode(0)
+			cam.IgnoreZ(true)
+				render.SetLightingMode(2)
+					render.SetColorModulation(1, 0, 0)
+						render.MaterialOverride(debug_white)
+							self:DrawModel()
+						render.MaterialOverride()
+					render.SetColorModulation(1, 1, 1)
+				render.SetLightingMode(0)
+			cam.IgnoreZ(false)
 		else
 			self:DrawModel()
 		end
@@ -1184,14 +1195,6 @@ if CLIENT then
 			if not IsValid(ent) then return end
 			if not ent:GetNWBool("MTACombine") then return end
 			dont_draw(ent)
-			for _, child in pairs(ent:GetChildren()) do
-				dont_draw(child)
-			end
-
-			local wep = ent.GetActiveWeapon and ent:GetActiveWeapon()
-			if IsValid(wep) then
-				dont_draw(wep)
-			end
 		end)
 	end)
 
