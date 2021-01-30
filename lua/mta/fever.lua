@@ -39,6 +39,7 @@ if SERVER then
 				wep.lobbyok = true
 				wep.PhysgunDisabled = true
 				wep.dont_televate = true
+				atck:SelectWeapon(FEVER_WEAPON_CLASS)
 				atck:SetActiveWeapon(wep)
 
 				net.Start(tag)
