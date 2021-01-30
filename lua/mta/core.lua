@@ -1035,12 +1035,26 @@ if CLIENT then
 		cam.PopModelMatrix()
 	end
 
+	local LOW_HEALTH = 30
 	local function draw_hud()
+		local lp = LocalPlayer()
+		local health, armor = lp:Health(), lp:Armor()
+		local scrw, scrh = ScrW(), ScrH()
+
+		if health <= LOW_HEALTH then
+			DrawMotionBlur(0.4, 0.8, 0.05)
+			surface.SetDrawColor(0, 0, 0, 150)
+			surface.DrawRect(0,0, scrw, scrh)
+			local alpha = 10 + math.abs((math.sin(CurTime() * 3) * 100))
+			surface.SetDrawColor(255, 0, 0, alpha)
+			surface.DrawRect(0, 0, scrw, scrh)
+		end
+
 		surface.SetTextColor(orange_color)
 		surface.SetFont("DermaLarge")
 		local text = ("/// WANTED LEVEL %d ///"):format(LocalPlayer():GetNWInt("MTAFactor"))
 		local tw, th = surface.GetTextSize(text)
-		local pos_x, pos_y = ScrW() / 2 - tw / 2, (ScrH() / 2 - th / 2) - (450 * (ScrH() / 1080))
+		local pos_x, pos_y = scrw / 2 - tw / 2, (scrh / 2 - th / 2) - (450 * (scrh / 1080))
 		surface.SetTextPos(pos_x, pos_y)
 
 		surface.SetDrawColor(black_color)
@@ -1052,12 +1066,9 @@ if CLIENT then
 
 		surface.DrawText(text)
 
-		local lp = LocalPlayer()
-		local health, armor = lp:Health(), lp:Armor()
 		surface.SetFont("DermaDefaultBold")
-
-		surface.SetDrawColor(health < 30 and red_color or orange_color)
-		surface.SetTextColor(health < 30 and red_color or orange_color)
+		surface.SetDrawColor(health < LOW_HEALTH and red_color or orange_color)
+		surface.SetTextColor(health < LOW_HEALTH and red_color or orange_color)
 		surface.DrawRect(pos_x - 10, pos_y + th + 25, (tw / 100) * health, 5, true)
 		surface.SetTextPos(pos_x + (tw / 100) * health, pos_y + th + 20)
 		surface.DrawText(("%d HPs"):format(math.Clamp(health, 0, 100)))
@@ -1140,8 +1151,35 @@ if CLIENT then
 		ent.RenderOverride = function() end
 	end
 
+	local mta_classes = {
+		npc_metropolice = true,
+		npc_manhack = true,
+		npc_combine_s = true
+	}
+	local debug_white = Material("models/debug/debugwhite")
+	local function mta_render_override(self)
+		if MTA.IsWanted() and LocalPlayer():Health() <= LOW_HEALTH then
+			render.SetLightingMode(2)
+				render.SetColorModulation(1,0,0)
+					render.MaterialOverride(debug_white)
+						self:DrawModel()
+					render.MaterialOverride()
+				render.SetColorModulation(1, 1, 1)
+			render.SetLightingMode(0)
+		else
+			self:DrawModel()
+		end
+	end
+
 	hook.Add("OnEntityCreated", tag, function(ent)
-		if not MTA.IsOptedOut() then return end
+		if not MTA.IsOptedOut() then
+			if mta_classes[ent:GetClass()] then
+				ent.RenderOverride = mta_render_override
+			end
+
+			return
+		end
+
 		timer.Simple(0.5, function()
 			if not IsValid(ent) then return end
 			if not ent:GetNWBool("MTACombine") then return end
