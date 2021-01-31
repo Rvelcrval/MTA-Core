@@ -163,8 +163,8 @@ if SERVER then
 		return ply:GetInfoNum("mta_opt_out", 0) ~= 0
 	end
 
-	local MAX_COMBINES = 25
-	local ESCAPE_TIME = 20 -- in seconds
+	MTA.MAX_COMBINES = 25
+	MTA.ESCAPE_TIME = 20 -- in seconds
 
 	MTA.FarCombine = MTA.FarCombine or function() return false, "did not load \'far_combine\'" end
 	MTA.SetupCombine = MTA.SetupCombine or function() return false, "did not load \'far_combine\'" end
@@ -251,7 +251,7 @@ if SERVER then
 	function MTA.SpawnCombine()
 		local spawning_wait_count = math.max(spawning, 0)
 		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
-		if (#MTA.Combines + spawning_wait_count) >= MAX_COMBINES then return end
+		if (#MTA.Combines + spawning_wait_count) >= MTA.MAX_COMBINES then return end
 		if #MTA.BadPlayers == 0 then return end
 
 		local succ, ret = MTA.FarCombine(MTA.BadPlayers, function(combine)
@@ -323,7 +323,7 @@ if SERVER then
 
 		if count >= 1 then
 			if count < factor then -- spawn remaining combines
-				MTA.ToSpawn = math.min(MAX_COMBINES, factor - count)
+				MTA.ToSpawn = math.min(MTA.MAX_COMBINES, factor - count)
 			end
 		else
 			MTA.ToSpawn = factor
@@ -475,7 +475,7 @@ if SERVER then
 				if not MTA.CanPlayerEscape(ply) then
 					-- refresh the "player factor state", since we dont want them to escape
 					MTA.ProcessPlayerFactor(ply)
-				elseif (time - (ply.MTALastFactorIncrease or 0)) >= ESCAPE_TIME then
+				elseif (time - (ply.MTALastFactorIncrease or 0)) >= MTA.ESCAPE_TIME then
 					local internal_factor = ply:GetNWInt("MTAFactor") * 10
 					local decrease = BASE_DECREASE_FACTOR + math.exp(internal_factor / DECREASE_DIVIDER)
 					MTA.DecreasePlayerFactor(ply, decrease)
