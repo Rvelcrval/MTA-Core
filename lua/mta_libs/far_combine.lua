@@ -402,6 +402,8 @@ local function handle_entity_block(combine)
 end
 
 local function setup_combine(combine, target, players)
+	if not IsValid(target) then return end
+
 	SafeRemoveEntityDelayed(combine, 120)
 
 	combine:SetLagCompensated(true)
