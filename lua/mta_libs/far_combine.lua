@@ -22,6 +22,7 @@ if CLIENT then
 			local ang = ((i * 36) * math.pi) / 180
 			local turn = Vector(math.sin(ang), math.cos(ang), 0) * 2
 			timer.Simple(i / CANNON_AMT, function()
+				if not IsValid(spawn_pos_ent) or not IsValid(beam_point_origin_1) or not IsValid(beam_point_origin_2) then return end
 				beam_point_origin_1:SetPos(pos + Vector(0, 0,1000) + turn)
 				beam_point_origin_2:SetPos(pos + Vector(0, 0,1000 * (CANNON_AMT - i) / CANNON_AMT) + turn)
 				spawn_pos_ent:CreateParticleEffect("Weapon_Combine_Ion_Cannon", {
