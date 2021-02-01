@@ -1,5 +1,5 @@
 MTA_CONFIG = {}
-for _, f in pairs((file.Find("lua/mta_cfg/*.lua", "GAME"))) do
+for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
 	local path = "mta_cfg/" .. f
 	if SERVER then AddCSLuaFile(path) end
 	MTA_CONFIG[f:StripExtension()] = include(path)

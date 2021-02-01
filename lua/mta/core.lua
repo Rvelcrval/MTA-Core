@@ -852,6 +852,7 @@ if CLIENT then
 	end)
 
 	function MTA.IsOptedOut()
+		if not MTA_CONFIG.core.CanOptOut then return false end
 		if banni and banni.isbanned(LocalPlayer()) then return true end
 		return MTA_OPT_OUT:GetBool()
 	end
