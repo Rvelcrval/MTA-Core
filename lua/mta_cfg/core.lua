@@ -41,9 +41,9 @@ return {
 			["damage_coef"] = 1,
 		},
 	},
-	["CanOptOut"] = true,
-	["UseMapData"] = true,
+	["CanOptOut"] = false,
+	["UseMapData"] = false,
 	["DecreaseDivider"] = 250,
 	["EscapeTime"] = 20,
-	["MaxCombines"] = 25,
+	["MaxCombines"] = 150,
 }

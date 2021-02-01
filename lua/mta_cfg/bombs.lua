@@ -6,6 +6,6 @@ return {
 		"prop_physics",
 		"prop_dynamic",
 	},
-	["CampingDistance"] = 150,
+	["CampingDistance"] = 300,
 	["CampingInterval"] = 180,
 }
