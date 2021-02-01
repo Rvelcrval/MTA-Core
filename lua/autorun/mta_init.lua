@@ -1,12 +1,9 @@
-if SERVER then
-	resource.AddFile("particles/cmb_tracers_rework.pcf")
-
-	MTA_CONFIG = {}
-	for _, f in pairs((file.Find("lua/mta_cfg/*.json", "GAME"))) do
-		local path = "lua/mta_cfg/" .. f
-		local json = file.Read(path, "GAME")
-		MTA_CONFIG[f:StripExtension()] = util.JSONToTable(json)
-	end
+MTA_CONFIG = {}
+for _, f in pairs((file.Find("lua/mta_cfg/*.json", "GAME"))) do
+	local path = "lua/mta_cfg/" .. f
+	if SERVER then resource.AddSingleFile(path) end
+	local json = file.Read(path, "GAME")
+	MTA_CONFIG[f:StripExtension()] = util.JSONToTable(json)
 end
 
 AddCSLuaFile("mta/core.lua")
@@ -29,6 +26,10 @@ include("mta/riot_shield_texture_manager.lua")
 
 -- better combine tracers
 do
+	if SERVER then
+		resource.AddFile("particles/cmb_tracers_rework.pcf")
+	end
+
 	PrecacheParticleSystem("cmb_tracer")
 	PrecacheParticleSystem("ar2_combineball")
 
