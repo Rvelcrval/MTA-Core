@@ -52,11 +52,12 @@ function MTA.Reset()
 end
 
 function MTA.InLobby(ply)
-	if ply.InLobby then
+	return true -- will need to do a check for gamemode later on
+	--[[if ply.InLobby then
 		return ply:InLobby()
 	end
 
-	return false
+	return false]]--
 end
 
 local NET_WANTED_STATE = "MTA_WANTED_STATE"
