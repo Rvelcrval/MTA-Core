@@ -3,8 +3,8 @@ if SERVER then
 
 	MTA_CONFIG = {}
 	for _, f in pairs((file.Find("lua/mta_cfg/*.json", "GAME"))) do
-		local path = "mta_cfg/" .. f
-		local json = file.Read(path)
+		local path = "lua/mta_cfg/" .. f
+		local json = file.Read(path, "GAME")
 		MTA_CONFIG[f:StripExtension()] = util.JSONToTable(json)
 	end
 end
