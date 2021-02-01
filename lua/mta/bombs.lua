@@ -86,13 +86,10 @@ if SERVER then
 		end)
 	end
 
-	local blocking_classes = {
-		prop_door_rotating = true,
-		func_breakable = true,
-		func_movelinear = true,
-		prop_physics = true,
-		prop_dynamic = true,
-	}
+	local blocking_classes = {}
+	for _, class_name in pairs(MTA_CONFIG.bombs.BlockingClasses) do
+		blocking_classes[class_name] = true
+	end
 
 	local function is_blocking_entity(ent)
 		if not IsValid(ent) then return false end
@@ -140,8 +137,8 @@ if SERVER then
 		end
 	end)
 
-	local CAMPING_DIST = 150
-	local START_CAMPING_DURATION = 3 * 60 -- 3mins
+	local CAMPING_DIST = MTA_CONFIG.bombs.CampingDistance
+	local START_CAMPING_DURATION = MTA_CONFIG.bombs.CampingInterval
 
 	local campers = {}
 	timer.Create(tag, 1, 0, function()

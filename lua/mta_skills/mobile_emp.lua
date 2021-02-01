@@ -1,5 +1,5 @@
-local DISTANCE = 500
-local INTERVAL = 15
+local DISTANCE = MTA_CONFIG.upgrades.EMPDistance
+local INTERVAL = MTA_CONFIG.upgrades.EMPInterval
 
 local ENT = {}
 ENT.Type = "anim"

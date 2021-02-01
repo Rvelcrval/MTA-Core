@@ -1,0 +1,7 @@
+{
+	"FeverTime": 20,
+	"FeverTreshold": 10,
+	"FeverInterval": 10,
+	"FeverTimeout": 180,
+	"FeverWeaponClass": "weapon_core_thrower"
+}

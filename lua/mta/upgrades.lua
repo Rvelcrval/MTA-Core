@@ -7,9 +7,9 @@ local NET_GIVE_WEAPON = "MTA_GIVE_WEAPON"
 local NET_REFILL_WEAPON = "MTA_REFILL_WEAPON"
 local NET_PRESTIGE = "MTA_PRESTIGE"
 
-local MAX_LEVEL = 100
-local COIN_MULTIPLIER = 300
-local POINT_MULTIPLIER = 5 / 110
+local MAX_LEVEL = MTA_CONFIG.upgrades.MaxLevel
+local COIN_MULTIPLIER = MTA_CONFIG.upgrades.CoinMultiplier
+local POINT_MULTIPLIER = MTA_CONFIG.upgrades.PointMultiplier
 
 -- DB SCHEME
 --[[

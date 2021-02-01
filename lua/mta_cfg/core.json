@@ -1,0 +1,49 @@
+{
+	"MaxCombines": 25,
+	"EscapeTime": 20,
+	"Coeficients": {
+		"lua_npc_wander" : {
+			"damage_coef":0.5,
+			"kill_coef": 1
+		},
+		"lua_npc": {
+			"damage_coef":0.5,
+			"kill_coef": 1
+		},
+		"npc_combine_s": {
+			"damage_coef":1,
+			"kill_coef": 1.5
+		},
+		"npc_metropolice": {
+			"damage_coef":1,
+			"kill_coef": 1.5
+		},
+		"npc_manhack": {
+			"damage_coef":0.75,
+			"kill_coef": 1
+		},
+		"player": {
+			"damage_coef":0,
+			"kill_coef":  2.5
+		}
+	},
+	"CanOptOut": true,
+	"BaseDecreaseFactor": 1,
+	"DecreaseDivider": 250,
+	"UseMapData": true,
+	"DamageWhitelist": [
+		"crossbow_bolt",
+		"npc_grenade_frag",
+		"rpg_missile",
+		"rpg_rocket",
+		"prop_combine_ball",
+		"grenade_ar2",
+		"npc_satchel",
+		"crossbow_bolt_hl1",
+		"monster_tripmine",
+		"grenade_hand",
+		"ent_lite_hegrenade",
+		"ms_hax_monitor",
+		"mta_mobile_emp"
+	]
+}

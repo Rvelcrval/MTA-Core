@@ -84,13 +84,6 @@ if SERVER then
 		return table.concat(modes, ", ")
 	end
 
-	local blocked_maps = {
-		gm_construct_m3_204 = true, -- broken triggers
-		gm_construct_m3_207 = true, -- same
-		gm_construct_m3_234 = true, -- same :)
-		gm_construct_m3_239 = true, -- another one bites the dust
-	}
-
 	local function map_has_broken_triggers()
 		local max = 0
 		for _, trigger in pairs(ents.FindByClass("lua_trigger")) do
@@ -114,8 +107,8 @@ if SERVER then
 		local cur_value = MTA_MODE:GetInt()
 		if cur_value == tonumber(old_value) then return end
 
-		if cur_value ~= 0 and (blocked_maps[game.GetMap()] or map_has_broken_triggers()) then
-			warn_log("Blocked MTA mode change, the map is blocked")
+		if map_has_broken_triggers() then
+			warn_log("Blocked MTA mode change, the map is broken")
 			MTA_MODE:SetInt(0)
 			return
 		end
@@ -159,12 +152,13 @@ if SERVER then
 	end
 
 	function MTA.IsOptedOut(ply)
+		if not MTA_CONFIG.core.CanOptOut then return false end
 		if banni and banni.isbanned(ply) then return true end
 		return ply:GetInfoNum("mta_opt_out", 0) ~= 0
 	end
 
-	MTA.MAX_COMBINES = 25
-	MTA.ESCAPE_TIME = 20 -- in seconds
+	MTA.MAX_COMBINES = MTA_CONFIG.core.MaxCombines
+	MTA.ESCAPE_TIME = MTA_CONFIG.core.EscapeTime
 
 	MTA.FarCombine = MTA.FarCombine or function() return false, "did not load \'far_combine\'" end
 	MTA.SetupCombine = MTA.SetupCombine or function() return false, "did not load \'far_combine\'" end
@@ -175,32 +169,7 @@ if SERVER then
 	MTA.Combines = {}
 	MTA.BadPlayers = {}
 	MTA.Factors = {}
-	MTA.Coeficients = {
-		lua_npc_wander = {
-			damage_coef = 0.5,
-			kill_coef = 1,
-		},
-		lua_npc = {
-			damage_coef = 0.5,
-			kill_coef = 1,
-		},
-		npc_combine_s = {
-			damage_coef = 1,
-			kill_coef = 1.5,
-		},
-		npc_metropolice = {
-			damage_coef = 1,
-			kill_coef = 1.5,
-		},
-		npc_manhack = {
-			damage_coef = 0.75,
-			kill_coef = 1,
-		},
-		player = {
-			damage_coef = 0,
-			kill_coef =  2.5,
-		}
-	}
+	MTA.Coeficients = MTA_CONFIG.core.Coeficients
 
 	local function remove_ent_from_table(ent, tbl)
 		for k, v in pairs(tbl) do
@@ -464,8 +433,8 @@ if SERVER then
 	-- With this numbers the maximum time to escape at lvl 1000 should be
 	-- about 1mins 45 and 1min for lvl 10. Keep in mind these levels are hidden
 	-- and to get the displayed levels you should divide them by 10.
-	local BASE_DECREASE_FACTOR = 1
-	local DECREASE_DIVIDER = 250 -- increase to slow down escape, increase to speed up escape
+	local BASE_DECREASE_FACTOR = MTA_CONFIG.core.BaseDecreaseFactor
+	local DECREASE_DIVIDER = MTA_CONFIG.core.DecreaseDivider -- increase to slow down escape, increase to speed up escape
 	function MTA.UpdateState()
 		MTA.SpawnCombine()
 
@@ -525,6 +494,8 @@ if SERVER then
 	end
 
 	local function spawn_lobby_persistent_ents()
+		if not MTA_CONFIG.core.UseMapData then return end
+
 		-- we need to handle it ourselves because
 		-- ms.persist doesnt handle anything but saving and pasting
 		if ms and ms.persist and ms.persist.paste then
@@ -591,9 +562,6 @@ if SERVER then
 		if map_has_broken_triggers() then
 			warn_log("BROKEN TRIGGERS DETECTED DISABLING")
 			MTA_MODE:SetInt(0)
-		elseif blocked_maps[game.GetMap()] then
-			warn_log("BAD MAP DETECTED DISABLING")
-			MTA_MODE:SetInt(0)
 		end
 	end
 
@@ -631,21 +599,11 @@ if SERVER then
 		return true
 	end
 
-	local whitelist = {
-		["crossbow_bolt"] = true,
-		["npc_grenade_frag"] = true,
-		["rpg_missile"] = true,
-		["rpg_rocket"] = true,
-		["prop_combine_ball"] = true,
-		["grenade_ar2"] = true,
-		["npc_satchel"] = true,
-		["crossbow_bolt_hl1"] = true,
-		["monster_tripmine"] = true,
-		["grenade_hand"] = true,
-		["ent_lite_hegrenade"] = true,
-		["ms_hax_monitor"] = true,
-		["mta_mobile_emp"] = true,
-	}
+	local whitelist = {}
+	for _, class_name in pairs(MTA_CONFIG.core.DamageWhitelist) do
+		whitelist[class_name] = true
+	end
+
 	hook.Add("EntityTakeDamage", tag, function(ent, dmg_info)
 		if dmg_info:IsFallDamage() then return end
 

@@ -6,7 +6,7 @@ local old_value_color = Color(252, 71, 58)
 local new_value_color = Color(58, 252, 113)
 
 local NET_UPGRADE = "MTA_UPGRADE"
-local POINT_MULTIPLIER = 5 / 110
+local POINT_MULTIPLIER = MTA_CONFIG.upgrades.PointMultiplier
 
 local tree_data = {
 	damage_multiplier = {

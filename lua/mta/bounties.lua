@@ -3,9 +3,9 @@ local NET_MTA_BOUNTIES = "MTA_BOUNTIES"
 local NET_MTA_ACCEPT_BOUNTY = "MTA_ACCEPT_BOUNTY"
 local NET_MTA_REMOVE_BOUNTY = "MTA_REMOVE_BOUNTY"
 
-local MINIMUM_LEVEL = 20
-local MAX_BOUNTIES_PER_HUNTER = 4
-local TIME_TO_BOUNTY_REFRESH = 60 * 60 * 2 -- 2 hours
+local MINIMUM_LEVEL = MTA_CONFIG.bounties.MinimumLevel
+local MAX_BOUNTIES_PER_HUNTER = MTA_CONFIG.bounties.MaxBountiesPerHunter
+local TIME_TO_BOUNTY_REFRESH = MTA_CONFIG.bounties.TimeToBountyRefresh
 
 local color_white = Color(255, 255, 255)
 local header_col = Color(250, 58, 60)

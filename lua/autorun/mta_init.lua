@@ -1,3 +1,14 @@
+if SERVER then
+	resource.AddFile("particles/cmb_tracers_rework.pcf")
+
+	MTA_CONFIG = {}
+	for _, f in pairs((file.Find("lua/mta_cfg/*.json", "GAME"))) do
+		local path = "mta_cfg/" .. f
+		local json = file.Read(path)
+		MTA_CONFIG[f:StripExtension()] = util.JSONToTable(json)
+	end
+end
+
 AddCSLuaFile("mta/core.lua")
 AddCSLuaFile("mta/songs.lua")
 AddCSLuaFile("mta/upgrades.lua")
@@ -18,12 +29,6 @@ include("mta/riot_shield_texture_manager.lua")
 
 -- better combine tracers
 do
-	if SERVER then
-		-- commenting this for now, so we get the latest update from the workshop addon
-		-- for the particles (.pcf) instead of having a dated copy
-		-- resource.AddFile("particles/cmb_tracers_rework.pcf")
-	end
-
 	PrecacheParticleSystem("cmb_tracer")
 	PrecacheParticleSystem("ar2_combineball")
 

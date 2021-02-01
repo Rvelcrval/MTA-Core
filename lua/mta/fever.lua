@@ -1,10 +1,10 @@
 local tag = "mta_fever"
 
-local FEVER_TIME = 20
-local FEVER_TRESHOLD = 10
-local FEVER_INTERVAL = 10
-local FEVER_TIMEOUT = 180
-local FEVER_WEAPON_CLASS = "weapon_core_thrower"
+local FEVER_TIME = MTA_CONFIG.fever.FeverTime
+local FEVER_TRESHOLD = MTA_CONFIG.fever.FeverTreshold
+local FEVER_INTERVAL = MTA_CONFIG.fever.FeverInterval
+local FEVER_TIMEOUT = MTA_CONFIG.fever.FeverTimeout
+local FEVER_WEAPON_CLASS = MTA_CONFIG.fever.FeverWeaponClass
 
 if SERVER then
 	util.AddNetworkString(tag)
@@ -12,7 +12,7 @@ if SERVER then
 	local fever_data = {}
 
 	local function stop_fever(ply)
-		ply:StripWeapon("weapon_core_thrower")
+		ply:StripWeapon(FEVER_WEAPON_CLASS)
 		ply.MTAInFever = nil
 		fever_data[ply] = nil
 		net.Start(tag)
