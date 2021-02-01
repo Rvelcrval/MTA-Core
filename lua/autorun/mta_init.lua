@@ -1,9 +1,8 @@
 MTA_CONFIG = {}
-for _, f in pairs((file.Find("lua/mta_cfg/*.json", "GAME"))) do
-	local path = "lua/mta_cfg/" .. f
-	if SERVER then resource.AddSingleFile(path) end
-	local json = file.Read(path, "GAME")
-	MTA_CONFIG[f:StripExtension()] = util.JSONToTable(json)
+for _, f in pairs((file.Find("lua/mta_cfg/*.lua", "GAME"))) do
+	local path = "mta_cfg/" .. f
+	if SERVER then AddCSLuaFile(path) end
+	MTA_CONFIG[f:StripExtension()] = include(path)
 end
 
 AddCSLuaFile("mta/core.lua")

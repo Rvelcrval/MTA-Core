@@ -1,0 +1,22 @@
+return {
+	["EMPDistance"] = 500,
+	["WeaponCosts"] = {
+		["weapon_crossbow"] = 10,
+		["weapon_asmd"] = 12,
+		["weapon_ar2"] = 8,
+		["weapon_escape_teleporter"] = 4,
+		["weapon_riot_shield"] = 2,
+		["weapon_pistol"] = 1,
+		["weapon_smg1"] = 6,
+		["weapon_rpg"] = 15,
+		["weapon_plasmanade"] = 6,
+		["weapon_357"] = 4,
+		["weapon_slam"] = 4,
+		["weapon_shotgun"] = 6,
+	},
+	["EMPInterval"] = 15,
+	["PointMultiplier"] = 0.045,
+	["CoinMultiplier"] = 300,
+	["ReviveCost"] = 25,
+	["MaxLevel"] = 100,
+}
