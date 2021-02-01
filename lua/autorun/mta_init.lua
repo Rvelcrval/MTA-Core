@@ -1,3 +1,5 @@
+pcall(require, "coinsys")
+
 MTA_CONFIG = {}
 for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
 	local path = "mta_cfg/" .. f
