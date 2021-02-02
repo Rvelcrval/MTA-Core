@@ -1,9 +1,11 @@
 include("sh_init.lua")
 
 function GM:OnSpawnMenuOpen()
+	return false
 end
 
 function GM:OnSpawnMenuClose()
+	return false
 end
 
 language.Add("worldspawn", "Ground")
