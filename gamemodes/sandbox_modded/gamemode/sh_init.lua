@@ -19,4 +19,12 @@ if SERVER then
 			return ply:IsAdmin()
 		end
 	end
+
+	function GM:PlayerLoadout(ply)
+		ply:Give("weapon_crowbar")
+		ply:Give("none")
+
+		-- Prevent default Loadout.
+		return true
+	end
 end
