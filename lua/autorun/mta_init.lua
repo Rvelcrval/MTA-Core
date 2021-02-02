@@ -37,5 +37,5 @@ do
 	PrecacheParticleSystem("Weapon_Combine_Ion_Cannon")
 
 	game.AddParticles("particles/cmb_tracers_rework.pcf")
-	game.AddParticles(particles/weapon_fx.pcf)
+	game.AddParticles("particles/weapon_fx.pcf")
 end
