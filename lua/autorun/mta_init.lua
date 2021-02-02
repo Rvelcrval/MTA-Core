@@ -1,3 +1,5 @@
+pcall(require, "coinsys")
+
 MTA_CONFIG = {}
 for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
 	local path = "mta_cfg/" .. f
@@ -27,11 +29,13 @@ include("mta/riot_shield_texture_manager.lua")
 do
 	if SERVER then
 		resource.AddFile("particles/cmb_tracers_rework.pcf")
+		resource.AddFile("particles/weapon_fx.pcf")
 	end
 
 	PrecacheParticleSystem("cmb_tracer")
 	PrecacheParticleSystem("ar2_combineball")
+	PrecacheParticleSystem("Weapon_Combine_Ion_Cannon")
 
 	game.AddParticles("particles/cmb_tracers_rework.pcf")
-	game.AddParticles("particles/cmb_tracers_rework.pcf")
+	game.AddParticles("particles/weapon_fx.pcf")
 end
