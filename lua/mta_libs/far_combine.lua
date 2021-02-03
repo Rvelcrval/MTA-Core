@@ -173,6 +173,10 @@ local function create_combine(pos)
 	npc:Input("StartPatrolling")
 	npc:SetHealth(100)
 
+	if not npc:IsFlagSet(FL_FLY) then
+		npc:DropToFloor()
+	end
+
 	return npc
 end
 
