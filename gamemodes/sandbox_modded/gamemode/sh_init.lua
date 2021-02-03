@@ -12,8 +12,7 @@ if SERVER then
 	local GOD_CVAR = GetConVar("sbox_godmode")
 	if GOD_CVAR then GOD_CVAR:SetBool(false) end
 
-	local LUA_CVAR = GetConVar("sv_allowcslua")
-	if LUA_CVAR then LUA_CVAR:SetBool(false) end
+	RunConsoleCommand("sv_allowcslua", "0")
 
 	local hooks = {
 		"PlayerSpawnEffect", "PlayerSpawnNPC", "PlayerSpawnObject", "PlayerSpawnProp",
