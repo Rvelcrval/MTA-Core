@@ -7,7 +7,7 @@ GM.Author = "Meta Construct"
 GM.Email = ""
 GM.Website = "http://metastruct.net"
 
-team.SetUp(3, "Wanteds", Color(244, 135, 2), false)
+team.SetUp(3, "Wanted", Color(244, 135, 2), false)
 team.SetUp(4, "Bounty Hunters", Color(255, 0, 0), false)
 
 if SERVER then
