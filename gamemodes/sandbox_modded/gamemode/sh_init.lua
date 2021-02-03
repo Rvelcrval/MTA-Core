@@ -5,9 +5,15 @@ GM.Author = "Meta Construct"
 GM.Email = ""
 GM.Website = "http://metastruct.net"
 
+team.SetUp(3, "Wanteds", Color(244, 135, 2), false)
+team.SetUp(4, "Bounty Hunters", Color(255, 0, 0), false)
+
 if SERVER then
 	local GOD_CVAR = GetConVar("sbox_godmode")
 	if GOD_CVAR then GOD_CVAR:SetBool(false) end
+
+	local LUA_CVAR = GetConVar("sv_allowcslua")
+	if LUA_CVAR then LUA_CVAR:SetBool(false) end
 
 	local hooks = {
 		"PlayerSpawnEffect", "PlayerSpawnNPC", "PlayerSpawnObject", "PlayerSpawnProp",
@@ -134,5 +140,23 @@ if SERVER then
 		local spot = jail_spots[math.random(#jail_spots)]
 		ply:Spawn()
 		ply:SetPos(spot)
+	end
+
+	local function handle_mta_team(ply, state, mta_id)
+		if state then
+			ply:SetTeam(mta_id)
+		elseif aowl then
+			ply:SetTeam(ply:IsAdmin() and 2 or 1) -- aowl compat?
+		else
+			ply:SetTeam(1)
+		end
+	end
+
+	function GM:MTAWantedStateUpdate(ply, is_wanted)
+		handle_mta_team(ply, is_wanted, 3)
+	end
+
+	function GM:MTABountyHunterStateUpdate(ply, is_bounty_hunter)
+		handle_mta_team(ply, is_wanted, 4)
 	end
 end

@@ -59,6 +59,7 @@ if SERVER then
 				ply:SetNWBool("MTABountyHunter", false)
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
+				hook.Run("MTABountyHunterStateUpdate", ply, false)
 			end
 		end
 	end
@@ -106,6 +107,7 @@ if SERVER then
 				ply:SetNWBool("MTABountyHunter", false)
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
+				hook.Run("MTABountyHunterStateUpdate", ply, false)
 
 				net.Start(NET_MTA_BOUNTIES)
 				net.WriteEntity(atck)
@@ -185,6 +187,7 @@ if SERVER then
 
 		MTA.ConstrainPlayer(ply, "MTA bounty hunter")
 		ply:Spawn()
+		hook.Run("MTABountyHunterStateUpdate", ply, true)
 
 		MTA.ChatPrint(target, ply, color_white, " has accepted a bounty for your head!")
 	end)
