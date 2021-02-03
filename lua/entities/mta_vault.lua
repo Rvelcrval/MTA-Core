@@ -39,6 +39,9 @@ if SERVER then
 		self:SetNWInt("DrillingProgress", 0)
 		self:SetNWBool("Drilling", false)
 		self:SetNWEntity("DrillingPlayer", NULL)
+
+		self:SetSequence(0)
+		self:SetCycle(0)
 	end
 
 	function ENT:StartDrill(ply)
@@ -84,6 +87,8 @@ if SERVER then
 			if coins and coins.Create then
 				coins.Create(self:WorldSpaceCenter() + self:GetForward() * 20, math.random(10000, 250000), "MTA Vault")
 			end
+			self:SetSequence(1)
+			self:SetCycle(1)
 		end)
 	end
 
