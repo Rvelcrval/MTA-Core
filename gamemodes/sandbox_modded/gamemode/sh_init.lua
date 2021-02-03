@@ -7,8 +7,8 @@ GM.Author = "Meta Construct"
 GM.Email = ""
 GM.Website = "http://metastruct.net"
 
-team.SetUp(3, "Wanted", Color(244, 135, 2), false)
-team.SetUp(4, "Bounty Hunters", Color(255, 0, 0), false)
+team.SetUp(6669, "Wanted", Color(244, 135, 2), false)
+team.SetUp(6668, "Bounty Hunters", Color(255, 0, 0), false)
 
 if SERVER then
 	local GOD_CVAR = GetConVar("sbox_godmode")
@@ -154,10 +154,10 @@ if SERVER then
 	end
 
 	function GM:MTAWantedStateUpdate(ply, is_wanted)
-		handle_mta_team(ply, is_wanted, 3)
+		handle_mta_team(ply, is_wanted, 6669)
 	end
 
 	function GM:MTABountyHunterStateUpdate(ply, is_bounty_hunter)
-		handle_mta_team(ply, is_wanted, 4)
+		handle_mta_team(ply, is_wanted, 6668)
 	end
 end
