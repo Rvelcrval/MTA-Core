@@ -121,4 +121,17 @@ if SERVER then
 	function GM:InitPostEntity()
 		spawn_ents()
 	end
+
+	local jail_spots = {
+		Vector(1870, -974, 5416),
+		Vector(2124, -985, 5416),
+		Vector(2112, -1329, 5416),
+		Vector(1999, -1317, 5416),
+		Vector(1888, -1331, 5416)
+	}
+	function GM:MTAPlayerFailed(ply, max_factor, old_factor, is_death)
+		local spot = jail_spots[math.random(#jail_spots)]
+		ply:Spawn()
+		ply:SetPos(spot)
+	end
 end
