@@ -111,6 +111,7 @@ if SERVER then
 			ent:SetAngles(data.ang)
 			ent.role = data.role
 			ent:Spawn()
+			ent:DropToFloor()
 		end
 	end
 
