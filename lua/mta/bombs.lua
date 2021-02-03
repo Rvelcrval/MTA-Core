@@ -1,8 +1,8 @@
 local tag = "mta_bombs"
 
 if SERVER then
-	local function is_free_space(ply, vec, bomb)
-	    local maxs = bomb:OBBMaxs()
+	local function is_free_space(ply, vec, ent)
+	    local maxs = isentity(ent) and ent:OBBMaxs() or ent
 	    local tr = util.TraceHull({
 	        start = vec,
 	        endpos = vec + Vector(0, 0, maxs.z or 60),
@@ -14,17 +14,20 @@ if SERVER then
 		if not util.IsInWorld(tr.HitPos) then return false end
 
 		-- this checks if the pos found is behind a wall or obstacle of some kind
+		local filter = { ply }
+		if isentity(ent) then table.insert(filter, ent) end
+
 		tr = util.TraceLine({
 			start = ply:WorldSpaceCenter(),
 			endpos = tr.HitPos,
-			filter = { ply, bomb }
+			filter = filter
 		})
 
 		-- only use the pos if its not obstructed
 		return tr.Fraction == 1
 	end
 
-	local function find_space(ply, bomb)
+	local function find_space(ply, ent)
 	   	local maxs = ply:OBBMaxs()
 	   	local margin = 75
 	    local left = ply:WorldSpaceCenter() + ply:GetRight() * (-maxs.x + margin)
@@ -32,13 +35,13 @@ if SERVER then
 	    local forward = ply:WorldSpaceCenter() + ply:GetForward() * (maxs.y + margin)
 	    local backward = ply:WorldSpaceCenter() + ply:GetForward() * (-maxs.y + margin)
 
-		if is_free_space(ply, forward, bomb) then
+		if is_free_space(ply, forward, ent) then
 	        return forward
-	    elseif is_free_space(ply, left, bomb) then
+	    elseif is_free_space(ply, left, ent) then
 	        return left
-	    elseif is_free_space(ply, right, bomb) then
+	    elseif is_free_space(ply, right, ent) then
 	        return right
-	    elseif is_free_space(ply, backward, bomb) then
+	    elseif is_free_space(ply, backward, ent) then
 	    	return backward
 	    else
 	        return ply:GetPos() + Vector(0, 0, ply:OBBMaxs().z)
@@ -127,12 +130,14 @@ if SERVER then
 		end
 	end)
 
+	local COMBINE_MAXS = Vector(13, 13, 72)
 	hook.Add("MTASpawnFail", tag, function(failed_count, reason)
 		if #MTA.BadPlayers < 1 then return end
 		if failed_count > 0 and failed_count % 5 == 0 then
 			local ply = MTA.BadPlayers[math.random(#MTA.BadPlayers)]
 			if IsValid(ply) then
-				MTA.TeleportBombToPlayer(ply)
+				local pos = find_space(ply, COMBINE_MAXS)
+				MTA.TrySpawnCombine(pos)
 			end
 		end
 	end)

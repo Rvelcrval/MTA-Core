@@ -218,29 +218,34 @@ if SERVER then
 	local spawning = 0
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
+	local function combine_spawn_callback(combine)
+		if not IsValid(combine) then return end
+
+		if #MTA.BadPlayers == 0 then
+			SafeRemoveEntity(combine)
+			return
+		end
+
+		table.insert(MTA.Combines, combine)
+		combine:SetNWBool("MTACombine", true)
+		combine.ms_notouch = true
+		dont_transmit_combine(combine)
+
+		MTA.ToSpawn = MTA.ToSpawn - 1
+		spawning = spawning - 1
+	end
+
+	function MTA.TrySpawnCombine(pos)
+		return MTA.FarCombine(MTA.BadPlayers, combine_spawn_callback, pos)
+	end
+
 	function MTA.SpawnCombine()
 		local spawning_wait_count = math.max(spawning, 0)
 		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
 		if (#MTA.Combines + spawning_wait_count) >= MTA.MAX_COMBINES then return end
 		if #MTA.BadPlayers == 0 then return end
 
-		local succ, ret = MTA.FarCombine(MTA.BadPlayers, function(combine)
-			if not IsValid(combine) then return end
-
-			if #MTA.BadPlayers == 0 then
-				SafeRemoveEntity(combine)
-				return
-			end
-
-			table.insert(MTA.Combines, combine)
-			combine:SetNWBool("MTACombine", true)
-			combine.ms_notouch = true
-			dont_transmit_combine(combine)
-
-			MTA.ToSpawn = MTA.ToSpawn - 1
-			spawning = spawning - 1
-		end)
-
+		local succ, ret = MTA.TrySpawnCombine()
 		if succ then
 			spawning = spawning + 1
 		else
