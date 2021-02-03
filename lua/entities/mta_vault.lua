@@ -16,6 +16,7 @@ if SERVER then
 	resource.AddFile("models/props_mta/mta_vault/mta_vault.mdl")
 	resource.AddFile("materials/models/props_mta/mta_vault/vault_metal.vmt")
 	resource.AddFile("materials/models/props_mta/mta_vault/vault_misc.vmt")
+	resource.AddFile("materials/models/props_mta/mta_vault/vault_normal.vtf")
 
 	function ENT:Initialize()
 		self:SetModel("models/props_mta/mta_vault/mta_vault.mdl")
