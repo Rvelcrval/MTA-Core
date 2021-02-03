@@ -13,11 +13,13 @@ ENT.lobbyok = true
 ENT.PhysgunDisabled = true
 
 if SERVER then
+	resource.AddFile("models/props_mta/mta_vault/mta_vault.mdl")
+	resource.AddFile("materials/models/props_mta/mta_vault/vault_metal.vmt")
+	resource.AddFile("materials/models/props_mta/mta_vault/vault_misc.vmt")
+
 	function ENT:Initialize()
-		self:SetModel("models/items/ammocrate_grenade.mdl")
-		self:SetMaterial("phoenix_storms/gear")
+		self:SetModel("models/props_mta/mta_vault/mta_vault.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetColor(Color(100, 100, 100, 255))
 		self:SetSolid(SOLID_VPHYSICS)
 
 		local phys = self:GetPhysicsObject()
