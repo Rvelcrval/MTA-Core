@@ -1,4 +1,4 @@
-local IS_MTA_GM = gmod.GetGamemode().Name == "MTA"
+local IS_MTA_GM = (gmod.GetGamemode() or GM or GAMEMODE).Name == "MTA"
 
 return {
 	["DamageWhitelist"] = {
