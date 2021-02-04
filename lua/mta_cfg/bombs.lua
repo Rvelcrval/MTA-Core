@@ -1,5 +1,3 @@
-local IS_MTA_GM = (gmod.GetGamemode() or GM or GAMEMODE).Name == "MTA"
-
 return {
 	["BlockingClasses"] = {
 		"prop_door_rotating",
