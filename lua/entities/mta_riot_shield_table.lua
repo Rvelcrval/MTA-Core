@@ -33,6 +33,10 @@ if SERVER then
 			phys:Wake()
 			phys:EnableMotion(false)
 		end
+
+		if not IS_MTA_GM then
+			SafeRemoveEntityDelayed(self, 1)
+		end
 	end
 
 	function ENT:Use(activator)

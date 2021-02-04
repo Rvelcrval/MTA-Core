@@ -33,6 +33,10 @@ if SERVER then
 		self:SetNWInt("DrillingProgress", 0)
 		self:SetNWBool("Drilling", false)
 		self:SetNWEntity("DrillingPlayer", NULL)
+
+		if not IS_MTA_GM then
+			SafeRemoveEntityDelayed(self, 1)
+		end
 	end
 
 	function ENT:ResetDrill()

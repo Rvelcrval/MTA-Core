@@ -59,6 +59,8 @@ local weapon_prices = {
 
 local prestige_stats = { "damage_multiplier", "defense_multiplier", "healing_multiplier" }
 local function can_prestige_upgrade(ply)
+	if not IS_MTA_GM then return false end
+
 	for _, stat_name in ipairs(prestige_stats) do
 		if SERVER and MTA.GetPlayerStat(ply, stat_name) < MAX_LEVEL then return false end
 		if CLIENT and MTA.GetPlayerStat(stat_name) < MAX_LEVEL then return false end
@@ -157,8 +159,14 @@ if SERVER then
 		local total_points = MTA.IncreasePlayerStat(ply, "points", amount, true)
 		if total_points == -1 then return -1 end
 
+		local chat_print_args = IS_MTA_GM
+			and { ", you can spend them with the ", new_value_color, "dealer." }
+			or { ", you can spend them on ", new_value_color, "server #3", color_white, " with the ", new_value_color, "dealer." }
 		MTA.ChatPrint(ply, color_white, "You've earned ", new_value_color, amount .. " criminal points",
-			total_value_color, (" (Total: %d)"):format(total_points), color_white, ", you can spend them with the ", new_value_color, "dealer.")
+			total_value_color, (" (Total: %d)"):format(total_points), color_white, chat_print_args)
+		if not IS_MTA_GM then
+			MTA.ChatPrint(ply, total_value_color, "Type !goto 3 to join the MTA server")
+		end
 
 		return total_points
 	end
@@ -297,6 +305,8 @@ if SERVER then
 	end)
 
 	local function try_upgrade_player_stat(ply, stat_name)
+		if not IS_MTA_GM then return end
+
 		local cur_value = MTA.GetPlayerStat(ply, stat_name)
 		local upgrade_price = math.Round(math.exp(cur_value * POINT_MULTIPLIER))
 		if MTA.GetPlayerStat(ply, "points") < upgrade_price then return end
@@ -314,6 +324,8 @@ if SERVER then
 	end)
 
 	net.Receive(NET_GIVE_WEAPON, function(_, ply)
+		if not IS_MTA_GM then return end
+
 		local weapon_class = net.ReadString()
 
 		local wep_price = weapon_prices[weapon_class]
@@ -519,7 +531,7 @@ if CLIENT then
 			end)
 
 			-- weapons
-			do
+			if IS_MTA_GM then
 				local panel = content:Add("DPanel")
 				panel:Dock(TOP)
 				panel:DockMargin(0, 10, 0, 0)

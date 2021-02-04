@@ -37,6 +37,10 @@ if SERVER then
 		end
 
 		self:Activate()
+
+		if not IS_MTA_GM then
+			SafeRemoveEntityDelayed(self, 1)
+		end
 	end
 
 	function ENT:Use(activator)
