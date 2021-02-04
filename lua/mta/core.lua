@@ -1135,11 +1135,9 @@ if CLIENT then
 		if MTA.IsWanted() and LocalPlayer():Health() <= LOW_HEALTH then
 			cam.IgnoreZ(true)
 				render.SetLightingMode(2)
-					render.SetColorModulation(1, 0, 0)
-						render.MaterialOverride(debug_white)
-							self:DrawModel()
-						render.MaterialOverride()
-					render.SetColorModulation(1, 1, 1)
+					render.MaterialOverride(debug_white)
+						self:DrawModel()
+					render.MaterialOverride()
 				render.SetLightingMode(0)
 			cam.IgnoreZ(false)
 		else
