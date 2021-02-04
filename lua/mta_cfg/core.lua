@@ -1,3 +1,5 @@
+local IS_MTA_GM = gmod.GetGamemode().Name == "MTA"
+
 return {
 	["DamageWhitelist"] = {
 		"crossbow_bolt",
@@ -41,9 +43,9 @@ return {
 			["damage_coef"] = 1,
 		},
 	},
-	["CanOptOut"] = false,
-	["UseMapData"] = false,
+	["CanOptOut"] = not IS_MTA_GM,
+	["UseMapData"] = not IS_MTA_GM,
 	["DecreaseDivider"] = 250,
 	["EscapeTime"] = 20,
-	["MaxCombines"] = 150,
+	["MaxCombines"] = IS_MTA_GM and 150 or 25,
 }

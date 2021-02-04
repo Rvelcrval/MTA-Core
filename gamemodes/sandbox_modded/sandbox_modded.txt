@@ -1,7 +1,0 @@
-"gamemode"
-{
-	"base"		"sandbox"
-	"title"		"MTA"
-	"maps"		"rp_unioncity"
-	"menusystem"	"0"
-}
