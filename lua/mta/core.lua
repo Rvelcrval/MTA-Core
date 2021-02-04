@@ -294,7 +294,8 @@ if SERVER then
 		end
 
 		local count = #MTA.Combines
-		factor = math.max(0, math.floor(factor / 2))
+		local divider = math.max(2, 5 - #MTA.BadPlayers)
+		factor = math.max(0, math.floor(factor / divider))
 
 		if count >= 1 then
 			if count < factor then -- spawn remaining combines
