@@ -1,5 +1,15 @@
 pcall(require, "coinsys")
 
+IS_MTA_GM = false
+for _, gm_data in pairs(engine.GetGamemodes()) do
+	if gm_data.title == "MTA" then
+		IS_MTA_GM = true
+	elseif gm_data.title == "qbox" then
+		IS_MTA_GM = false
+		break
+	end
+end
+
 MTA_CONFIG = {}
 for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
 	local path = "mta_cfg/" .. f
