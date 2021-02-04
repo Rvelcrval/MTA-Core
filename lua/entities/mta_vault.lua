@@ -209,4 +209,27 @@ if CLIENT then
 			end
 		end
 	end)
+
+	hook.Add("MTAPaint", tag, function()
+		local vault = LocalPlayer():GetNWEntity("MTAVault", NULL)
+		if not IsValid(vault) then return end
+
+		surface.SetDrawColor(black_color)
+		local coef = ScrW() / 2560
+		local x, y = ScrW() - 400 * coef, ScrH() / 2
+		surface.DrawRect(x, y, 400 * coef, 50)
+
+		surface.SetTextColor(orange_color)
+		surface.SetTextPos(x + 10 * coef, y + 6)
+		surface.SetFont("DermaDefault")
+		surface.DrawText("/// DRILL PROGRESS ///")
+
+		local perc = vault:GetNWInt("DrillingProgress", 0)
+		local margin = ((300 * coef) * perc) / 100
+		surface.SetDrawColor(orange_color)
+		surface.DrawRect(x + 10 * coef, y + 30, margin, 10)
+
+		surface.SetTextPos(x + 15 * coef + margin, y + 28)
+		surface.DrawText(perc .. "%")
+	end)
 end
