@@ -499,6 +499,11 @@ if SERVER then
 		})
 	end
 
+	local function is_gm_mta()
+		return gmod.GetGamemode().Name == "MTA"
+	end
+
+	local blocked_ents = { "mta_vault", "mta_jukebox", "mta_skills_computer" }
 	local function spawn_lobby_persistent_ents()
 		if not MTA_CONFIG.core.UseMapData then return end
 
@@ -512,6 +517,13 @@ if SERVER then
 			end
 
 			ms.persist.paste("lobby_mta", "lobby_3", Angle())
+			if is_gm_mta() then
+				for _, ent in ipairs(ents.GetAll()) do
+					if blocked_ents[ent:GetClass()] then
+						SafeRemoveEntity(ent)
+					end
+				end
+			end
 		end
 	end
 
