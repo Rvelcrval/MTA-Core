@@ -1,20 +1,11 @@
 pcall(require, "coinsys")
 
 IS_MTA_GM = false
-for _, gm_data in pairs(engine.GetGamemodes()) do
-	if gm_data.title == "MTA" then
-		IS_MTA_GM = true
-	elseif gm_data.title == "qbox" then
-		IS_MTA_GM = false
-		break
-	end
-end
-
 MTA_CONFIG = {}
+
 for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
 	local path = "mta_cfg/" .. f
-	if SERVER then AddCSLuaFile(path) end
-	MTA_CONFIG[f:StripExtension()] = include(path)
+	AddCSLuaFile(path)
 end
 
 AddCSLuaFile("mta/core.lua")
@@ -25,15 +16,6 @@ AddCSLuaFile("mta/bounties.lua")
 AddCSLuaFile("mta/bombs.lua")
 AddCSLuaFile("mta/fever.lua")
 AddCSLuaFile("mta/riot_shield_texture_manager.lua")
-
-include("mta/core.lua")
-include("mta/songs.lua")
-include("mta/upgrades.lua")
-include("mta/skill_tree.lua")
-include("mta/bounties.lua")
-include("mta/bombs.lua")
-include("mta/fever.lua")
-include("mta/riot_shield_texture_manager.lua")
 
 -- better combine tracers
 do
@@ -49,3 +31,21 @@ do
 	game.AddParticles("particles/cmb_tracers_rework.pcf")
 	game.AddParticles("particles/weapon_fx.pcf")
 end
+
+hook.Add("PostGamemodeLoaded", "MTA", function()
+	IS_MTA_GM = (gmod.GetGamemode() or GM or GAMEMODE).Name == "MTA"
+
+	for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
+		local path = "mta_cfg/" .. f
+		MTA_CONFIG[f:StripExtension()] = include(path)
+	end
+
+	include("mta/core.lua")
+	include("mta/songs.lua")
+	include("mta/upgrades.lua")
+	include("mta/skill_tree.lua")
+	include("mta/bounties.lua")
+	include("mta/bombs.lua")
+	include("mta/fever.lua")
+	include("mta/riot_shield_texture_manager.lua")
+end)
