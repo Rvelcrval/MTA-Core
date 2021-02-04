@@ -139,8 +139,11 @@ if SERVER then
 	}
 	function GM:MTAPlayerFailed(ply, max_factor, old_factor, is_death)
 		local spot = jail_spots[math.random(#jail_spots)]
-		ply:Spawn()
-		ply:SetPos(spot)
+		timer.Simple(0.5, function()
+			if not IsValid(ply) then return end
+			ply:Spawn()
+			ply:SetPos(spot)
+		end)
 	end
 
 	local function handle_mta_team(ply, state, mta_id)
