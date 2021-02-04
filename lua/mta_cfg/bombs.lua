@@ -1,3 +1,5 @@
+local IS_MTA_GM = gmod.GetGamemode().Name == "MTA"
+
 return {
 	["BlockingClasses"] = {
 		"prop_door_rotating",
@@ -6,6 +8,6 @@ return {
 		"prop_physics",
 		"prop_dynamic",
 	},
-	["CampingDistance"] = 300,
+	["CampingDistance"] = IS_MTA_GM and 300 or 150,
 	["CampingInterval"] = 180,
 }
