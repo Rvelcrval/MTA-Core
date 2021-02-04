@@ -27,6 +27,7 @@ if SERVER then
 		self.Screen = ents.Create("prop_physics")
 		self.Screen:SetModel("models/props_combine/combine_intmonitor001.mdl")
 		self.Screen:SetPos(self:GetPos() + Vector(0, 0, 50) + self:GetForward() * -15)
+		self.Screen:SetAngles(self:GetAngles())
 		self.Screen:SetParent(self)
 		self.Screen:Spawn()
 		self.Screen:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
