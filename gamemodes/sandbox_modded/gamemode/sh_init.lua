@@ -14,6 +14,7 @@ if SERVER then
 	local GOD_CVAR = GetConVar("sbox_godmode")
 	if GOD_CVAR then GOD_CVAR:SetBool(false) end
 
+	RunConsoleCommand("sbox_godmode", "0")
 	RunConsoleCommand("sv_allowcslua", "0")
 
 	local hooks = {
@@ -28,10 +29,15 @@ if SERVER then
 	end
 
 	function GM:PlayerLoadout(ply)
+		if ply:IsAdmin() then
+			ply:Give("weapon_physgun")
+		end
+
 		ply:Give("weapon_crowbar")
 		ply:Give("none")
 
-		-- Prevent default Loadout.
+		ply:SelectWeapon("none")
+
 		return true
 	end
 
