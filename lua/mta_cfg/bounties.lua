@@ -1,5 +1,7 @@
+local IS_MTA_GM = gmod.GetGamemode().Name == "MTA"
+
 return {
-	["MaxBountiesPerHunter"] = 4,
+	["MaxBountiesPerHunter"] = IS_MTA_GM and 10 or 4,
 	["MinimumLevel"] = 20,
 	["TimeToBountyRefresh"] = 7200,
 }

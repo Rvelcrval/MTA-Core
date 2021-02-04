@@ -173,6 +173,10 @@ local function create_combine(pos)
 	npc:Input("StartPatrolling")
 	npc:SetHealth(100)
 
+	if not npc:IsFlagSet(FL_FLY) then
+		npc:DropToFloor()
+	end
+
 	return npc
 end
 
@@ -535,23 +539,27 @@ local function setup_combine(combine, target, players)
 	end)
 end
 
-local function find_node(players)
-	if #players == 0 then return false, "no players to use" end
-	local target = players[math.random(#players)]
-	if not IsValid(target) then return end
-
+local function find_node(players, target)
 	local nearest_node = get_nearest_node(target, MAX_SPAWN_DISTANCE)
 	if not nearest_node then return false, "could not get nearest node" end
 
 	local node, pos = find_cadidate_node(target, nearest_node)
 	if not node then return false, "could not find suitable node" end
 
-	return true, node.pos, target
+	return true, node.pos
 end
 
-local function far_combine(players, callback)
-	local succ, pos, target = find_node(players)
-	if not succ then return false, pos end
+local function far_combine(players, callback, pos)
+	if #players == 0 then return false, "no players to use" end
+
+	local target = players[math.random(#players)]
+	if not IsValid(target) then return end
+
+	if not isvector(pos) then
+		local succ, ret = find_node(players, target)
+		if not succ then return false, ret end
+		pos = ret
+	end
 
 	net.Start(NET_FAR_COMBINE_SPAWN_EFFECT, true)
 	net.WriteVector(pos)

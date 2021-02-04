@@ -241,6 +241,7 @@ if SERVER then
 				end
 			end
 
+			if not IsValid(ply) then return end
 			hook.Run("MTAPlayerStatsInitialized", ply)
 		end)
 

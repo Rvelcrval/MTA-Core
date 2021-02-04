@@ -52,11 +52,12 @@ function MTA.Reset()
 end
 
 function MTA.InLobby(ply)
-	if ply.InLobby then
+	return true -- will need to do a check for gamemode later on
+	--[[if ply.InLobby then
 		return ply:InLobby()
 	end
 
-	return false
+	return false]]--
 end
 
 local NET_WANTED_STATE = "MTA_WANTED_STATE"
@@ -217,29 +218,34 @@ if SERVER then
 	local spawning = 0
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
+	local function combine_spawn_callback(combine)
+		if not IsValid(combine) then return end
+
+		if #MTA.BadPlayers == 0 then
+			SafeRemoveEntity(combine)
+			return
+		end
+
+		table.insert(MTA.Combines, combine)
+		combine:SetNWBool("MTACombine", true)
+		combine.ms_notouch = true
+		dont_transmit_combine(combine)
+
+		MTA.ToSpawn = MTA.ToSpawn - 1
+		spawning = spawning - 1
+	end
+
+	function MTA.TrySpawnCombine(pos)
+		return MTA.FarCombine(MTA.BadPlayers, combine_spawn_callback, pos)
+	end
+
 	function MTA.SpawnCombine()
 		local spawning_wait_count = math.max(spawning, 0)
 		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
 		if (#MTA.Combines + spawning_wait_count) >= MTA.MAX_COMBINES then return end
 		if #MTA.BadPlayers == 0 then return end
 
-		local succ, ret = MTA.FarCombine(MTA.BadPlayers, function(combine)
-			if not IsValid(combine) then return end
-
-			if #MTA.BadPlayers == 0 then
-				SafeRemoveEntity(combine)
-				return
-			end
-
-			table.insert(MTA.Combines, combine)
-			combine:SetNWBool("MTACombine", true)
-			combine.ms_notouch = true
-			dont_transmit_combine(combine)
-
-			MTA.ToSpawn = MTA.ToSpawn - 1
-			spawning = spawning - 1
-		end)
-
+		local succ, ret = MTA.TrySpawnCombine()
 		if succ then
 			spawning = spawning + 1
 		else
@@ -493,6 +499,11 @@ if SERVER then
 		})
 	end
 
+	local function is_gm_mta()
+		return gmod.GetGamemode().Name == "MTA"
+	end
+
+	local blocked_ents = { "mta_vault", "mta_jukebox", "mta_skills_computer" }
 	local function spawn_lobby_persistent_ents()
 		if not MTA_CONFIG.core.UseMapData then return end
 
@@ -506,6 +517,13 @@ if SERVER then
 			end
 
 			ms.persist.paste("lobby_mta", "lobby_3", Angle())
+			if is_gm_mta() then
+				for _, ent in ipairs(ents.GetAll()) do
+					if blocked_ents[ent:GetClass()] then
+						SafeRemoveEntity(ent)
+					end
+				end
+			end
 		end
 	end
 
@@ -1129,11 +1147,9 @@ if CLIENT then
 		if MTA.IsWanted() and LocalPlayer():Health() <= LOW_HEALTH then
 			cam.IgnoreZ(true)
 				render.SetLightingMode(2)
-					render.SetColorModulation(1, 0, 0)
-						render.MaterialOverride(debug_white)
-							self:DrawModel()
-						render.MaterialOverride()
-					render.SetColorModulation(1, 1, 1)
+					render.MaterialOverride(debug_white)
+						self:DrawModel()
+					render.MaterialOverride()
 				render.SetLightingMode(0)
 			cam.IgnoreZ(false)
 		else
