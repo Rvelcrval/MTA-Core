@@ -115,7 +115,7 @@ if CLIENT then
 		surface.SetFont("DermaLarge")
 
 		local diff = math.max(fever_end_time - CurTime(), 0)
-		local s, ms = math.floor(diff), math.Round((1 - math.fmod(diff, 1)) * 1000)
+		local s, ms = math.floor(diff), math.Round(math.fmod(diff, 1) * 1000)
 		local time_left = ("/// %d:%d ///"):format(s, ms)
 		local tw, th = surface.GetTextSize(time_left)
 		local pos_x, pos_y = scrw / 2 - tw / 2, scrh / 2 - th / 2
