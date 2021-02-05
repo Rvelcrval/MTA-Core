@@ -1040,18 +1040,20 @@ if CLIENT then
 
 		surface.DrawText(text)
 
-		surface.SetFont("DermaDefaultBold")
-		surface.SetDrawColor(health < LOW_HEALTH and red_color or orange_color)
-		surface.SetTextColor(health < LOW_HEALTH and red_color or orange_color)
-		surface.DrawRect(pos_x - 10, pos_y + th + 25, (tw / 100) * health, 5, true)
-		surface.SetTextPos(pos_x + (tw / 100) * health, pos_y + th + 20)
-		surface.DrawText(("%d HPs"):format(math.Clamp(health, 0, 100)))
+		if not IS_MTA_GM then
+			surface.SetFont("DermaDefaultBold")
+			surface.SetDrawColor(health < LOW_HEALTH and red_color or orange_color)
+			surface.SetTextColor(health < LOW_HEALTH and red_color or orange_color)
+			surface.DrawRect(pos_x - 10, pos_y + th + 25, (tw / 100) * health, 5, true)
+			surface.SetTextPos(pos_x + (tw / 100) * health, pos_y + th + 20)
+			surface.DrawText(("%d HPs"):format(math.Clamp(health, 0, 100)))
 
-		surface.SetDrawColor(orange_color)
-		surface.SetTextColor(orange_color)
-		surface.DrawRect(pos_x - 10, pos_y + th + 40, (tw / 100) * armor, 5, true)
-		surface.SetTextPos(pos_x + (tw / 100) * armor, pos_y + th + 35)
-		surface.DrawText(("%d SUIT"):format(math.Clamp(armor, 0, 100)))
+			surface.SetDrawColor(orange_color)
+			surface.SetTextColor(orange_color)
+			surface.DrawRect(pos_x - 10, pos_y + th + 40, (tw / 100) * armor, 5, true)
+			surface.SetTextPos(pos_x + (tw / 100) * armor, pos_y + th + 35)
+			surface.DrawText(("%d SUIT"):format(math.Clamp(armor, 0, 100)))
+		end
 
 		hook.Run("MTAPaint", pos_x, pos_y, tw, th)
 	end
