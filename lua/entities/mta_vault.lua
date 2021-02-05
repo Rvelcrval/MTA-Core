@@ -113,7 +113,7 @@ if SERVER then
 			if IsValid(self) and IsValid(activator) then
 				local progress = self:GetNWInt("DrillingProgress", 0) + 1 -- done in 5 mins
 				self:SetNWInt("DrillingProgress", progress)
-				MTA.IncreasePlayerFactor(activator, 2)
+				MTA.IncreasePlayerFactor(activator, 4 * math.min(activator.MTAVaultStreak or 1, 3))
 
 				if progress == 100 then
 					self:Explode()
