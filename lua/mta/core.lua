@@ -294,15 +294,15 @@ if SERVER then
 		end
 
 		local count = #MTA.Combines
-		local divider = math.max(2, 5 - #MTA.BadPlayers)
-		factor = math.max(0, math.floor(factor / divider))
+		local divider = math.max(1, 3 - (#MTA.BadPlayers / 10))
+		local count_to_spawn = math.max(0, math.floor(factor / 10 / divider))
 
 		if count >= 1 then
 			if count < factor then -- spawn remaining combines
-				MTA.ToSpawn = math.min(MTA.MAX_COMBINES, factor - count)
+				MTA.ToSpawn = math.min(MTA.MAX_COMBINES, count_to_spawn - count)
 			end
 		else
-			MTA.ToSpawn = factor
+			MTA.ToSpawn = count_to_spawn
 		end
 	end
 
