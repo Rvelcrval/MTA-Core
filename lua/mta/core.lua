@@ -294,7 +294,7 @@ if SERVER then
 		end
 
 		local count = #MTA.Combines
-		local base_divider = 2
+		local base_divider = 3
 		local divider = math.max(1, base_divider - (#MTA.BadPlayers / 10))
 		local count_to_spawn = math.max(1, math.floor(factor / 10 / divider))
 
