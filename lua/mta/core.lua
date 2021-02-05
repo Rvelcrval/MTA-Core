@@ -878,29 +878,33 @@ if CLIENT then
 	end
 
 	surface.CreateFont("MTAIndicatorFont", {
-		font = "Arial",
+		font = IS_MTA_GM and "Orbitron" or "Arial",
 		size = 20,
 		weight = 800,
 		shadow = false,
+		extended = true,
 	})
 
-	surface.CreateFont("MTAHUDFont", {
-		font = "Tahoma",
-		size = 20,
+	surface.CreateFont("MTALargeFont", {
+		font = IS_MTA_GM and "Orbitron" or "Arial",
+		size = 32,
 		weight = 600,
-		antialias = true,
+		shadow = false,
+		extended = true,
 	})
 
-	surface.CreateFont("MTAHUDFontExtra", {
-		font = "Tahoma",
-		size = 100,
+	surface.CreateFont("MTASmallFont", {
+		font = IS_MTA_GM and "Orbitron" or "Arial",
+		size = 13,
 		weight = 600,
-		antialias = true,
+		shadow = false,
+		extended = true,
 	})
 
 	local black_color = Color(0, 0, 0, 150)
 	local orange_color = Color(244, 135, 2)
 	local red_color = Color(255, 0, 0)
+	local white_color = Color(255, 255, 255)
 
 	function MTA.HighlightPosition(pos, text, color)
 		if MTA.IsOptedOut() then return end
@@ -1025,8 +1029,8 @@ if CLIENT then
 			surface.DrawRect(0, 0, scrw, scrh)
 		end
 
-		surface.SetTextColor(orange_color)
-		surface.SetFont("DermaLarge")
+		surface.SetTextColor(white_color)
+		surface.SetFont("MTALargeFont")
 		local text = ("/// WANTED LEVEL %d ///"):format(LocalPlayer():GetNWInt("MTAFactor"))
 		local tw, th = surface.GetTextSize(text)
 		local pos_x, pos_y = scrw / 2 - tw / 2, (scrh / 2 - th / 2) - (450 * (scrh / 1080))
@@ -1042,7 +1046,7 @@ if CLIENT then
 		surface.DrawText(text)
 
 		if not IS_MTA_GM then
-			surface.SetFont("DermaDefaultBold")
+			surface.SetFont("MTASmallFont")
 			surface.SetDrawColor(health < LOW_HEALTH and red_color or orange_color)
 			surface.SetTextColor(health < LOW_HEALTH and red_color or orange_color)
 			surface.DrawRect(pos_x - 10, pos_y + th + 25, (tw / 100) * health, 5, true)

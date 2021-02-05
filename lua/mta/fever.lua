@@ -112,7 +112,7 @@ if CLIENT then
 
 		local scrw, scrh = ScrW(), ScrH()
 		surface.SetTextColor(red_color)
-		surface.SetFont("DermaLarge")
+		surface.SetFont("MTALargeFont")
 
 		local diff = math.max(fever_end_time - CurTime(), 0)
 		local s, ms = math.floor(diff), math.Round(math.fmod(diff, 1) * 1000)

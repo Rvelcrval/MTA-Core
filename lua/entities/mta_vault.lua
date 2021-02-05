@@ -228,7 +228,7 @@ if CLIENT then
 
 		surface.SetTextColor(orange_color)
 		surface.SetTextPos(x + 10 * coef, y + 6)
-		surface.SetFont("DermaDefault")
+		surface.SetFont("MTASmallFont")
 		surface.DrawText("/// DRILL PROGRESS ///")
 
 		local perc = vault:GetNWInt("DrillingProgress", 0)

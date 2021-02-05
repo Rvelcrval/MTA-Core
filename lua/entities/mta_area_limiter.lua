@@ -204,7 +204,7 @@ if CLIENT then
 		surface.SetDrawColor(255, 255, 0, 10)
 		surface.DrawRect(0, 0, 400, 400)
 
-		surface.SetFont("DermaDefaultBold")
+		surface.SetFont("MTASmallFont")
 		local th, tw = surface.GetTextSize(text)
 		local tx, ty = 125 + tw / 2, 125 + th / 2
 		surface.SetTextPos(tx, ty)

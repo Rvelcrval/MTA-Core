@@ -103,7 +103,7 @@ if CLIENT then
 			surface.DrawOutlinedRect((sw_half - 25) + coef, sh_half - 100, 50, 200)
 
 			local text = ("Mash [%s]"):format(bind)
-			surface.SetFont("DermaLarge")
+			surface.SetFont("MTALargeFont")
 			local tw, th = surface.GetTextSize(text)
 			surface.SetTextPos((sw_half - tw / 2) + coef, sh_half - 140)
 			surface.SetTextColor(255, 255 - i, 255 - i)
