@@ -97,6 +97,18 @@ if SERVER then
 		end)
 	end
 
+	local function stop_drill(ply)
+		local vault = ply:GetNWEntity("MTAVault")
+		if not IsValid(vault) then return end
+
+		ply.MTAVaultStreak = 0
+		ply:SetNWEntity("MTAVault", NULL)
+		MTA.AllowPlayerEscape(ply)
+		vault:ResetDrill()
+		timer.Remove(("MTA_VAULT_%d_%s"):format(vault:EntIndex(), ply:SteamID()))
+	end
+
+	local VAULT_DISTANCE_LIMIT = 3000
 	function ENT:AcceptInput(input_name, activator)
 		if not MTA.IsEnabled() then return end
 		if input_name ~= "Use" then return end
@@ -111,6 +123,11 @@ if SERVER then
 		self:StartDrill(activator)
 		timer.Create(("MTA_VAULT_%d_%s"):format(self:EntIndex(), activator:SteamID()), 3, 100, function()
 			if IsValid(self) and IsValid(activator) then
+				if activator:GetPos():Distance(self:GetPos()) >= VAULT_DISTANCE_LIMIT then
+					stop_drill(activator)
+					return
+				end
+
 				local progress = self:GetNWInt("DrillingProgress", 0) + 1 -- done in 5 mins
 				self:SetNWInt("DrillingProgress", progress)
 				MTA.IncreasePlayerFactor(activator, 4 * math.min(activator.MTAVaultStreak or 1, 3))
@@ -130,17 +147,6 @@ if SERVER then
 		end)
 
 		return true
-	end
-
-	local function stop_drill(ply)
-		local vault = ply:GetNWEntity("MTAVault")
-		if not IsValid(vault) then return end
-
-		ply.MTAVaultStreak = 0
-		ply:SetNWEntity("MTAVault", NULL)
-		MTA.AllowPlayerEscape(ply)
-		vault:ResetDrill()
-		timer.Remove(("MTA_VAULT_%d_%s"):format(vault:EntIndex(), ply:SteamID()))
 	end
 
 	function ENT:OnRemove()
