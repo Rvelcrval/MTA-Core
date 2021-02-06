@@ -77,17 +77,28 @@ if SERVER then
 	hook.Add("MTAPlayerStatsInitialized", tag, MTA.Weapons.Init)
 	hook.Add("PlayerDisconnected", tag, function(ply) MTA.Weapons.Classes[ply] = nil end)
 
+	local function give_weapon(ply, weapon_class)
+		local wep = ply:HasWeapon(weapon_class) and ply:GetWeapon(weapon_class) or ply:Give(weapon_class)
+		wep.unrestricted_gun = true
+		wep.lobbyok = true
+		wep.PhysgunDisabled = true
+		wep.dont_televate = true
+		wep:SetClip1(wep:GetMaxClip1())
+		wep:SetClip2(2)
+		ply:SelectWeapon(weapon_class)
+	end
+
 	if IS_MTA_GM then
 		hook.Add("PlayerLoadout", tag, function(ply)
 			for _, weapon_class in pairs(MTA.Weapons.Get(ply)) do
-				ply:Give(weapon_class)
+				give_weapon(ply, weapon_class)
 			end
 		end)
 	else
 		hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 			if not is_wanted then return end
 			for _, weapon_class in pairs(MTA.Weapons.Get(ply)) do
-				ply:Give(weapon_class)
+				give_weapon(ply, weapon_class)
 			end
 		end)
 	end
