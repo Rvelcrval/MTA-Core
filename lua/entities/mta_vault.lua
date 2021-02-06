@@ -142,6 +142,7 @@ if SERVER then
 					timer.Simple(600, function()
 						if IsValid(self) then self:ResetDrill() end
 					end)
+					hook.Run("MTADrillSuccess", activator)
 				end
 			end
 		end)
