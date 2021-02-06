@@ -16,6 +16,12 @@ local function clear_empty_urls(tbl)
 	end
 end
 
+local function fix_dropbox_links(tbl)
+	for i, url in pairs(tbl) do
+		tbl[i] = url:gsub("^https?%:%/%/www%.dropbox%.com", "https://dl.dropboxusercontent.com")
+	end
+end
+
 local NET_SONGS_TRANSMIT = "MTA_SONGS_TRANSMIT"
 if SERVER then
 	resource.AddFile("materials/mta/policeassault_corners.png")
@@ -33,6 +39,7 @@ if SERVER then
 
 	function MTA.Songs.Save(ply, songs)
 		clear_empty_urls(songs)
+		fix_dropbox_links(songs)
 
 		local prestige_lvl = MTA.GetPlayerStat(ply, "prestige_level")
 		local count = #songs >= prestige_lvl and prestige_lvl or #songs
