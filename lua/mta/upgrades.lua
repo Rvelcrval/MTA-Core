@@ -25,11 +25,6 @@ CREATE TABLE mta_stats (
 )
 ]]--
 
--- TODO IDEAS:
---[[
-- skill to scare metrocops away if grenade explodes or whatever
-]]--
-
 local color_white = Color(255, 255, 255)
 
 local valid_stats = {
@@ -42,21 +37,7 @@ local valid_stats = {
 	prestige_level = 0,
 }
 
-local weapon_prices = {
-	weapon_ar2 = 8,
-	weapon_357 = 4,
-	weapon_pistol = 1,
-	weapon_crossbow = 10,
-	weapon_rpg = 15,
-	weapon_smg1 = 6,
-	weapon_shotgun = 6,
-	weapon_asmd = 12,
-	weapon_plasmanade = 6,
-	weapon_slam = 4,
-	weapon_escape_teleporter = 4,
-	weapon_riot_shield = 2,
-}
-
+local weapon_prices = MTA_CONFIG.upgrades.WeaponCosts
 local prestige_stats = { "damage_multiplier", "defense_multiplier", "healing_multiplier" }
 local function can_prestige_upgrade(ply)
 	if not IS_MTA_GM then return false end
@@ -331,6 +312,9 @@ if SERVER then
 		local wep_price = weapon_prices[weapon_class]
 		if not wep_price then return end
 
+		local cur_classes = MTA.Weapons.Get(ply)
+		if table.HasValue(cur_classes, weapon_class) then return end
+
 		if MTA.GetPlayerStat(ply, "points") < wep_price then return end
 		MTA.IncreasePlayerStat(ply, "points", -wep_price, true)
 
@@ -342,6 +326,9 @@ if SERVER then
 		wep:SetClip1(wep:GetMaxClip1())
 		wep:SetClip2(2)
 		ply:SelectWeapon(weapon_class)
+
+		table.insert(cur_classes, weapon_class)
+		MTA.Weapons.Save(ply, cur_classes)
 	end)
 
 	net.Receive(NET_REFILL_WEAPON, function(_, ply)
@@ -366,6 +353,7 @@ if SERVER then
 
 		local new_prestige = MTA.IncreasePlayerStat(ply, "prestige_level", 1, true)
 
+		MTA.Weapons.Save(ply, {})
 		for _, stat_name in ipairs(stats_to_reset) do
 			MTA.IncreasePlayerStat(ply, stat_name, -MTA.GetPlayerStat(ply, stat_name), true)
 		end
@@ -588,7 +576,7 @@ if CLIENT then
 						surface.SetDrawColor(75, 75, 75, 240)
 						surface.DrawRect(0, 0, w, h)
 
-						surface.SetDrawColor(MTA.GetPlayerStat("points") >= wep_price and 50 or 255, 50, 50)
+						surface.SetDrawColor((MTA.GetPlayerStat("points") >= wep_price and not MTA.Weapons[weapon_class]) and 50 or 255, 50, 50)
 						surface.DrawOutlinedRect(0, 0, w, h, 2)
 					end
 

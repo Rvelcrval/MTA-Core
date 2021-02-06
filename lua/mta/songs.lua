@@ -1,6 +1,6 @@
 -- DB SCHEME
 --[[
-CREATE TABLE mta_stats (
+CREATE TABLE mta_user_songs (
 	id INTEGER NOT NULL PRIMARY KEY,
 	urls TEXT NOT NULL DEFAULT ''
 )

@@ -10,6 +10,7 @@ end
 
 AddCSLuaFile("mta/core.lua")
 AddCSLuaFile("mta/songs.lua")
+AddCSLuaFile("mta/weapons.lua")
 AddCSLuaFile("mta/upgrades.lua")
 AddCSLuaFile("mta/skill_tree.lua")
 AddCSLuaFile("mta/bounties.lua")
@@ -42,6 +43,7 @@ hook.Add("PostGamemodeLoaded", "MTA", function()
 
 	include("mta/core.lua")
 	include("mta/songs.lua")
+	include("mta/weapons.lua")
 	include("mta/upgrades.lua")
 	include("mta/skill_tree.lua")
 	include("mta/bounties.lua")
