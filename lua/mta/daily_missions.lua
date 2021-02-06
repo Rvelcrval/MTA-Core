@@ -191,11 +191,11 @@ if CLIENT then
 
 		last_angles = curAngs
 
-		last_translate_p = Lerp(0.1, last_translate_p, ang_delta_p)
-		last_translate_y = Lerp(0.1, last_translate_y, ang_delta_y)
+		last_translate_p = Lerp(FrameTime() * 5, last_translate_p, ang_delta_p)
+		last_translate_y = Lerp(FrameTime() * 5, last_translate_y, ang_delta_y)
 
 		if vel.z ~= 0 then
-			last_translate_p = last_translate_p + (math.Clamp(vel.z, -100, 100) * 0.005)
+			last_translate_p = last_translate_p + (math.Clamp(vel.z, -100, 100) * FrameTime() * 0.2)
 		end
 
 		local mat = Matrix()
