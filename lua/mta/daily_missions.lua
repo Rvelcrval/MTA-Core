@@ -127,6 +127,11 @@ if SERVER then
 	end
 
 	hook.Add("PlayerFullyConnected", tag, function(ply)
+		for mission_id, data in pairs(cur_missions) do
+			local ply_data = data[ply:AccountID()] or { Progress = 0, Completed = false }
+			ply:SetNWInt(tag .. "_" .. mission_id, ply_data.Progress)
+		end
+
 		net.Start(tag)
 		net.WriteTable(table.GetKeys(cur_missions))
 		net.Send(ply)
