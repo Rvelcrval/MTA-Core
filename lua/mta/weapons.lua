@@ -79,11 +79,12 @@ if SERVER then
 
 	local function give_weapon(ply, weapon_class)
 		local wep = ply:HasWeapon(weapon_class) and ply:GetWeapon(weapon_class) or ply:Give(weapon_class)
+		if not IsValid(wep) then return end
 		wep.unrestricted_gun = true
 		wep.lobbyok = true
 		wep.PhysgunDisabled = true
 		wep.dont_televate = true
-		wep:SetClip1(wep:GetMaxClip1())
+		wep:SetClip1(wep.GetMaxClip1 and wep:GetMaxClip1() or 10)
 		wep:SetClip2(2)
 		ply:SelectWeapon(weapon_class)
 	end
