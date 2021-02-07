@@ -147,9 +147,11 @@ if CLIENT then
 		selected_mission_ids = net.ReadTable()
 	end)
 
+	local screen_ratio = ScrH() / 1080
+
 	surface.CreateFont("MTAMissionsFont", {
 		font = IS_MTA_GM and "Orbitron" or "Arial",
-		size = 20,
+		size = 20 * screen_ratio,
 		weight = 600,
 		shadow = false,
 		extended = true,
@@ -157,7 +159,7 @@ if CLIENT then
 
 	surface.CreateFont("MTAMissionsFontDesc", {
 		font = IS_MTA_GM and "Alte Haas Grotesk" or "Arial",
-		size = 20,
+		size = 20 * screen_ratio,
 		weight = 600,
 		shadow = false,
 		extended = true,
@@ -165,7 +167,7 @@ if CLIENT then
 
 	surface.CreateFont("MTAMissionsFontTitle", {
 		font = IS_MTA_GM and "Alte Haas Grotesk" or "Arial",
-		size = 30,
+		size = 30 * screen_ratio,
 		weight = 600,
 		shadow = false,
 		extended = true,
@@ -173,13 +175,12 @@ if CLIENT then
 
 	local orange_color = Color(244, 135, 2)
 	local white_color = Color(255, 255, 255)
-	local offset_x = 300
-	local width = 280
+	local offset_x = 300 * screen_ratio
+	local width = 280 * screen_ratio
 
-	local screen_ration = ScrH() / 1080
 	local mat_vec = Vector()
-	local pos_x_left = -25 * screen_ration
-	local pos_y_left = -100 * screen_ration
+	local pos_x_left = -25 * screen_ratio
+	local pos_y_left = -25 * screen_ratio
 	local last_angles = EyeAngles()
 	local ang_delta_p = 0
 	local ang_delta_y = 0
@@ -212,15 +213,16 @@ if CLIENT then
 		mat:SetTranslation(mat_vec)
 		cam.PushModelMatrix(mat)
 
-		local title_x, title_y = ScrW() - offset_x, ScrH() / 2 - 50
+		local margin = 5 * screen_ratio
+		local title_x, title_y = ScrW() - offset_x, ScrH() / 2 - 50 * screen_ratio
 		surface.SetDrawColor(0, 0, 0, 150)
-		surface.DrawRect(title_x - 5, title_y - 5, width, 40)
+		surface.DrawRect(title_x - margin, title_y - margin, width, 40 * screen_ratio)
 
 		surface.SetDrawColor(orange_color)
-		surface.DrawOutlinedRect(title_x - 5, title_y - 5, width, 40, 2)
+		surface.DrawOutlinedRect(title_x - margin, title_y - margin, width, 40 * screen_ratio, 2)
 
 		surface.SetTextColor(color_white)
-		surface.SetTextPos(title_x + 5, title_y)
+		surface.SetTextPos(title_x + margin, title_y)
 		surface.SetFont("MTAMissionsFontTitle")
 		surface.DrawText("DAILY CHALLENGES")
 
@@ -230,9 +232,9 @@ if CLIENT then
 			if progress < mission.Completion then
 				surface.SetFont("MTAMissionsFontDesc")
 				local desc = mission.Description:upper()
-				local x, y = ScrW() - offset_x, ScrH() / 2 + 60*(i -1)
+				local x, y = ScrW() - offset_x, ScrH() / 2 + (60 * (i -1) * screen_ratio)
 				surface.SetDrawColor(0, 0, 0, 150)
-				surface.DrawRect(x - 5, y - 5, width, 50)
+				surface.DrawRect(x - margin, y - margin, width, 50 * screen_ratio)
 
 				surface.SetTextColor(white_color)
 				surface.SetTextPos(x, y)
@@ -240,17 +242,17 @@ if CLIENT then
 
 				surface.SetFont("MTAMissionsFont")
 				surface.SetTextColor(orange_color)
-				surface.SetTextPos(x, y + 20)
+				surface.SetTextPos(x, y + 20 * screen_ratio)
 				local progress = get_progress(LocalPlayer(), mission_id)
 				surface.DrawText(("%d/%d"):format(progress, mission.Completion))
 
 				local points = mission.Reward .. "pts"
 				local tw, _ = surface.GetTextSize(points)
-				surface.SetTextPos(x + width - (tw + 10), y + 20)
+				surface.SetTextPos(x + width - (tw + 10 * screen_ratio), y + 20 * screen_ratio)
 				surface.DrawText(points)
 
 				surface.SetDrawColor(orange_color)
-				surface.DrawLine(x - 5, y + 45, x + width - 5, y + 45)
+				surface.DrawLine(x - margin, y + 45 * screen_ratio, x + width - margin, y + 45 * screen_ratio)
 			end
 		end
 
