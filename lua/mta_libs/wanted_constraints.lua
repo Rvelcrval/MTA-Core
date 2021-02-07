@@ -153,8 +153,9 @@ hook.Add("CanPlyGoto", tag, function(ply)
     local old_pos = ply:GetPos()
     timer.Simple(0, function()
         if not IsValid(ply) then return end
-        if ply.InLobby and ply:InLobby() and is_constrained(ply) then
-            ply:SetPos(old_pos)
+        if is_constrained(ply) then
+            if IS_MTA_GM then ply:SetPos(old_pos)
+            elseif ply.InLobby and ply:InLobby() then ply:SetPos(old_pos) end
         end
     end)
 end)
