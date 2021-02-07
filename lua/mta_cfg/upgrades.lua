@@ -13,6 +13,8 @@ return {
 		["weapon_357"] = 20,
 		["weapon_slam"] = 25,
 		["weapon_shotgun"] = 30,
+		["weapon_ut2004_flak"] = 75,
+		["weapon_ut2004_minigun"] = 100,
 	},
 	["EMPInterval"] = 15,
 	["PointMultiplier"] = 0.045,
