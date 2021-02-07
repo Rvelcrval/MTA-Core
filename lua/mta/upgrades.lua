@@ -335,11 +335,19 @@ if SERVER then
 		if ply.PayCoins and ply:PayCoins(400, "MTA Weapon Refill") then
 			local wep = ply:GetActiveWeapon()
 			if wep.GetPrimaryAmmoType and wep:GetPrimaryAmmoType() ~= -1 then
-				ply:GiveAmmo(wep:GetMaxClip1() / 2, wep:GetPrimaryAmmoType())
+				local max = wep:GetMaxClip1()
+				max = max <= 0 and 10 or max
+				ply:GiveAmmo(max, wep:GetPrimaryAmmoType())
+			elseif wep.SetClip1 and wep.Clip1 then
+				wep:SetClip1(wep:Clip1() + 10)
 			end
 
 			if wep.GetSecondaryAmmoType and wep:GetSecondaryAmmoType() ~= -1 then
-				ply:GiveAmmo(wep:GetMaxClip2() / 2, wep:GetSecondaryAmmoType())
+				local max = wep:GetMaxClip2()
+				max = max <= 0 and 10 or max
+				ply:GiveAmmo(max, wep:GetSecondaryAmmoType())
+			elseif wep.SetClip2 and wep.Clip2 then
+				wep:SetClip2(wep:Clip2() + 10)
 			end
 		end
 	end)

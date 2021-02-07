@@ -50,8 +50,15 @@ if SERVER then
 		wep.lobbyok = true
 		wep.PhysgunDisabled = true
 		wep.dont_televate = true
-		wep:SetClip1(wep.GetMaxClip1 and wep:GetMaxClip1() or 10)
-		wep:SetClip2(2)
+
+		local max1 = wep.GetMaxClip1 and wep:GetMaxClip1()
+		if not max1 or max1 <= 0 then max1 = 10 end
+
+		local max2 = wep.GetMaxClip2 and wep:GetMaxClip2()
+		if not max2 or max2 <= 0 then max2 = 10 end
+
+		wep:SetClip1(max1)
+		wep:SetClip2(max2)
 		ply:SelectWeapon(weapon_class)
 	end
 
