@@ -12,7 +12,7 @@ SWEP.SlotPos = 2
 SWEP.DrawAmmo = false
 SWEP.DrawCrosshair = false
 SWEP.ViewModel = "models/maxofs2d/hover_rings.mdl"
-SWEP.WorldModel = "models/maxofs2d/hover_rings.mdl"
+SWEP.WorldModel = ""
 SWEP.UseHands = true
 
 SWEP.Primary = {}
@@ -43,6 +43,7 @@ end
 if SERVER then
 	function SWEP:Initialize()
 		self:SetModel("models/maxofs2d/hover_rings.mdl")
+		self:SetModelScale(0.3)
 	end
 
 	function SWEP:PrimaryAttack()
