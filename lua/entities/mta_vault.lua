@@ -172,8 +172,36 @@ if CLIENT then
 	pcall(include, "autorun/translation.lua")
 	local L = translation and translation.L or function(s) return s end
 
+	local drill_base = ClientsideModel("models/props_combine/combine_mine01.mdl")
+	drill_base:SetNoDraw(true)
+
+	local drill = ClientsideModel("models/Items/combine_rifle_ammo01.mdl")
+	drill:SetNoDraw(true)
+
 	function ENT:Draw()
 		self:DrawModel()
+
+		if self:GetNWBool("CanDrill", false) and self:GetNWBool("Drilling", false) then
+			local progress = self:GetNWInt("DrillingProgress", 0)
+
+			local pos = self:WorldSpaceCenter() + Vector(0, 0, 10) + self:GetForward() * 15
+			local ang = self:GetAngles()
+			ang:RotateAroundAxis(ang:Right(), -90)
+
+			drill_base:SetPos(pos)
+			drill_base:SetAngles(ang)
+			drill_base:DrawModel()
+
+			pos:Add(ang:Up() * (20 - 10 * progress / 100))
+
+			ang:RotateAroundAxis(ang:Right(), 180)
+
+			ang:RotateAroundAxis(ang:Up(), CurTime() * 500)
+
+			drill:SetPos(pos)
+			drill:SetAngles(ang)
+			drill:DrawModel()
+		end
 	end
 
 	local MIN_INDICATOR_DIST = 300
