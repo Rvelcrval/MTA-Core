@@ -11,8 +11,8 @@ SWEP.Slot = 1
 SWEP.SlotPos = 2
 SWEP.DrawAmmo = false
 SWEP.DrawCrosshair = false
-SWEP.ViewModel = "models/maxofs2d/hover_rings.mdl"
-SWEP.WorldModel = ""
+SWEP.ViewModel = ""
+SWEP.WorldModel = "models/maxofs2d/hover_rings.mdl"
 SWEP.UseHands = true
 
 SWEP.Primary = {}
