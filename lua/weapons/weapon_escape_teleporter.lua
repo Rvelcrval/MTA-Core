@@ -11,8 +11,8 @@ SWEP.Slot = 1
 SWEP.SlotPos = 2
 SWEP.DrawAmmo = false
 SWEP.DrawCrosshair = false
-SWEP.ViewModel = "models/weapons/c_medkit.mdl"
-SWEP.WorldModel = "models/weapons/w_medkit.mdl"
+SWEP.ViewModel = "models/maxofs2d/hover_rings.mdl"
+SWEP.WorldModel = "models/maxofs2d/hover_rings.mdl"
 SWEP.UseHands = true
 
 SWEP.Primary = {}
@@ -40,27 +40,9 @@ function SWEP:Deploy()
 	self:SetHoldType("slam")
 end
 
-if CLIENT then
-	local mat = Material("Models/props_combine/CombineThumper002")
-	function SWEP:PreDrawViewModel(vm, ply, weapon)
-		render.MaterialOverride(mat)
-	end
-
-	function SWEP:PostDrawViewModel(vm, weapon)
-		render.MaterialOverride()
-
-		render.SetColorModulation(1, 1, 1)
-        local hands = LocalPlayer():GetHands()
-        if hands:IsValid() then
-            hands:DrawModel()
-        end
-	end
-end
-
 if SERVER then
 	function SWEP:Initialize()
-		self:SetModel("models/weapons/w_medkit.mdl")
-		self:SetMaterial("Models/props_combine/CombineThumper002")
+		self:SetModel("models/maxofs2d/hover_rings.mdl")
 	end
 
 	function SWEP:PrimaryAttack()
