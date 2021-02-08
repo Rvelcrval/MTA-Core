@@ -219,86 +219,70 @@ if CLIENT then
 
 	local orange_color = Color(244, 135, 2)
 	local white_color = Color(255, 255, 255)
-	local offset_x = 300 * screen_ratio
-	local width = 280 * screen_ratio
-
 	local mat_vec = Vector()
-	local pos_x_left = -25 * screen_ratio
-	local pos_y_left = -25 * screen_ratio
-	local last_angles = EyeAngles()
-	local ang_delta_p = 0
-	local ang_delta_y = 0
-	local last_translate_p = 0
-	local last_translate_y = 0
+	local function draw_daily_missions()
+		return {
+			Draw = function()
+				local screen_ratio = MTAHud.Config.ScrRatio
+				local offset_x = 300 * screen_ratio
+				local width = 280 * screen_ratio
+				local yaw = -EyeAngles().y
+				local mat = Matrix()
+				mat:SetField(2, 1, 0.10)
 
-	hook.Add("HUDPaint", tag, function()
-		local curAngs = EyeAngles()
-		local vel = LocalPlayer():GetAbsVelocity()
+				mat_vec.x = (-25 * screen_ratio) + (MTAHud.Vars.LastTranslateY * 2)
+				mat_vec.y = (-25 * screen_ratio) + (MTAHud.Vars.LastTranslateP * 3)
 
-		ang_delta_p = math.AngleDifference(last_angles.p, curAngs.p)
-		ang_delta_y = math.AngleDifference(last_angles.y, curAngs.y)
+				mat:SetTranslation(mat_vec)
+				cam.PushModelMatrix(mat)
 
-		last_angles = curAngs
-
-		last_translate_p = Lerp(FrameTime() * 5, last_translate_p, ang_delta_p)
-		last_translate_y = Lerp(FrameTime() * 5, last_translate_y, ang_delta_y)
-
-		if vel.z ~= 0 then
-			last_translate_p = last_translate_p + (math.Clamp(vel.z, -100, 100) * FrameTime() * 0.2)
-		end
-
-		local mat = Matrix()
-		mat:SetField(2, 1, 0.10)
-
-		mat_vec.x = pos_x_left + (last_translate_y * 2)
-		mat_vec.y = pos_y_left + (last_translate_p * 3)
-
-		mat:SetTranslation(mat_vec)
-		cam.PushModelMatrix(mat)
-
-		local margin = 5 * screen_ratio
-		local title_x, title_y = ScrW() - offset_x, ScrH() / 2 - 50 * screen_ratio
-		surface.SetDrawColor(0, 0, 0, 150)
-		surface.DrawRect(title_x - margin, title_y - margin, width, 40 * screen_ratio)
-
-		surface.SetDrawColor(orange_color)
-		surface.DrawOutlinedRect(title_x - margin, title_y - margin, width, 40 * screen_ratio, 2)
-
-		surface.SetTextColor(color_white)
-		surface.SetTextPos(title_x + margin, title_y)
-		surface.SetFont("MTAMissionsFontTitle")
-		surface.DrawText("DAILY CHALLENGES")
-
-		for i, mission_id in pairs(selected_mission_ids) do
-			local mission = base_missions[mission_id]
-			local progress = get_progress(LocalPlayer(), mission_id)
-			if progress < mission.Completion then
-				surface.SetFont("MTAMissionsFontDesc")
-				local desc = mission.Description:upper()
-				local x, y = ScrW() - offset_x, ScrH() / 2 + (60 * (i -1) * screen_ratio)
+				local margin = 5 * screen_ratio
+				local title_x, title_y = ScrW() - offset_x, ScrH() / 2 - 50 * screen_ratio
 				surface.SetDrawColor(0, 0, 0, 150)
-				surface.DrawRect(x - margin, y - margin, width, 50 * screen_ratio)
-
-				surface.SetTextColor(white_color)
-				surface.SetTextPos(x, y)
-				surface.DrawText(desc)
-
-				surface.SetFont("MTAMissionsFont")
-				surface.SetTextColor(orange_color)
-				surface.SetTextPos(x, y + 20 * screen_ratio)
-				local progress = get_progress(LocalPlayer(), mission_id)
-				surface.DrawText(("%d/%d"):format(progress, mission.Completion))
-
-				local points = mission.Reward .. "pts"
-				local tw, _ = surface.GetTextSize(points)
-				surface.SetTextPos(x + width - (tw + 10 * screen_ratio), y + 20 * screen_ratio)
-				surface.DrawText(points)
+				surface.DrawRect(title_x - margin, title_y - margin, width, 40 * screen_ratio)
 
 				surface.SetDrawColor(orange_color)
-				surface.DrawLine(x - margin, y + 45 * screen_ratio, x + width - margin, y + 45 * screen_ratio)
-			end
-		end
+				surface.DrawOutlinedRect(title_x - margin, title_y - margin, width, 40 * screen_ratio, 2)
 
-		cam.PopModelMatrix()
-	end)
+				surface.SetTextColor(color_white)
+				surface.SetTextPos(title_x + margin, title_y)
+				surface.SetFont("MTAMissionsFontTitle")
+				surface.DrawText("DAILY CHALLENGES")
+
+				for i, mission_id in pairs(selected_mission_ids) do
+					local mission = base_missions[mission_id]
+					local progress = get_progress(LocalPlayer(), mission_id)
+					if progress < mission.Completion then
+						surface.SetFont("MTAMissionsFontDesc")
+						local desc = mission.Description:upper()
+						local x, y = ScrW() - offset_x, ScrH() / 2 + (60 * (i -1) * screen_ratio)
+						surface.SetDrawColor(0, 0, 0, 150)
+						surface.DrawRect(x - margin, y - margin, width, 50 * screen_ratio)
+
+						surface.SetTextColor(white_color)
+						surface.SetTextPos(x, y)
+						surface.DrawText(desc)
+
+						surface.SetFont("MTAMissionsFont")
+						surface.SetTextColor(orange_color)
+						surface.SetTextPos(x, y + 20 * screen_ratio)
+						local progress = get_progress(LocalPlayer(), mission_id)
+						surface.DrawText(("%d/%d"):format(progress, mission.Completion))
+
+						local points = mission.Reward .. "pts"
+						local tw, _ = surface.GetTextSize(points)
+						surface.SetTextPos(x + width - (tw + 10 * screen_ratio), y + 20 * screen_ratio)
+						surface.DrawText(points)
+
+						surface.SetDrawColor(orange_color)
+						surface.DrawLine(x - margin, y + 45 * screen_ratio, x + width - margin, y + 45 * screen_ratio)
+					end
+				end
+
+				cam.PopModelMatrix()
+			end
+		}
+	end
+
+	MTAHud:AddComponent("daily_missions", draw_daily_missions)
 end
