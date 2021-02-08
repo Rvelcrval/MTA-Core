@@ -137,8 +137,27 @@ if SERVER then
 		net.Send(ply)
 	end)
 
-	select_daily_missions()
-	timer.Create(tag, 86400, 0, select_daily_missions)
+	local data_file_name = tag .. ".json"
+	local last_day = os.date("%d")
+	timer.Create(tag, 60, 0, function()
+		local day_component = os.date("%d")
+		if last_day ~= day_component and os.date("%H") == "0" then
+			select_daily_missions()
+			last_day = day_component
+		end
+
+		file.Write(data_file_name, util.TableToJSON({
+			date = cur_date,
+			cur_missions = cur_missions,
+		}))
+	end)
+
+	local data = util.JSONToTable(file.Read(data_file_name, "GAME"))
+	if data and data.date == os.date("%d/%m/%Y") then
+		cur_missions = data
+	else
+		select_daily_missions()
+	end
 end
 
 if CLIENT then
