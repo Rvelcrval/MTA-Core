@@ -99,6 +99,31 @@ base_missions.wanted_lvl_75 = {
 	end,
 }
 
+base_missions.survive_2500_dmg = {
+	Description = "Take 2500dmg while wanted",
+	Completion = 2500,
+	Reward = 75,
+	Execute = function()
+		hook.Add("EntityTakeDamage", tag .. "_survive_2500_dmg", function(target, dmg_info)
+			if target:IsPlayer() and MTA.IsWanted(target) then
+				local atck = dmg_info:GetAttacker()
+				if IsValid(atck) and atck:GetNWBool("MTACombine") then
+					add_progress(target, "survive_2500_dmg", dmg_info:GetDamage())
+				end
+			end
+		end)
+
+		hook.Add("MTAPlayerFailed", tag .. "_survive_2500_dmg", function(ply)
+			local progress = get_progress(ply, "survive_2500_dmg")
+			add_progress(ply "survive_2500_dmg", progress)
+		end)
+	end,
+	Finish = function()
+		hook.Remove("EntityTakeDamage", tag .. "_survive_2500_dmg")
+		hook.Remove("MTAPlayerFailed", tag .. "_survive_2500_dmg")
+	end,
+}
+
 if SERVER then
 	util.AddNetworkString(tag)
 
@@ -205,7 +230,6 @@ if CLIENT then
 	local ang_delta_y = 0
 	local last_translate_p = 0
 	local last_translate_y = 0
-	local mat_vec = Vector()
 
 	hook.Add("HUDPaint", tag, function()
 		local curAngs = EyeAngles()
