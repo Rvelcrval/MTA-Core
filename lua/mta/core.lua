@@ -236,7 +236,24 @@ if SERVER then
 	end
 
 	function MTA.TrySpawnCombine(pos)
-		return MTA.FarCombine(MTA.BadPlayers, combine_spawn_callback, pos)
+		local ranges = {}
+		local total_lvl = 0
+		for _, ply in ipairs(MTA.BadPlayers) do
+			local wanted_lvl = MTA.Factors[ply] / 10
+			table.insert(ranges, { Min = total_lvl, Max = total_lvl + wanted_lvl, Ply = ply })
+			total_lvl = total_lvl + wanted_lvl
+		end
+
+		local target = MTA.BadPlayers[1]
+		local rand = math.random(total_lvl - 1)
+		for _, range in ipairs(ranges) do
+			if rand >= range.Min and rand < range.Max then
+				target = range.Ply
+				break
+			end
+		end
+
+		return MTA.FarCombine(target, MTA.BadPlayers, combine_spawn_callback, pos)
 	end
 
 	function MTA.SpawnCombine()

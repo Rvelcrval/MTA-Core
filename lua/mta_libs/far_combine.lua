@@ -539,7 +539,7 @@ local function setup_combine(combine, target, players)
 	end)
 end
 
-local function find_node(players, target)
+local function find_node(target)
 	local nearest_node = get_nearest_node(target, MAX_SPAWN_DISTANCE)
 	if not nearest_node then return false, "could not get nearest node" end
 
@@ -549,14 +549,12 @@ local function find_node(players, target)
 	return true, node.pos
 end
 
-local function far_combine(players, callback, pos)
+local function far_combine(target, players, callback, pos)
+	if not IsValid(target) then return false, "invalid target" end
 	if #players == 0 then return false, "no players to use" end
 
-	local target = players[math.random(#players)]
-	if not IsValid(target) then return end
-
 	if not isvector(pos) then
-		local succ, ret = find_node(players, target)
+		local succ, ret = find_node(target)
 		if not succ then return false, ret end
 		pos = ret
 	end
