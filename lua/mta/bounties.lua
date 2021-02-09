@@ -32,6 +32,7 @@ if SERVER then
 	local blocked_hunters = {}
 
 	local function finish_bounty(hunter)
+		if IS_MTA_GM then return end
 		local steam_id = hunter:SteamID()
 		blocked_hunters[steam_id] = (blocked_hunters[steam_id] or 0) + 1
 		if blocked_hunters[steam_id] >= MAX_BOUNTIES_PER_HUNTER then
