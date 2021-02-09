@@ -177,7 +177,7 @@ if SERVER then
 		}))
 	end)
 
-	local data = util.JSONToTable(file.Read(data_file_name, "GAME"))
+	local data = util.JSONToTable(file.Read(data_file_name, "DATA") or "")
 	if data and data.date == os.date("%d/%m/%Y") then
 		cur_missions = data
 	else
