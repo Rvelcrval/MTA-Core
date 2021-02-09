@@ -312,7 +312,9 @@ if SERVER then
 
 		local count = #MTA.Combines
 		local base_divider = 3
-		local count_to_spawn = math.max(1, math.floor(factor / 10 / base_divider))
+		local count_to_spawn = IS_MTA_GM
+			and math.max(1, math.floor(factor / 10 / base_divider))
+			or math.max(1, math.floor(factor / 2))
 
 		if count >= 1 then
 			if count < factor then -- spawn remaining combines
