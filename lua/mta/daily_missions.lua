@@ -115,7 +115,7 @@ base_missions.survive_2500_dmg = {
 
 		hook.Add("MTAPlayerFailed", tag .. "_survive_2500_dmg", function(ply)
 			local progress = get_progress(ply, "survive_2500_dmg")
-			add_progress(ply "survive_2500_dmg", progress)
+			add_progress(ply, "survive_2500_dmg", -progress)
 		end)
 	end,
 	Finish = function()
