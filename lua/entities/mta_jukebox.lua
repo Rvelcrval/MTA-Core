@@ -138,6 +138,7 @@ if CLIENT then
 		local songs_preview_btn = songs:Add("DButton")
 		songs_preview_btn:SetSize(60, 20)
 		songs_preview_btn:SetPos(330, 50)
+		songs_preview_btn:SetTextColor(color_white)
 		songs_preview_btn:SetText("PREVIEW")
 		local preview_is_playing = false
 		local is_loading = false
@@ -177,7 +178,7 @@ if CLIENT then
 		local songs_remove_btn = songs:Add("DButton")
 		songs_remove_btn:SetSize(50, 20)
 		songs_remove_btn:SetPos(400, 50)
-		songs_remove_btn:SetTextColor(Color(255, 255, 255))
+		songs_remove_btn:SetTextColor(color_white)
 		songs_remove_btn:SetText("REMOVE")
 		function songs_remove_btn:DoClick()
 			local _, data = songs_combobox:GetSelected()
@@ -230,6 +231,7 @@ if CLIENT then
 		local songs_customs_add_btn = songs:Add("DButton")
 		songs_customs_add_btn:SetPos(330, 120)
 		songs_customs_add_btn:SetSize(40, 20)
+		songs_customs_add_btn:SetTextColor(color_white)
 		songs_customs_add_btn:SetText("ADD")
 		function songs_customs_add_btn:DoClick()
 			local url = songs_customs_textentry:GetText()
