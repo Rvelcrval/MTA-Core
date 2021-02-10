@@ -6,13 +6,16 @@ end
 local surface = surface
 local Color = Color
 
-surface.CreateFont("MTASkinFont", {
-	font = IS_MTA_GM and "Alte Haas Grotesk" or "Arial",
-	size = 13,
-	weight = 600,
-	shadow = false,
-	extended = true,
-})
+surface.CreateFont(
+	"MTASkinFont",
+	{
+		font = IS_MTA_GM and "Alte Haas Grotesk" or "Arial",
+		size = 13,
+		weight = 600,
+		shadow = false,
+		extended = true
+	}
+)
 
 SKIN = {}
 
@@ -955,3 +958,94 @@ function SKIN:PaintMenuBar(panel, w, h)
 end
 
 derma.DefineSkin("MTA", "The MTA derma skin", SKIN)
+
+local function getupvalues(f)
+	local i, t = 0, {}
+
+	while true do
+		i = i + 1
+		local key, val = debug.getupvalue(f, i)
+		if not key then
+			break
+		end
+		t[key] = val
+	end
+
+	return t
+end
+
+function MTA_COLOR_HACK()
+	local DMenuOption = table.Copy(vgui.GetControlTable("DMenuOption"))
+	local DComboBox = table.Copy(vgui.GetControlTable("DComboBox"))
+	DMenuOption.Init = function(self)
+		self:SetContentAlignment(4)
+		self:SetTextInset(30, 0)
+		self:SetTextColor(self:GetSkin().Colours.Label.Dark)
+		self:SetChecked(false)
+	end
+
+	DMenuOption.UpdateColours = function(self, skin)
+		if self:IsHovered() then
+			self:SetTextColor(skin.Colours.Label.Bright)
+			return self:SetTextStyleColor(skin.Colours.Label.Bright)
+		end
+
+		self:SetTextColor(skin.Colours.Label.Dark)
+		return self:SetTextStyleColor(skin.Colours.Label.Dark)
+	end
+
+	derma.DefineControl("DMenuOption", "Menu Option Line", DMenuOption, "DButton")
+	derma.DefineControl("DMenuOptionCVar", "", vgui.GetControlTable("DMenuOptionCVar"), "DMenuOption")
+
+	DComboBox.UpdateColours = function(self, skin)
+		if self.Depressed or self:IsMenuOpen() then
+			self:SetTextColor(skin.Colours.Label.Bright)
+			return self:SetTextStyleColor(skin.Colours.Label.Bright)
+		end
+
+		self:SetTextColor(skin.Colours.Label.Dark)
+		return self:SetTextStyleColor(skin.Colours.Label.Dark)
+	end
+
+	derma.DefineControl("DComboBox", "", DComboBox, "DButton")
+
+	local DProperties = table.Copy(vgui.GetControlTable("DProperties"))
+	local tblCategory = getupvalues(DProperties.GetCategory).tblCategory
+	DProperties.GetCategory = function(self, name, bCreate)
+		local cat = self.Categories[name]
+		if IsValid(cat) then
+			return cat
+		end
+
+		if not bCreate then
+			return
+		end
+
+		cat = self:GetCanvas():Add(tblCategory)
+		cat.Label:SetText(name)
+
+		cat.Container.Paint = function(pnl, w, h)
+			self:GetSkin():PaintListBox(pnl, w, h)
+		end
+
+		self.Categories[name] = cat
+
+		return cat
+	end
+
+	derma.DefineControl("DProperties", "", DProperties, "Panel")
+
+	local DTree_Node_Button = table.Copy(vgui.GetControlTable("DTree_Node_Button"))
+	DTree_Node_Button.UpdateColours = function(self, skin)
+		-- m_bSelectable is false on this for some reason
+		if self.m_bSelected then
+			return self:SetTextStyleColor(skin.Colours.Tree.Selected)
+		end
+		if self.Hovered then
+			return self:SetTextStyleColor(skin.Colours.Tree.Hover)
+		end
+
+		return self:SetTextStyleColor(skin.Colours.Tree.Normal)
+	end
+	derma.DefineControl("DTree_Node_Button", "Tree Node Button", DTree_Node_Button, "DButton")
+end
