@@ -93,14 +93,6 @@ if CLIENT then
 		frame:SetSize(500, 250)
 		frame:Center()
 
-		function frame:Paint(w, h)
-			surface.SetDrawColor(0, 0, 0, 240)
-			surface.DrawRect(0, 0, self:GetWide(), 25)
-
-			surface.SetDrawColor(0, 0, 0, 210)
-			surface.DrawRect(0, 25, self:GetWide(), self:GetTall() - 25)
-		end
-
 		function frame:OnClose()
 			if IsValid(UI_STATION) then
 				UI_STATION:Stop()
@@ -113,7 +105,6 @@ if CLIENT then
 		local frame_close_btn = frame:Add("DButton")
 		frame_close_btn:SetSize(30, 25)
 		frame_close_btn:SetPos(frame:GetWide() - frame_close_btn:GetWide(), 0)
-		frame_close_btn:SetPaintBackground(false)
 		frame_close_btn:SetTextColor(Color(255, 0, 0))
 		frame_close_btn:SetText("X")
 		function frame_close_btn:DoClick() frame:Close() end
@@ -122,45 +113,17 @@ if CLIENT then
 		local songs = frame:Add("DPanel")
 		songs:SetSize(frame:GetWide() - 20, 150)
 		songs:Dock(TOP)
-		function songs:Paint( w, h)
-			surface.SetDrawColor(100, 100, 100, 200)
-			surface.DrawOutlinedRect(0, 0, w, h, 3)
-		end
 
 		local songs_label = songs:Add("DLabel")
 		songs_label:SetPos(10, 10)
-		--[[songs_label:SetText(
-			"Select and preview songs that play during police assault!\nYou can also randomize the song that plays with shuffle.\nWith custom song slots you can add/remove your own songs."
-		)]]--
 		songs_label:SetText(
 			"Select and preview songs that play during police assault!\nWith custom song slots you can add/remove your own songs."
 		)
 		songs_label:SizeToContents()
 
-		--[[local songs_shuffle = songs:Add("DCheckBox")
-		songs_shuffle:SetSize(15, 15)
-		songs_shuffle:SetPos(10, 65)
-		songs_shuffle:SetChecked(false)
-		function songs_shuffle:Paint(w, h)
-			surface.SetDrawColor(255, 150, 0)
-
-			if not self:GetChecked() then
-				surface.DrawOutlinedRect(0, 0, w, h)
-			else
-				surface.DrawRect(0, 0, w, h)
-			end
-		end
-
-		local songs_shuffle_label = songs:Add("DLabel")
-		songs_shuffle_label:SetPos(30, 65)
-		songs_shuffle_label:SetTextColor(Color(255, 255, 255))
-		songs_shuffle_label:SetText("SHUFFLE")
-		songs_shuffle_label:SizeToContents()]]--
-
 		local songs_combobox = songs:Add("DComboBox")
 		songs_combobox:SetSize(300, 20)
 		songs_combobox:SetPos(10, 50)
-		songs_combobox:SetPaintBackground(false)
 		songs_combobox:SetTextColor(Color(255, 255, 255))
 		songs_combobox:SetSortItems(false)
 
@@ -179,24 +142,11 @@ if CLIENT then
 			end
 		end
 
-		function songs_combobox:Paint(w, h)
-			surface.SetDrawColor(255, 150, 0, 255)
-			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
-		end
-
 		local songs_preview_btn = songs:Add("DButton")
 		songs_preview_btn:SetSize(60, 20)
 		songs_preview_btn:SetPos(330, 50)
 		songs_preview_btn:SetText("PREVIEW")
 		local preview_is_playing = false
-		function songs_preview_btn:Paint(w, h)
-			surface.SetDrawColor(255, 150, 0, 255)
-			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
-
-			local col = (self:IsHovered()) and Color(255, 200, 100) or Color(255, 255, 255)
-			self:SetTextColor(col)
-		end
-
 		local is_loading = false
 		function songs_preview_btn:DoClick()
 			if is_loading then return end
@@ -231,36 +181,11 @@ if CLIENT then
 			self:SetText(text)
 		end
 
-		--[[local songs_select_btn = songs:Add("DButton")
-		songs_select_btn:SetSize(50, 20)
-		songs_select_btn:SetPos(340, 100)
-		songs_select_btn:SetTextColor(Color(255, 255, 255, 255))
-		songs_select_btn:SetText("SELECT")
-		function songs_select_btn:Paint(w, h)
-			self:SetEnabled(not songs_shuffle:GetChecked())
-
-			local alpha = (self:IsEnabled()) and 255 or 50
-
-			surface.SetDrawColor(255, 150, 0, alpha)
-			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
-
-			local col = (self:IsHovered() and self:IsEnabled()) and Color(255, 200, 100, 255) or Color(255, 255, 255, alpha)
-			self:SetTextColor(col)
-		end]]--
-
 		local songs_remove_btn = songs:Add("DButton")
 		songs_remove_btn:SetSize(50, 20)
 		songs_remove_btn:SetPos(400, 50)
 		songs_remove_btn:SetTextColor(Color(255, 255, 255))
 		songs_remove_btn:SetText("REMOVE")
-		function songs_remove_btn:Paint(w, h)
-			surface.SetDrawColor(255, 150, 0, 255)
-			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
-
-			local col = (self:IsHovered()) and Color(255, 200, 100) or Color(255, 255, 255)
-			self:SetTextColor(col)
-		end
-
 		function songs_remove_btn:DoClick()
 			local _, data = songs_combobox:GetSelected()
 			if not data then return end
@@ -313,14 +238,6 @@ if CLIENT then
 		songs_customs_add_btn:SetPos(330, 120)
 		songs_customs_add_btn:SetSize(40, 20)
 		songs_customs_add_btn:SetText("ADD")
-		function songs_customs_add_btn:Paint(w, h)
-			surface.SetDrawColor(255, 150, 0, 255)
-			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
-
-			local col = (self:IsHovered()) and Color(255, 200, 100) or Color(255, 255, 255)
-			self:SetTextColor(col)
-		end
-
 		function songs_customs_add_btn:DoClick()
 			local url = songs_customs_textentry:GetText()
 			if not url or url:Trim() == "" then return end
