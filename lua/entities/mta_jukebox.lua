@@ -102,13 +102,6 @@ if CLIENT then
 
 		frame:MakePopup()
 
-		local frame_close_btn = frame:Add("DButton")
-		frame_close_btn:SetSize(30, 25)
-		frame_close_btn:SetPos(frame:GetWide() - frame_close_btn:GetWide(), 0)
-		frame_close_btn:SetTextColor(Color(255, 0, 0))
-		frame_close_btn:SetText("X")
-		function frame_close_btn:DoClick() frame:Close() end
-
 		-- Song selection
 		local songs = frame:Add("DPanel")
 		songs:SetSize(frame:GetWide() - 20, 150)
