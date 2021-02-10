@@ -393,22 +393,6 @@ if CLIENT then
 		return cur_value
 	end
 
-	local function paint_btn(self, w, h)
-		if not self:IsEnabled() then
-			surface.SetDrawColor(220, 0, 75)
-			surface.DrawRect(0, 0, w, h)
-			return
-		end
-
-		surface.SetDrawColor(30, 30, 30)
-		surface.DrawRect(0, 0, w, h)
-
-		if self:IsHovered() then
-			surface.SetDrawColor(255, 255, 255)
-			surface.DrawOutlinedRect(0, 0, w, h)
-		end
-	end
-
 	local function show_dealer_frame(npc)
 		local frame = vgui.Create("DFrame")
 		frame:SetSize(640, 480)
@@ -449,14 +433,6 @@ if CLIENT then
 			intro:SetText([[Pssst... Hey kid, interested in some upgrades? I got plenty of things here.
 			What? What's MTA? That's the system in place to prevent you from rebelling against the gov' of course!]])
 			intro:SetWrap(true)
-
-			function header:Paint(w, h)
-				surface.SetDrawColor(0, 0, 0, 240)
-				surface.DrawRect(0, 0, w, h)
-
-				surface.SetDrawColor(50, 50, 50)
-				surface.DrawOutlinedRect(0, 0, w, h, 2)
-			end
 		end
 
 		-- actions
@@ -471,14 +447,6 @@ if CLIENT then
 				panel:DockMargin(0, 10, 0, 0)
 				panel:SetTall(50)
 
-				function panel:Paint(w, h)
-					surface.SetDrawColor(0, 0, 0, 240)
-					surface.DrawRect(0, 0, w, h)
-
-					surface.SetDrawColor(50, 50, 50)
-					surface.DrawOutlinedRect(0, 0, w, h, 2)
-				end
-
 				local label = panel:Add("DLabel")
 				label:Dock(LEFT)
 				label:DockMargin(10, 5, 5, 5)
@@ -492,7 +460,6 @@ if CLIENT then
 				btn:SetTextColor(color_white)
 				btn:SetWide(125)
 				btn.DoClick = callback
-				btn.Paint = paint_btn
 				btn.Description = label
 
 				return btn
@@ -539,15 +506,6 @@ if CLIENT then
 			end
 		end
 
-		function frame.btnClose:Paint(w, h)
-			surface.SetTextColor(220, 0, 50)
-			surface.SetFont("DermaDefault")
-
-			local tw, th = surface.GetTextSize("X")
-			surface.SetTextPos(w / 2 - tw / 2, h / 2 - th / 2)
-			surface.DrawText("X")
-		end
-
 		function frame:OnKeyCodePressed(key_code)
 			if key_code == KEY_ESCAPE or key_code == KEY_E then
 				self:Remove()
@@ -562,13 +520,6 @@ if CLIENT then
 
 		local stat__height_margin = 10
 		local stat_width_margin = 20
-		function frame:Paint(w, h)
-			surface.SetDrawColor(0, 0, 0, 240)
-			surface.DrawRect(0, 0, w, 25)
-
-			surface.SetDrawColor(0, 0, 0, 200)
-			surface.DrawRect(0, 25, w, h - 25)
-		end
 
 		function frame:PaintOver(w, h)
 			local current_width = 0

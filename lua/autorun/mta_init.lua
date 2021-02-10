@@ -8,6 +8,7 @@ for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
 	AddCSLuaFile(path)
 end
 
+AddCSLuaFile("mta/skin.lua")
 AddCSLuaFile("mta/core.lua")
 AddCSLuaFile("mta/songs.lua")
 AddCSLuaFile("mta/weapons.lua")
@@ -42,6 +43,7 @@ hook.Add("PostGamemodeLoaded", "MTA", function()
 		MTA_CONFIG[f:StripExtension()] = include(path)
 	end
 
+	include("mta/skin.lua")
 	include("mta/core.lua")
 	include("mta/songs.lua")
 	include("mta/weapons.lua")

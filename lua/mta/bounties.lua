@@ -238,6 +238,7 @@ if CLIENT then
 			frame:SetWide(200)
 			frame:SetPos(cur_x, cur_y)
 			frame:SetTitle("MTA Bounty")
+			frame:SetSkin("MTA")
 
 			-- python hack taken from netgraphx to allow movement
 			frame:SetZPos(32000)
@@ -251,15 +252,6 @@ if CLIENT then
 
 			frame.btnMinim:Hide()
 			frame.btnMaxim:Hide()
-
-			function frame.btnClose:Paint(w, h)
-				surface.SetTextColor(220, 0, 50)
-				surface.SetFont("DermaDefault")
-
-				local tw, th = surface.GetTextSize("X")
-				surface.SetTextPos(w / 2 - tw / 2, h / 2 - th / 2)
-				surface.DrawText("X")
-			end
 
 			local label_name = frame:Add("DLabel")
 			label_name:SetText("Target: " .. (UndecorateNick and UndecorateNick(bounty:Nick()) or bounty:Nick()))
@@ -280,14 +272,6 @@ if CLIENT then
 			label_gains:DockMargin(5, 5, 5, 5)
 			label_gains:SetContentAlignment(5)
 
-			function label_gains:Paint(w, h)
-				surface.SetDrawColor(244, 135, 2)
-				surface.DrawOutlinedRect(0, 0, w, h, 2)
-
-				surface.SetDrawColor(244, 135, 2, 10)
-				surface.DrawRect(0, 0, w, h)
-			end
-
 			frame:InvalidateLayout(true)
 			frame:SizeToChildren(false, true)
 
@@ -302,24 +286,6 @@ if CLIENT then
 
 				frame:Close()
 				chat.AddText(header_col, "[MTA] ", color_white, "You have ", green_col, "accepted", color_white, " the bounty for ", bounty)
-			end
-
-			function btn_accept:Paint(w, h)
-				surface.SetDrawColor(58, 252, 113, 100)
-				surface.DrawRect(0, 0, w, h)
-
-				if self:IsHovered() then
-					surface.SetDrawColor(255, 255, 255)
-					surface.DrawOutlinedRect(0, 0, w, h)
-				end
-			end
-
-			function frame:Paint(w, h)
-				surface.SetDrawColor(0, 0, 0, 240)
-				surface.DrawRect(0, 0, w, 25)
-
-				surface.SetDrawColor(0, 0, 0, 200)
-				surface.DrawRect(0, 25, w, h - 25)
 			end
 
 			cur_x = cur_x + frame:GetWide() + 20
