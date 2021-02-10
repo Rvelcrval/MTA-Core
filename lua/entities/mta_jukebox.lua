@@ -89,7 +89,6 @@ if CLIENT then
 	local function show_jukebox_ui()
 		local frame = vgui.Create("DFrame")
 		frame:SetTitle("MTA Jukebox")
-		frame:ShowCloseButton(false)
 		frame:SetSize(500, 250)
 		frame:Center()
 
