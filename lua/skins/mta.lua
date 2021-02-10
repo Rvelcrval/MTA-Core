@@ -6,16 +6,13 @@ end
 local surface = surface
 local Color = Color
 
-surface.CreateFont(
-	"MTASkinFont",
-	{
-		font = IS_MTA_GM and "Alte Haas Grotesk" or "Arial",
-		size = 13,
-		weight = 600,
-		shadow = false,
-		extended = true
-	}
-)
+surface.CreateFont("MTASkinFont", {
+	font = IS_MTA_GM and "Alte Haas Grotesk" or "Arial",
+	size = 13,
+	weight = 800,
+	shadow = false,
+	extended = true
+})
 
 SKIN = {}
 
