@@ -222,6 +222,7 @@ if SERVER then
 		if not IsValid(combine) then return end
 
 		if #MTA.BadPlayers == 0 or not util.IsInWorld(combine:GetPos()) then
+			spawning = spawning - 1
 			SafeRemoveEntity(combine)
 			return
 		end
