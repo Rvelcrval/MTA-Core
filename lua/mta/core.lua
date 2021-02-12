@@ -221,7 +221,7 @@ if SERVER then
 	local function combine_spawn_callback(combine)
 		if not IsValid(combine) then return end
 
-		if #MTA.BadPlayers == 0 then
+		if #MTA.BadPlayers == 0 or not util.IsInWorld(combine:GetPos()) then
 			SafeRemoveEntity(combine)
 			return
 		end
