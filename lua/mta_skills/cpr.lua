@@ -1,7 +1,5 @@
 local tag = "MTASkill_CPR"
 
-local REVIVE_COST = MTA_CONFIG.upgrades.ReviveCost
-
 if SERVER then
 	util.AddNetworkString(tag)
 
@@ -19,7 +17,7 @@ if SERVER then
 			return
 		end
 
-		if not MTA.PayPoints(ply, REVIVE_COST) then return end
+		if not MTA.PayPoints(ply, ply_data.Cost) then return end
 
 		local pos = ply_data.Pos or ply:GetPos()
 		ply:Spawn()
@@ -52,7 +50,7 @@ if SERVER then
 	end)
 
 	-- we do this here, because PlayerDeath is too late
-	hook.Add("MTAPlayerFailed", tag, function(ply, _, wanted_level, is_death)
+	hook.Add("MTAPlayerFailed", tag, function(ply, max_factor, wanted_level, is_death)
 		if not is_death then return end
 
 		if MTA.HasSkill(ply, "healing_multiplier", "cpr") then
@@ -61,13 +59,16 @@ if SERVER then
 				table.insert(wep_class_names, wep:GetClass())
 			end
 
+			local cost = math.floor(max_factor / 2)
 			dead_players[ply] = {
 				Weapons = wep_class_names,
 				WantedLevel = wanted_level,
 				Pos = ply:GetPos(),
+				Cost = cost,
 			}
 
 			net.Start(tag)
+			net.WriteInt(cost, 32)
 			net.Send(ply)
 		end
 	end)
@@ -75,8 +76,9 @@ end
 
 if CLIENT then
 	net.Receive(tag, function()
+		local cost = net.ReadInt(32)
 		Derma_Query("Would you like to revive yourself with your current wanted level and weapoons?", "MTA CPR (Revive)",
-			("Yes (%dpts)"):format(REVIVE_COST), function()
+			("Yes (%dpts)"):format(cost), function()
 				net.Start(tag)
 				net.WriteBool(true)
 				net.SendToServer()
