@@ -356,7 +356,8 @@ if SERVER then
 
 		if should_pay and old_factor > 0 then
 			local cur_coins = ply.GetCoins and ply:GetCoins() or 0
-			local to_pay = cur_coins > 1000000 and ((cur_coins / 1000) * old_factor) or old_factor * 100
+			local wanted_lvl = old_factor / 10
+			local to_pay = cur_coins > 1000000 and math.ceil((cur_coins / 10000) * wanted_lvl) or wanted_lvl * 1000
 			if ply.PayCoins and not ply:PayCoins(to_pay, "MTA Criminal Fee") then
 				if cur_coins > 0 then
 					ply:PayCoins(cur_coins, "MTA Criminal Fee")
