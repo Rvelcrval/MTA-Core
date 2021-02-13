@@ -39,6 +39,10 @@ if SERVER then
 		end
 	end
 
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
+
 	function ENT:ResetDrill()
 		self:SetNWBool("CanDrill", true)
 		self:SetNWInt("DrillingProgress", 0)
