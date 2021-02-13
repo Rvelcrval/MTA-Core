@@ -337,22 +337,27 @@ if SERVER then
 	end)
 
 	net.Receive(NET_REFILL_WEAPON, function(_, ply)
-		if ply.PayCoins and ply:PayCoins(400, "MTA Weapon Refill") then
-			local wep = ply:GetActiveWeapon()
-			if wep.GetPrimaryAmmoType and wep:GetPrimaryAmmoType() ~= -1 then
-				local max = wep:GetMaxClip1()
-				max = max <= 0 and 10 or max
-				ply:GiveAmmo(max, wep:GetPrimaryAmmoType())
-			elseif wep.SetClip1 and wep.Clip1 then
-				wep:SetClip1(wep:Clip1() + 10)
-			end
+		local all_weapons = net.ReadBool()
+		local weps = all_weapons and ply:GetWeapons() or  { ply:GetActiveWeapon() }
+		local price = 400 * #weps
+		if ply.PayCoins and ply:PayCoins(price, "MTA Weapon Refill") then
+			for _, wep in pairs(weps) do
+				local wep = ply:GetActiveWeapon()
+				if wep.GetPrimaryAmmoType and wep:GetPrimaryAmmoType() ~= -1 then
+					local max = wep:GetMaxClip1()
+					max = max <= 0 and 10 or max
+					ply:GiveAmmo(max, wep:GetPrimaryAmmoType())
+				elseif wep.SetClip1 and wep.Clip1 then
+					wep:SetClip1(wep:Clip1() + 10)
+				end
 
-			if wep.GetSecondaryAmmoType and wep:GetSecondaryAmmoType() ~= -1 then
-				local max = wep:GetMaxClip2()
-				max = max <= 0 and 10 or max
-				ply:GiveAmmo(max, wep:GetSecondaryAmmoType())
-			elseif wep.SetClip2 and wep.Clip2 then
-				wep:SetClip2(wep:Clip2() + 10)
+				if wep.GetSecondaryAmmoType and wep:GetSecondaryAmmoType() ~= -1 then
+					local max = wep:GetMaxClip2()
+					max = max <= 0 and 10 or max
+					ply:GiveAmmo(max, wep:GetSecondaryAmmoType())
+				elseif wep.SetClip2 and wep.Clip2 then
+					wep:SetClip2(wep:Clip2() + 10)
+				end
 			end
 		end
 	end)
@@ -500,6 +505,7 @@ if CLIENT then
 
 			local btn_refill = add_action("Refill your current weapon's clip (ammo)", "Buy (400c)", function()
 				net.Start(NET_REFILL_WEAPON)
+				net.WriteBool(false)
 				net.SendToServer()
 				surface.PlaySound("ui/buttonclick.wav")
 			end)
@@ -508,6 +514,19 @@ if CLIENT then
 				if not lp.GetCoins then return end
 
 				self:SetDisabled(lp:GetCoins() < 400)
+			end
+
+			local btn_refill_all = add_action("Refill all your weapon clips (ammo)", "Buy", function()
+				net.Start(NET_REFILL_WEAPON)
+				net.WriteBool(true)
+				net.SendToServer()
+				surface.PlaySound("ui/buttonclick.wav")
+			end)
+			function btn_refill_all:Think()
+				local lp = LocalPlayer()
+				if not lp.GetCoins then return end
+				local price = #lp:GetWeapons() * 400
+				self:SetDisabled(lp:GetCoins() < price)
 			end
 		end
 
