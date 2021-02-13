@@ -284,5 +284,5 @@ if CLIENT then
 		}
 	end
 
-	MTAHud:AddComponent("daily_missions", draw_daily_missions)
+	MTAHud:AddComponent("daily_missions", draw_daily_missions())
 end
