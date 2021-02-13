@@ -22,7 +22,7 @@ if SERVER then
 		if MTA.GetPlayerStat(ply, "points") < REVIVE_COST then return end
 		MTA.IncreasePlayerStat(ply, "points", -REVIVE_COST, true)
 
-		local pos = ply:GetPos()
+		local pos = ply_data.Pos or ply:GetPos()
 		ply:Spawn()
 		ply:SetPos(pos)
 		for _, wep_class_name in pairs(ply_data.Weapons) do
@@ -64,7 +64,8 @@ if SERVER then
 
 			dead_players[ply] = {
 				Weapons = wep_class_names,
-				WantedLevel = wanted_level
+				WantedLevel = wanted_level,
+				Pos = ply:GetPos(),
 			}
 
 			net.Start(tag)
