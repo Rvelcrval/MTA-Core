@@ -19,8 +19,7 @@ if SERVER then
 			return
 		end
 
-		if MTA.GetPlayerStat(ply, "points") < REVIVE_COST then return end
-		MTA.IncreasePlayerStat(ply, "points", -REVIVE_COST, true)
+		if not MTA.PayPoints(ply, REVIVE_COST) then return end
 
 		local pos = ply_data.Pos or ply:GetPos()
 		ply:Spawn()
