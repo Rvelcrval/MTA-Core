@@ -59,7 +59,7 @@ if SERVER then
 				table.insert(wep_class_names, wep:GetClass())
 			end
 
-			local cost = math.floor(max_factor / 2)
+			local cost = math.floor(max_factor / 2) + 25
 			dead_players[ply] = {
 				Weapons = wep_class_names,
 				WantedLevel = wanted_level,
