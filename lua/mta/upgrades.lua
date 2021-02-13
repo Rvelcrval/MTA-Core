@@ -526,6 +526,7 @@ if CLIENT then
 				local lp = LocalPlayer()
 				if not lp.GetCoins then return end
 				local price = #lp:GetWeapons() * 400
+				self:SetText(("Buy (%dc)"):format(price))
 				self:SetDisabled(lp:GetCoins() < price)
 			end
 		end
