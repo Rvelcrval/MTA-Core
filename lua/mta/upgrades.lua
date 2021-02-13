@@ -274,27 +274,33 @@ if SERVER then
 		end)
 	end)
 
+	function MTA.PayPoints(ply, amount)
+		local cur_ply_points = MTA.GetPlayerStat(ply, "points")
+		if amount > cur_ply_points then return false end
+
+		return MTA.IncreasePlayerStat(ply, "points", -amount, true) ~= -1
+	end
+
 	net.Receive(NET_CONVERT_POINTS, function(_, ply)
 		local points_to_convert = net.ReadUInt(32)
-		local cur_ply_points = MTA.GetPlayerStat(ply, "points")
-		if points_to_convert > cur_ply_points then return end
 		if not ply.GiveCoins then return end
 
-		local coins = points_to_convert * COIN_MULTIPLIER
-		MTA.IncreasePlayerStat(ply, "points", -points_to_convert, true)
-		ply:GiveCoins(coins, "MTA Converted Points")
+		if MTA.PayPoints(ply, points_to_convert) then
+			local coins = points_to_convert * COIN_MULTIPLIER
+			ply:GiveCoins(coins, "MTA Converted Points")
+		end
 	end)
 
 	local function try_upgrade_player_stat(ply, stat_name)
 		if not IS_MTA_GM then return end
 
 		local cur_value = MTA.GetPlayerStat(ply, stat_name)
-		local upgrade_price = math.Round(math.exp(cur_value * POINT_MULTIPLIER))
-		if MTA.GetPlayerStat(ply, "points") < upgrade_price then return end
 		if cur_value >= MAX_LEVEL then return end -- lock at level 100
 
-		MTA.IncreasePlayerStat(ply, "points", -upgrade_price, true)
-		MTA.IncreasePlayerStat(ply, stat_name, 1)
+		local upgrade_price = math.Round(math.exp(cur_value * POINT_MULTIPLIER))
+		if MTA.PayPoints(ply, upgrade_price) then
+			MTA.IncreasePlayerStat(ply, stat_name, 1)
+		end
 	end
 
 	net.Receive(NET_UPGRADE, function(_, ply)
@@ -315,20 +321,19 @@ if SERVER then
 		local cur_classes = MTA.Weapons.Get(ply)
 		if table.HasValue(cur_classes, weapon_class) then return end
 
-		if MTA.GetPlayerStat(ply, "points") < wep_price then return end
-		MTA.IncreasePlayerStat(ply, "points", -wep_price, true)
+		if MTA.PayPoints(ply, wep_price) then
+			local wep = ply:HasWeapon(weapon_class) and ply:GetWeapon(weapon_class) or ply:Give(weapon_class)
+			wep.unrestricted_gun = true
+			wep.lobbyok = true
+			wep.PhysgunDisabled = true
+			wep.dont_televate = true
+			wep:SetClip1(wep:GetMaxClip1())
+			wep:SetClip2(2)
+			ply:SelectWeapon(weapon_class)
 
-		local wep = ply:HasWeapon(weapon_class) and ply:GetWeapon(weapon_class) or ply:Give(weapon_class)
-		wep.unrestricted_gun = true
-		wep.lobbyok = true
-		wep.PhysgunDisabled = true
-		wep.dont_televate = true
-		wep:SetClip1(wep:GetMaxClip1())
-		wep:SetClip2(2)
-		ply:SelectWeapon(weapon_class)
-
-		table.insert(cur_classes, weapon_class)
-		MTA.Weapons.Save(ply, cur_classes)
+			table.insert(cur_classes, weapon_class)
+			MTA.Weapons.Save(ply, cur_classes)
+		end
 	end)
 
 	net.Receive(NET_REFILL_WEAPON, function(_, ply)
