@@ -236,34 +236,17 @@ if SERVER then
 		spawning = spawning - 1
 	end
 
-	function MTA.TrySpawnCombine(pos)
-		local ranges = {}
-		local total_lvl = 0
-		for _, ply in ipairs(MTA.BadPlayers) do
-			local wanted_lvl = MTA.Factors[ply] / 10
-			table.insert(ranges, { Min = total_lvl, Max = total_lvl + wanted_lvl, Ply = ply })
-			total_lvl = total_lvl + wanted_lvl
-		end
-
-		local target = MTA.BadPlayers[1]
-		local rand = math.random(total_lvl - 1)
-		for _, range in ipairs(ranges) do
-			if rand >= range.Min and rand < range.Max then
-				target = range.Ply
-				break
-			end
-		end
-
+	function MTA.TrySpawnCombine(target, pos)
 		return MTA.FarCombine(target, MTA.BadPlayers, combine_spawn_callback, pos)
 	end
 
-	function MTA.SpawnCombine()
+	function MTA.SpawnCombine(target)
 		local spawning_wait_count = math.max(spawning, 0)
 		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
 		if (#MTA.Combines + spawning_wait_count) >= MTA.MAX_COMBINES then return end
 		if #MTA.BadPlayers == 0 then return end
 
-		local succ, ret = MTA.TrySpawnCombine()
+		local succ, ret = MTA.TrySpawnCombine(target)
 		if succ then
 			spawning = spawning + 1
 		else
@@ -271,7 +254,7 @@ if SERVER then
 			spawn_fail_reps = spawn_fail_reps + 1
 			spawn_fails[reason] = true
 
-			hook.Run("MTASpawnFail", spawn_fail_reps, reason)
+			hook.Run("MTASpawnFail", spawn_fail_reps, reason, target)
 
 			timer.Create("MTASpawnFails", 5, 1, function()
 				local fail_reason_display = table.concat(table.GetKeys(spawn_fails), " & ")
@@ -307,6 +290,15 @@ if SERVER then
 			net.WriteBool(true)
 			net.Broadcast()
 
+			local timer_name = ("MTACombineSpawn_%d"):format(ply:EntIndex())
+			timer.Create(timer_name, 0.3, 0, function()
+				if not IsValid(ply) then
+					timer.Remove(timer_name)
+					return
+				end
+
+				MTA.SpawnCombine(ply)
+			end)
 			MTA.ConstrainPlayer(ply, "Wanted by MTA")
 			MTA.Print(tostring(ply) .. " is now a criminal")
 		end
@@ -378,6 +370,9 @@ if SERVER then
 		net.WriteEntity(ply)
 		net.WriteBool(false)
 		net.Broadcast()
+
+		local timer_name = ("MTACombineSpawn_%d"):format(ply:EntIndex())
+		timer.Remove(timer_name)
 
 		ply.MTABad = nil
 		local removed = remove_ent_from_table(ply, MTA.BadPlayers)
@@ -465,8 +460,6 @@ if SERVER then
 	local BASE_DECREASE_FACTOR = MTA_CONFIG.core.BaseDecreaseFactor
 	local DECREASE_DIVIDER = MTA_CONFIG.core.DecreaseDivider -- increase to slow down escape, increase to speed up escape
 	function MTA.UpdateState()
-		MTA.SpawnCombine()
-
 		local time = CurTime()
 		for _, ply in ipairs(MTA.BadPlayers) do
 			if ply:IsValid() then

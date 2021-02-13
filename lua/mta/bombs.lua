@@ -131,14 +131,11 @@ if SERVER then
 	end)
 
 	local COMBINE_MAXS = Vector(13, 13, 72)
-	hook.Add("MTASpawnFail", tag, function(failed_count, reason)
+	hook.Add("MTASpawnFail", tag, function(failed_count, reason, target)
 		if #MTA.BadPlayers < 1 then return end
 		if failed_count > 0 and failed_count % 5 == 0 then
-			local ply = MTA.BadPlayers[math.random(#MTA.BadPlayers)]
-			if IsValid(ply) then
-				local pos = find_space(ply, COMBINE_MAXS)
-				MTA.TrySpawnCombine(pos)
-			end
+			local pos = find_space(target, COMBINE_MAXS)
+			MTA.TrySpawnCombine(target, pos)
 		end
 	end)
 
