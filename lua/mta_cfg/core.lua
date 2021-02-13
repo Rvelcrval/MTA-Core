@@ -45,5 +45,5 @@ return {
 	["UseMapData"] = not IS_MTA_GM,
 	["DecreaseDivider"] = 250,
 	["EscapeTime"] = 20,
-	["MaxCombines"] = IS_MTA_GM and 150 or 25,
+	["MaxCombines"] = IS_MTA_GM and 100 or 25,
 }
