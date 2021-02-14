@@ -50,7 +50,7 @@ if SERVER then
 	end)
 
 	-- we do this here, because PlayerDeath is too late
-	hook.Add("MTAPlayerFailed", tag, function(ply, max_factor, wanted_level, is_death)
+	hook.Add("MTAPlayerFailed", tag, function(ply, max_level, wanted_level, is_death)
 		if not is_death then return end
 
 		if MTA.HasSkill(ply, "healing_multiplier", "cpr") then
@@ -59,7 +59,7 @@ if SERVER then
 				table.insert(wep_class_names, wep:GetClass())
 			end
 
-			local cost = math.floor(max_factor / 2) + 25
+			local cost = math.floor(max_level / 2) + (25 * (max_level / 10))
 			dead_players[ply] = {
 				Weapons = wep_class_names,
 				WantedLevel = wanted_level,
