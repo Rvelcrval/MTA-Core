@@ -109,6 +109,7 @@ hook.Add("CanSSJump", tag, deny)
 hook.Add("ShouldAllowSit", tag, deny)
 hook.Add("CanPlayerTimescale", tag, deny)
 hook.Add("CanPlayerHax", tag, deny)
+hook.Add("CanPlyRespawn", tag, deny)
 
 hook.Add("CanPlyCursedBullet", tag, function(ply, atck)
     if is_constrained(ply) or is_constrained(atck) then return false end

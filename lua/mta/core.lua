@@ -770,7 +770,7 @@ if SERVER then
 	end)
 
 	hook.Add("PlayerShouldTakeDamage", tag, function(ply, atck)
-		if atck:IsPlayer() and atck.MTABad and ply.MTABad then
+		if not IS_MTA_GM and atck:IsPlayer() and atck.MTABad and ply.MTABad then
 			return false
 		end
 
