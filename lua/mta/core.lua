@@ -1036,7 +1036,7 @@ if CLIENT then
 
 		if health <= LOW_HEALTH then
 			DrawMotionBlur(0.4, 0.8, 0.05)
-			surface.SetDrawColor(0, 0, 0, 150)
+			surface.SetDrawColor(0, 0, 0, 25)
 			surface.DrawRect(0,0, scrw, scrh)
 			local alpha = 10 + math.abs((math.sin(CurTime() * 3) * 100))
 			surface.SetDrawColor(255, 0, 0, alpha)
