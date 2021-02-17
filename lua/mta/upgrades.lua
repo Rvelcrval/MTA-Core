@@ -342,7 +342,6 @@ if SERVER then
 		local price = 400 * #weps
 		if ply.PayCoins and ply:PayCoins(price, "MTA Weapon Refill") then
 			for _, wep in pairs(weps) do
-				local wep = ply:GetActiveWeapon()
 				if wep.GetPrimaryAmmoType and wep:GetPrimaryAmmoType() ~= -1 then
 					local max = wep:GetMaxClip1()
 					max = max <= 0 and 10 or max
