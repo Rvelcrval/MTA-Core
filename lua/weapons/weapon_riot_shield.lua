@@ -30,7 +30,7 @@ end
 function SWEP:SecondaryAttack()
 end
 
-local FRONT_ROTATION_MARKER = 60
+local FRONT_ROTATION_MARKER = 55
 
 local function get_rotation(ply, pos)
 	local diff = pos - ply:GetShootPos()
@@ -129,8 +129,8 @@ if SERVER then
 			local atck = dmg_info:GetAttacker()
 			if get_rotation(ent, atck:WorldSpaceCenter()) < FRONT_ROTATION_MARKER then
 				return true
-			else
-				dmg_info:ScaleDamage(0.2)
+			elseif not atck:IsPlayer() then
+				dmg_info:ScaleDamage(0.3)
 			end
 		end
 	end)
