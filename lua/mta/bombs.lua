@@ -109,6 +109,10 @@ if SERVER then
 		return false
 	end
 
+	local function is_explodable_car(car)
+		return car:GetClass() == "gmod_sent_vehicle_fphysics_base" and car:IsVehicle() and car.ExplodeVehicle
+	end
+
 	hook.Add("EntityRemoved", tag, function(grenade)
 		if grenade:GetClass() == "grenade_helicopter" and grenade:GetNWBool("MTABomb") then
 			local pos = grenade:WorldSpaceCenter()
@@ -121,7 +125,9 @@ if SERVER then
 
 			if FindMetaTable("Entity").PropDoorRotatingExplode then
 				for _, ent in pairs(ents.FindInSphere(pos, 300)) do
-					if is_blocking_entity(ent) then
+					if is_explodable_car(ent) then
+						ent:ExplodeVehicle()
+					elseif is_blocking_entity(ent) then
 						ent:PropDoorRotatingExplode(nil, 30, false, false)
 					end
 				end

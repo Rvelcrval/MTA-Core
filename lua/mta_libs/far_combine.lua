@@ -379,6 +379,10 @@ local function is_blocking_entity(ent)
 	return false
 end
 
+local function is_explodable_car(car)
+	return car:GetClass() == "gmod_sent_vehicle_fphysics_base" and car:IsVehicle() and car.ExplodeVehicle
+end
+
 local function handle_entity_block(combine)
 	-- dont bother if that function doesnt exist
 	if not FindMetaTable("Entity").PropDoorRotatingExplode then return end
@@ -391,7 +395,9 @@ local function handle_entity_block(combine)
 	if last_stuck_state and last_stuck_state.NPCPos:Distance(pos) <= 100 then
 		if last_stuck_state.Time > 6 then
 			for _, ent in pairs(ents.FindInSphere(pos, 150)) do
-				if is_blocking_entity(ent) then
+				if is_explodable_car(ent) then
+					ent:ExplodeVehicle()
+				elseif is_blocking_entity(ent) then
 					ent:PropDoorRotatingExplode(aim_vector * 1000, 30, false, false)
 				end
 			end
@@ -461,6 +467,8 @@ local function setup_combine(combine, target, players)
 	local next_update = CurTime() + 1
 	keep_sane(combine, function(_, curtime, onesec)
 		if not IsValid(combine) then return end
+
+		combine.Targets = players
 
 		local old_target = target
 		if CurTime() > next_update then
