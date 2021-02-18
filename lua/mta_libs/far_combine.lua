@@ -118,15 +118,15 @@ local function keep_sane(combine, callback)
 	combines[combine] = callback or nil
 end
 
-local function is_far_behind(ply, pos, fard)
+local function is_far_behind(ent, pos, fard)
 	fard = (fard or 888) ^ 2
-	local pl_pos = ply:EyePos()
-	if pl_pos:DistToSqr(pos) < fard then
+	local ent_pos = ent:EyePos()
+	if ent_pos:DistToSqr(pos) < fard then
 		return false
 	end
-	local aim = ply:GetAimVector()
-	pl_pos:Sub(pos)
-	local aim2 = pl_pos
+	local aim = ent.GetAimVector and ent:GetAimVector() or ent:GetForward()
+	ent_pos:Sub(pos)
+	local aim2 = ent_pos
 	aim2:Normalize()
 	local dot = aim:Dot(aim2)
 
