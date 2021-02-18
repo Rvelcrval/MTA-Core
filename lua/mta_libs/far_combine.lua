@@ -412,6 +412,11 @@ local function handle_entity_block(combine)
 	}
 end
 
+local function is_alive(ent)
+	if ent:IsPlayer() then return ent:Alive() end
+	return ent:Health() > 0
+end
+
 local function setup_combine(combine, target, players)
 	if not IsValid(target) then return end
 
@@ -439,7 +444,7 @@ local function setup_combine(combine, target, players)
 		if curtime - last_teleport < 5 then return end
 		local try_teleport = (curtime % 3 < 1) -- once every N seconds when N>1
 
-		if try_teleport and target:Alive() and teleports < 3 and not target:TestPVS(combine:GetPos()) and not combine:IsUnreachable(target) then
+		if try_teleport and is_alive(target) or target and teleports < 3 and not target:TestPVS(combine:GetPos()) and not combine:IsUnreachable(target) then
 			last_teleport = curtime
 			teleports = teleports + 1
 			local oldpos = combine:GetPos()
@@ -511,7 +516,7 @@ local function setup_combine(combine, target, players)
 			end
 
 			-- let's make you the enemy of the player again
-			--if target:Alive() then
+			--if is_alive(target) then
 			--	combine:SetEnemy(target)
 			--end
 		end
@@ -540,7 +545,7 @@ local function setup_combine(combine, target, players)
 		end
 
 		-- tell enemy where you exist
-		if (target.Alive and target:Alive()) or target:Health() > 0 then
+		if is_alive(target) then
 			combine:UpdateEnemyMemory(target, target:GetPos())
 		end
 
