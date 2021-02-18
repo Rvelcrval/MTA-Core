@@ -540,7 +540,7 @@ local function setup_combine(combine, target, players)
 		end
 
 		-- tell enemy where you exist
-		if target:Alive() then
+		if (target.Alive and target:Alive()) or target:Health() > 0 then
 			combine:UpdateEnemyMemory(target, target:GetPos())
 		end
 
