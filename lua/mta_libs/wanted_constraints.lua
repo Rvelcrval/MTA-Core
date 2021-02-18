@@ -24,7 +24,7 @@ local function constrain(ply, constraint_reason)
     players[ply] = constraint_reason or "unknown"
 
     local veh = ply:GetVehicle()
-    if IsValid(veh) and not (veh.base and veh.IsMTACar) then
+    if IsValid(veh) and not (veh.base and veh.base.IsMTACar) then
         ply:ExitVehicle()
     end
 
