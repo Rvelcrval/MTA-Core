@@ -660,8 +660,13 @@ if SERVER then
 		local inflictor = dmg_info:GetInflictor()
 		if isentity(inflictor) and IsValid(inflictor) then
 			if inflictor.ConcussionBall then return true end
-			if type(inflictor) ~= "Player" and not inflictor:IsWeapon() and not whitelist[inflictor:GetClass()] then
-				return true
+			if type(inflictor) ~= "Player"
+				and not inflictor:IsWeapon()
+				and not inflictor:IsVehicle()
+			then
+				if IS_MTA_GM and not whitelist[inflictor:GetClass()] then
+					return true
+				end
 			end
 		end
 

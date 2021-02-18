@@ -465,6 +465,14 @@ local function setup_combine(combine, target, players)
 		local old_target = target
 		if CurTime() > next_update then
 			local new_ply = get_closest_player(combine, players)
+
+			-- if the target is in a vehicle, try to target the vehicle
+			combine.TargetIsVehicle = false
+			if IsValid(new_ply) and new_ply:InVehicle() then
+				new_ply = new_ply:GetVehicle()
+				combine.TargetIsVehicle = true
+			end
+
 			if IsValid(target) and target ~= new_ply and not table.HasValue(players, target) then
 				combine:AddEntityRelationship(target, D_LI, 99)
 			end
@@ -475,7 +483,7 @@ local function setup_combine(combine, target, players)
 		end
 
 		if not IsValid(target) then
-			combine:Remove()
+			if not combine.TargetIsVehicle then combine:Remove() end
 			return
 		end
 

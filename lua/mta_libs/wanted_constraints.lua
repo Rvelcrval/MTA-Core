@@ -23,7 +23,8 @@ local ply_ents_to_remove = {
 local function constrain(ply, constraint_reason)
     players[ply] = constraint_reason or "unknown"
 
-    if ply:InVehicle() then
+    local veh = ply:GetVehicle()
+    if IsValid(veh) and not veh.IsMTACar then
         ply:ExitVehicle()
     end
 
@@ -97,7 +98,6 @@ local function deny(ply)
     end
 end
 
-hook.Add("CanPlayerEnterVehicle", tag, deny)
 hook.Add("CanPlyTeleport", tag, deny)
 hook.Add("CanPlyGoBack", tag, deny)
 hook.Add("OnPlayerSit", tag , deny)
@@ -163,6 +163,10 @@ end)
 
 hook.Add("ShouldShopNPCKill", tag, function(ply, atck)
     if is_constrained(ply) or is_constrained(atck) then return false end
+end)
+
+hook.Add("CanPlayerEnterVehicle", tag, function(ply, veh)
+    if is_constrained(ply) and not veh.IsMTACar then return false end
 end)
 
 return constrain, release
