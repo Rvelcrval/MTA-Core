@@ -664,7 +664,7 @@ if SERVER then
 				and not inflictor:IsWeapon()
 				and not inflictor:IsVehicle()
 			then
-				if IS_MTA_GM and not whitelist[inflictor:GetClass()] then
+				if not IS_MTA_GM and not whitelist[inflictor:GetClass()] then
 					return true
 				end
 			end

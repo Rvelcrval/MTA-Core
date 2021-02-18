@@ -24,7 +24,7 @@ local function constrain(ply, constraint_reason)
     players[ply] = constraint_reason or "unknown"
 
     local veh = ply:GetVehicle()
-    if IsValid(veh) and not veh.IsMTACar then
+    if IsValid(veh) and not (veh.base and veh.IsMTACar) then
         ply:ExitVehicle()
     end
 
@@ -166,7 +166,10 @@ hook.Add("ShouldShopNPCKill", tag, function(ply, atck)
 end)
 
 hook.Add("CanPlayerEnterVehicle", tag, function(ply, veh)
-    if is_constrained(ply) and not veh.IsMTACar then return false end
+    if is_constrained(ply) then
+        if veh.base and veh.base.IsMTACar then return end
+        return false
+    end
 end)
 
 return constrain, release
