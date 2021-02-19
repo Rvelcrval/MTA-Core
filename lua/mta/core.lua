@@ -270,8 +270,7 @@ if SERVER then
 
 		-- 10 to 60 -> metrocops and soldiers that become more and more common
 		if wanted_lvl < 60 and wanted_lvl >= 10 then
-			local chance = math.ceil(30 / 100) * wanted_lvl
-			spawn_function = math.random(0, 100) <= chance and combine_types.soldiers or combine_types.metrocops
+			spawn_function = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
 
 		-- 60 - 80 -> only elites
 		elseif wanted_lvl >= 60 and wanted_lvl < 80 then
