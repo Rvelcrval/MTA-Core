@@ -237,26 +237,25 @@ if SERVER then
 		spawning = spawning - 1
 	end
 
-	local soldier_weapons = { "weapon_smg1", "weapon_shotgun" }
 	local combine_types = {
-		function()
+		metrocops = function()
 			local npc = ents.Create("npc_metropolice")
 			npc:SetKeyValue("additionalequipment", math.random() > 0.5 and "weapon_pistol" or "weapon_stunstick")
 			npc:SetKeyValue("manhacks", tostring(math.random(0, 2)))
 			return npc
 		end,
-		function()
+		soldiers = function() --  this includes shotgunners
 			local npc = ents.Create("npc_combine_s")
-			npc:SetKeyValue("additionalequipment", soldier_weapons[math.random(#soldier_weapons)])
+			npc:SetKeyValue("additionalequipment", math.random() < 0.25 and "weapon_shotgun" or "weapon_smg1")
 			return npc
 		end,
-		function()
+		elites = function()
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_ar2")
 			npc:SetModel("models/combine_super_soldier.mdl")
 			return npc
 		end,
-		function()
+		shotgunners = function()
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_shotgun")
 			return npc
@@ -265,15 +264,25 @@ if SERVER then
 
 	function MTA.TrySpawnCombine(target, pos)
 		local wanted_lvl = math.ceil(MTA.Factors[target] / 10)
-		local spawn_function = combine_types[1]
-		if wanted_lvl < 10 then
-			spawn_function = combine_types[1]
-		elseif wanted_lvl < 50 and wanted_lvl >= 10 then
-			local chance = math.ceil(40 / 100) * wanted_lvl
-			spawn_function = combine_types[math.random(0, 100) <= chance and 2 or 1]
-		elseif wanted_lvl >= 50 then
-			spawn_function = math.random(1, 5) == 1 and combine_types[4] or combine_types[3]
+
+		-- under 10 -> only metrocops
+		local spawn_function = combine_types.metrocops
+
+		-- 10 to 60 -> metrocops and soldiers that become more and more common
+		if wanted_lvl < 60 and wanted_lvl >= 10 then
+			local chance = math.ceil(30 / 100) * wanted_lvl
+			spawn_function = math.random(0, 100) <= chance and combine_types.soldiers or combine_types.metrocops
+
+		-- 60 - 80 -> only elites
+		elseif wanted_lvl >= 60 and wanted_lvl < 80 then
+			spawn_function = combine_types.elites
+
+		-- 80 - inf -> elites and shotgunners
+		elseif wanted_lvl >= 80 then
+			spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
 		end
+
+		-- TODO: Helicopters n shit ?
 
 		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos)
 	end
