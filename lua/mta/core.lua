@@ -1,6 +1,9 @@
 AddCSLuaFile()
 AddCSLuaFile("mta_libs/far_combine.lua")
-AddCSLuaFile("includes/modules/metalog.lua") -- when is that going to get added ???
+
+-- when is that going to get added ???
+AddCSLuaFile("metalog_handlers/ml_console_printer.lua")
+AddCSLuaFile("includes/modules/metalog.lua")
 
 pcall(require, "metalog")
 pcall(include, "autorun/translation.lua")
