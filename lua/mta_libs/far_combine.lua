@@ -563,7 +563,7 @@ local function far_combine(target, players, spawn_function, callback, pos)
 	net.Broadcast()
 
 	timer.Simple(1, function()
-		local combine = create_combine(pos)
+		local combine = create_combine(pos, spawn_function)
 		setup_combine(combine, target, players)
 		combine:EmitSound("ambient/machines/teleport1.wav", 40)
 		callback(combine)

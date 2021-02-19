@@ -1,5 +1,6 @@
 AddCSLuaFile()
 AddCSLuaFile("mta_libs/far_combine.lua")
+AddCSLuaFile("includes/modules/metalog.lua") -- when is that going to get added ???
 
 pcall(require, "metalog")
 pcall(include, "autorun/translation.lua")
