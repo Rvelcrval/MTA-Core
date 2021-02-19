@@ -171,16 +171,17 @@ if SERVER then
 		end
 	end)
 
-	local FAR_AWAY_DIST = 1024
+	local FAR_AWAY_DIST = 2048
 	local TOO_CLOSE_DIST = 75
 	local function find_space_ex(combine)
 		local enemy = combine:GetEnemy()
 		local c_pos = combine:WorldSpaceCenter()
 		local e_pos = enemy:WorldSpaceCenter()
 		local dir = (c_pos - e_pos):GetNormalized()
+		local end_pos = e_pos + dir * (FAR_AWAY_DIST / 4)
 		local tr = util.TraceHull({
 			start = e_pos,
-	        endpos = e_pos + dir * FAR_AWAY_DIST,
+	        endpos = end_pos,
 	        filter = function(ent)
 	        	if ent == enemy or ent:GetParent() == enemy then return false end
 	        end,
@@ -188,26 +189,29 @@ if SERVER then
 	        maxs = combine:OBBMaxs()
 		})
 
-		return tr.HitPos + dir or e_pos + dir * FAR_AWAY_DIST
+		return tr.HitPos or end_pos
 	end
 
-	-- in theory it works but in practice its really not that good
-	--[[timer.Create("mta_combine_fallback_tp", 4, 0, function()
-		for _, combine in ipairs(MTA.Combines) do
-			local enemy = combine:GetEnemy()
-			local enemy_pos = enemy:WorldSpaceCenter()
-			if IsValid(enemy) and enemy_pos:Distance(combine:WorldSpaceCenter()) >= FAR_AWAY_DIST then
-				local pos = find_space_ex(combine)
-				if pos:Distance(enemy_pos) <= TOO_CLOSE_DIST then
-					pos = find_space(enemy, combine, 150)
-				end
-
-				SafeRemoveEntity(combine)
-				MTA.ToSpawn = MTA.ToSpawn + 1
-				MTA.TrySpawnCombine(enemy, pos)
+	local function do_distance_checks(combine)
+		local enemy = combine:GetEnemy()
+		local enemy_pos = enemy:WorldSpaceCenter()
+		if IsValid(enemy) and (combine:IsUnreachable(enemy) or enemy_pos:Distance(combine:WorldSpaceCenter()) >= FAR_AWAY_DIST) then
+			local pos = find_space_ex(combine)
+			if pos:Distance(enemy_pos) <= TOO_CLOSE_DIST then
+				pos = find_space(enemy, combine, 150)
 			end
+
+			SafeRemoveEntity(combine)
+			MTA.ToSpawn = MTA.ToSpawn + 1
+			MTA.TrySpawnCombine(enemy, pos)
 		end
-	end)]]--
+	end
+
+	timer.Create("mta_combine_fallback_tp", 4, 0, function()
+		for _, combine in ipairs(MTA.Combines) do
+			do_distance_checks()
+		end
+	end)
 end
 
 if CLIENT then
