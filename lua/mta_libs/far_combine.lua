@@ -444,7 +444,7 @@ local function setup_combine(combine, target, players)
 		if curtime - last_teleport < 5 then return end
 		local try_teleport = (curtime % 3 < 1) -- once every N seconds when N>1
 
-		if try_teleport and is_alive(target) or target and teleports < 3 and not target:TestPVS(combine:GetPos()) and not combine:IsUnreachable(target) then
+		if try_teleport and is_alive(target) and teleports < 3 and not target:TestPVS(combine:GetPos()) and not combine:IsUnreachable(target) then
 			last_teleport = curtime
 			teleports = teleports + 1
 			local oldpos = combine:GetPos()
