@@ -236,8 +236,45 @@ if SERVER then
 		spawning = spawning - 1
 	end
 
+	local soldier_weapons = { "weapon_smg1", "weapon_shotgun" }
+	local combine_types = {
+		function()
+			local npc = ents.Create("npc_metropolice")
+			npc:SetKeyValue("additionalequipment", math.random() > 0.5 and "weapon_pistol" or "weapon_stunstick")
+			npc:SetKeyValue("manhacks", tostring(math.random(0, 2)))
+			return npc
+		end,
+		function()
+			local npc = ents.Create("npc_combine_s")
+			npc:SetKeyValue("additionalequipment", soldier_weapons[math.random(#soldier_weapons)])
+			return npc
+		end,
+		function()
+			local npc = ents.Create("npc_combine_s")
+			npc:SetKeyValue("additionalequipment", "weapon_ar2")
+			npc:SetModel("models/combine_super_soldier.mdl")
+			return npc
+		end,
+		function()
+			local npc = ents.Create("npc_combine_s")
+			npc:SetKeyValue("additionalequipment", "weapon_shotgun")
+			return npc
+		end,
+	}
+
 	function MTA.TrySpawnCombine(target, pos)
-		return MTA.FarCombine(target, MTA.BadPlayers, combine_spawn_callback, pos)
+		local wanted_lvl = math.ceil(MTA.Factors[target] / 10)
+		local spawn_function = combine_types[1]
+		if wanted_lvl < 10 then
+			spawn_function = combine_types[1]
+		elseif wanted_lvl < 50 and wanted_lvl >= 10 then
+			local chance = math.ceil(40 / 100) * wanted_lvl
+			spawn_function = combine_types[math.random(0, 100) <= chance and 2 or 1]
+		elseif wanted_lvl >= 50 then
+			spawn_function = math.random(1, 5) == 1 and combine_types[4] or combine_types[3]
+		end
+
+		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos)
 	end
 
 	function MTA.SpawnCombine(target)
@@ -306,7 +343,7 @@ if SERVER then
 		local count = #MTA.Combines
 		local base_divider = 3
 		local count_to_spawn = IS_MTA_GM
-			and math.max(1, math.floor(factor / 10 / base_divider))
+			and math.max(1, math.floor(math.ceil(factor / 10) / base_divider))
 			or math.max(1, math.floor(factor / 2))
 
 		if count >= 1 then
@@ -348,7 +385,7 @@ if SERVER then
 
 		if should_pay and old_factor > 0 then
 			local cur_coins = ply.GetCoins and ply:GetCoins() or 0
-			local wanted_lvl = old_factor / 10
+			local wanted_lvl = math.ceil(old_factor / 10)
 			local to_pay = cur_coins > 1000000 and math.ceil((cur_coins / 10000) * wanted_lvl) or wanted_lvl * 1000
 			if ply.PayCoins and not ply:PayCoins(to_pay, "MTA Criminal Fee") then
 				if cur_coins > 0 then
@@ -362,7 +399,7 @@ if SERVER then
 				end
 			end
 
-			hook.Run("MTAPlayerFailed", ply, max_factor, old_factor / 10, is_death)
+			hook.Run("MTAPlayerFailed", ply, max_factor, wanted_lvl, is_death)
 		end
 
 		hook.Run("MTAWantedStateUpdate", ply, false)

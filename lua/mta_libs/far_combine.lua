@@ -133,29 +133,7 @@ local function is_far_behind(ent, pos, fard)
 	return dot > 0
 end
 
-local soldier_weapons = { "weapon_smg1", "weapon_ar2", "weapon_shotgun" }
-local combine_types = {
-	function()
-		local npc = ents.Create("npc_metropolice")
-		npc:SetKeyValue("additionalequipment", math.random() > 0.5 and "weapon_pistol" or "weapon_stunstick")
-		npc:SetKeyValue("manhacks", tostring(math.random(0, 2)))
-		return npc
-	end,
-	function()
-		local npc = ents.Create("npc_combine_s")
-		npc:SetKeyValue("additionalequipment", soldier_weapons[math.random(#soldier_weapons)])
-		return npc
-	end,
-	function()
-		local npc = ents.Create("npc_combine_s")
-		npc:SetKeyValue("additionalequipment", "weapon_ar2")
-		npc:SetModel("models/combine_super_soldier.mdl")
-		return npc
-	end
-}
-
-local function create_combine(pos)
-	local spawn_function = combine_types[math.random(#combine_types)]
+local function create_combine(pos, spawn_function)
 	local npc = spawn_function()
 	npc.ms_notouch = true
 
@@ -570,7 +548,7 @@ local function find_node(target)
 	return true, node.pos
 end
 
-local function far_combine(target, players, callback, pos)
+local function far_combine(target, players, spawn_function, callback, pos)
 	if not IsValid(target) then return false, "invalid target" end
 	if #players == 0 then return false, "no players to use" end
 
