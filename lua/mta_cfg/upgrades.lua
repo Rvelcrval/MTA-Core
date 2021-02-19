@@ -4,7 +4,7 @@ return {
 		["weapon_crossbow"] = 30,
 		["weapon_asmd"] = 40,
 		["weapon_ar2"] = 30,
-		["weapon_escape_teleporter"] = 15,
+		-- ["weapon_escape_teleporter"] = 15,
 		["weapon_riot_shield"] = 6,
 		["weapon_pistol"] = 10,
 		["weapon_smg1"] = 25,
