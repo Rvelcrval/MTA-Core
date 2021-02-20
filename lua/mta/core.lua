@@ -1175,6 +1175,21 @@ if CLIENT then
 		if ent:GetNWBool("MTACombine") then return false end
 	end)
 
+	if not IS_MTA_GM then
+		hook.Run("MTAWantedStateUpdate", tag, function(ply, is_wanted)
+			if is_wanted then return end
+			Derma_Query(
+				"Looks like you're enjoying MTA, do you wish to join the dedicated MTA server? (we have guns, pvp and a gamemode :eyes:)",
+				"MTA",
+				"Join", function()
+					RunConsoleCommand("aowl", "goto", "#3")
+				end,
+				"Remain here",
+				function() end
+			)
+		end)
+	end
+
 	net.Receive(NET_WANTED_STATE, function()
 		local ply = net.ReadEntity()
 		local is_wanted = net.ReadBool()

@@ -409,8 +409,11 @@ if CLIENT then
 		frame:DockPadding(5, 30, 5, 30)
 		frame:SetTitle("MTA Dealer")
 		frame:MakePopup()
+		frame:SetSkin("MTA")
 		frame.btnMinim:Hide()
 		frame.btnMaxim:Hide()
+
+		derma.RefreshSkins()
 
 		-- header
 		do
