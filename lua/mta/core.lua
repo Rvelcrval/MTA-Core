@@ -266,7 +266,8 @@ if SERVER then
 	}
 
 	function MTA.TrySpawnCombine(target, pos)
-		local wanted_lvl = math.ceil(MTA.Factors[target] / 10)
+		if not IsValid(target) then return false, "bad target" end
+		local wanted_lvl = math.ceil((MTA.Factors[target] or 0) / 10)
 
 		-- under 10 -> only metrocops
 		local spawn_function = combine_types.metrocops
