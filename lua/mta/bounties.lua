@@ -31,6 +31,14 @@ if SERVER then
 	local hunters = {}
 	local blocked_hunters = {}
 
+	local function set_nw_data(hunter)
+		local nw_data = ""
+		for _, bounty in ipairs(hunters[hunter]) do
+			nw_data = nw_data .. ("%d;"):format(bounty:EntIndex())
+		end
+		hunter:SetNWString("MTABountyHunter", nw_data)
+	end
+
 	local function finish_bounty(hunter)
 		local steam_id = hunter:SteamID()
 		blocked_hunters[steam_id] = (blocked_hunters[steam_id] or 0) + 1
@@ -43,8 +51,9 @@ if SERVER then
 
 	local function clear_bounty(ply)
 		bounties[ply] = nil
-		for _, targets in pairs(hunters) do
+		for hunter, targets in pairs(hunters) do
 			table.RemoveByValue(targets, ply)
+			set_nw_data(hunter)
 		end
 
 		net.Start(NET_MTA_REMOVE_BOUNTY)
@@ -56,7 +65,7 @@ if SERVER then
 		for ply, targets in pairs(hunters) do
 			if IsValid(ply) and #targets == 0 then
 				ply.MTAIgnore = nil
-				ply:SetNWInt("MTABountyHunter", -1)
+				ply:SetNWString("MTABountyHunter", "")
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
 				hook.Run("MTABountyHunterStateUpdate", ply, false)
@@ -68,6 +77,7 @@ if SERVER then
 		if wanted_level < (MINIMUM_LEVEL + (MTA.GetPlayerStat(ply, "prestige_level") * 10)) then return end
 		if bounties[ply] then return end
 
+		MTA.ChatPrint(ply, "A bounty has been ", header_col, "issued for you!")
 		bounties[ply] = true
 		net.Start(NET_MTA_BOUNTIES)
 		net.WriteEntity(ply)
@@ -104,7 +114,7 @@ if SERVER then
 				if not bounties[atck] then return end
 
 				ply.MTAIgnore = nil
-				ply:SetNWBool("MTABountyHunter", -1)
+				ply:SetNWString("MTABountyHunter", "")
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
 				hook.Run("MTABountyHunterStateUpdate", ply, false)
@@ -192,9 +202,9 @@ if SERVER then
 		end
 
 		ply.MTAIgnore = true
-		ply:SetNWInt("MTABountyHunter", target:EntIndex())
 		hunters[ply] = hunters[ply] or {}
 		table.insert(hunters[ply], target)
+		set_nw_data(ply)
 
 		MTA.ConstrainPlayer(ply, "MTA bounty hunter")
 		ply:Spawn()
@@ -318,12 +328,29 @@ if CLIENT then
 		table.Empty(bounty_panels)
 	end)
 
+	local next_check_data = {}
+	local function is_player_hunter(ply)
+		local check_data = next_check_data[ply] or { Time = 0, Cached = false }
+		if CurTime() < check_data.Time then return check_data.Cached end
+
+		local ret = false
+		local target_ids = ply:GetNWString("MTABountyHunter", "")
+		if target_ids ~= "" then
+			local targets = target_ids:Split(";")
+			ret = table.HasValue(targets, LocalPlayer():EntIndex())
+		end
+
+		check_data.Cached = ret
+		check_data.Time = CurTime() + 1
+		return ret
+	end
+
 	local red_color = Color(255, 0, 0)
 	hook.Add("HUDPaint", tag, function()
 		if not MTA.IsWanted() then return end
 
 		for _, ply in ipairs(player.GetAll()) do
-			if ply:GetNWInt("MTABountyHunter") == LocalPlayer():EntIndex() then
+			if is_player_hunter(ply) then
 				MTA.HighlightEntity(ply, "/// BOUNTY HUNTER ///", red_color)
 			end
 		end
