@@ -209,7 +209,7 @@ if SERVER then
 
 	timer.Create("mta_combine_fallback_tp", 4, 0, function()
 		for _, combine in ipairs(MTA.Combines) do
-			do_distance_checks()
+			do_distance_checks(combine)
 		end
 	end)
 end
