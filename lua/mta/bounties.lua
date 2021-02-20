@@ -32,7 +32,6 @@ if SERVER then
 	local blocked_hunters = {}
 
 	local function finish_bounty(hunter)
-		if IS_MTA_GM then return end
 		local steam_id = hunter:SteamID()
 		blocked_hunters[steam_id] = (blocked_hunters[steam_id] or 0) + 1
 		if blocked_hunters[steam_id] >= MAX_BOUNTIES_PER_HUNTER then
@@ -57,7 +56,7 @@ if SERVER then
 		for ply, targets in pairs(hunters) do
 			if IsValid(ply) and #targets == 0 then
 				ply.MTAIgnore = nil
-				ply:SetNWBool("MTABountyHunter", false)
+				ply:SetNWInt("MTABountyHunter", -1)
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
 				hook.Run("MTABountyHunterStateUpdate", ply, false)
@@ -105,7 +104,7 @@ if SERVER then
 				if not bounties[atck] then return end
 
 				ply.MTAIgnore = nil
-				ply:SetNWBool("MTABountyHunter", false)
+				ply:SetNWBool("MTABountyHunter", -1)
 				hunters[ply] = nil
 				MTA.ReleasePlayer(ply)
 				hook.Run("MTABountyHunterStateUpdate", ply, false)
@@ -122,7 +121,7 @@ if SERVER then
 
 		local targets = hunters[atck]
 		if atck:IsPlayer() and targets and table.HasValue(targets, ply) then
-			local point_amount = math.floor(ply:GetNWInt("MTAFactor") / 2)
+			local point_amount = math.ceil(ply:GetNWInt("MTAFactor") * 0.8) * (1 + MTA.GetPlayerStat(ply, "prestige_level"))
 			local total_points = MTA.GivePoints(atck, point_amount)
 
 			if atck.GiveCoins then
@@ -159,12 +158,23 @@ if SERVER then
 		if not atck:IsPlayer() then return end
 
 		-- allow the bounties to fight back
-		if bounties[atck] and hunters[ply] then return true end
+		if not IS_MTA_GM and bounties[atck] and hunters[ply] then return true end
+
+		-- dont damage this player if you have a bounty for them
+		if not hunters[atck] and bounties[ply] then
+			atck:PrintMessage(HUD_PRINTTALK, "You must accept the bounty for this player to kill them")
+			return false
+		end
 
 		local targets = hunters[atck]
 		if not targets then return end
 
-		if table.HasValue(targets, ply) then return true end
+		if not table.HasValue(targets, ply) then
+			atck:PrintMessage(HUD_PRINTTALK, "You must accept the bounty for this player to kill them")
+			return false
+		end
+
+		return true
 	end)
 
 	hook.Add("PlayerDisconnected", tag, function(ply)
@@ -182,7 +192,7 @@ if SERVER then
 		end
 
 		ply.MTAIgnore = true
-		ply:SetNWBool("MTABountyHunter", true)
+		ply:SetNWInt("MTABountyHunter", target:EntIndex())
 		hunters[ply] = hunters[ply] or {}
 		table.insert(hunters[ply], target)
 
@@ -265,7 +275,7 @@ if CLIENT then
 			btn_accept:DockMargin(5, 5, 5, 5)
 
 			local label_gains = frame:Add("DLabel")
-			label_gains:SetText(("Potential Gains: %dpts"):format(math.floor(bounty:GetNWInt("MTAFactor") / 2)))
+			label_gains:SetText(("Potential Gains: %dpts"):format(math.ceil(bounty:GetNWInt("MTAFactor") * 0.8) * (1 + bounty:GetNWInt("MTAStat_prestige_level"))))
 			label_gains:SetTextColor(Color(244, 135, 2))
 			label_gains:Dock(TOP)
 			label_gains:DockPadding(10, 10, 10, 10)
@@ -313,7 +323,7 @@ if CLIENT then
 		if not MTA.IsWanted() then return end
 
 		for _, ply in ipairs(player.GetAll()) do
-			if ply:GetNWBool("MTABountyHunter") then
+			if ply:GetNWInt("MTABountyHunter") == LocalPlayer():EntIndex() then
 				MTA.HighlightEntity(ply, "/// BOUNTY HUNTER ///", red_color)
 			end
 		end
