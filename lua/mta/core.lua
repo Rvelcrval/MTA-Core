@@ -1176,8 +1176,9 @@ if CLIENT then
 	end)
 
 	if not IS_MTA_GM then
-		hook.Run("MTAWantedStateUpdate", tag, function(ply, is_wanted)
+		hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 			if is_wanted then return end
+			if ply ~= LocalPlayer() then return end
 			Derma_Query(
 				"Looks like you're enjoying MTA, do you wish to join the dedicated MTA server? (we have guns, pvp and a gamemode :eyes:)",
 				"MTA",
