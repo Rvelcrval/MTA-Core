@@ -193,6 +193,8 @@ if SERVER then
 	end
 
 	local function do_distance_checks(combine)
+		if combine:GetClass() == "npc_helicopter" then return end
+
 		local enemy = combine:GetEnemy()
 		local enemy_pos = enemy:WorldSpaceCenter()
 		if IsValid(enemy) and (combine:IsUnreachable(enemy) or enemy_pos:Distance(combine:WorldSpaceCenter()) >= FAR_AWAY_DIST) then
