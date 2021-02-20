@@ -46,4 +46,5 @@ return {
 	["DecreaseDivider"] = 250,
 	["EscapeTime"] = 20,
 	["MaxCombines"] = IS_MTA_GM and 100 or 25,
+	["MaxHelis"] = 1
 }

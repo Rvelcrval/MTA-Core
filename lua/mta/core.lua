@@ -163,15 +163,18 @@ if SERVER then
 	end
 
 	MTA.MAX_COMBINES = MTA_CONFIG.core.MaxCombines
+	MTA.MAX_HELIS = MTA_CONFIG.core.MaxHelis
 	MTA.ESCAPE_TIME = MTA_CONFIG.core.EscapeTime
 
 	MTA.FarCombine = MTA.FarCombine or function() return false, "did not load \'far_combine\'" end
 	MTA.SetupCombine = MTA.SetupCombine or function() return false, "did not load \'far_combine\'" end
 	MTA.ConstrainPlayer = MTA.ConstrainPlayer or function() return false, "did no load \'wanted_constraints\'" end
 	MTA.ReleasePlayer = MTA.ReleasePlayer or function() return false, "did no load \'wanted_constraints\'" end
+	MTA.SpawnHelicopter = MTA.SpawnHelicopter or function() return false, "did no load \'heli_attack\'" end
 
 	MTA.ToSpawn = 0
 	MTA.Combines = {}
+	MTA.HelicopterCount = 0
 	MTA.BadPlayers = {}
 	MTA.Factors = {}
 	MTA.Coeficients = MTA_CONFIG.core.Coeficients
@@ -197,6 +200,7 @@ if SERVER then
 			SafeRemoveEntity(combine)
 		end
 		MTA.Combines = {}
+		MTA.HelicopterCount = 0
 	end
 
 	local function dont_transmit_combine(combine)
@@ -265,6 +269,23 @@ if SERVER then
 		end,
 	}
 
+	function MTA.ManagedSpawnHelicopter(target)
+		local succ, ret = MTA.SpawnHelicopter(target)
+		if not succ then
+			return false, ("helicopter could not spawn: %s"):format(ret)
+		end
+
+		MTA.SetupCombine(ret, target, MTA.BadPlayers)
+
+		table.insert(MTA.Combines, ret)
+		ret:SetNWBool("MTACombine", true)
+		ret.ms_notouch = true
+		MTA.ToSpawn = MTA.ToSpawn - 1
+		MTA.HelicopterCount = MTA.HelicopterCount + 1
+
+		return true, ret
+	end
+
 	function MTA.TrySpawnCombine(target, pos)
 		if not IsValid(target) then return false, "bad target" end
 		local wanted_lvl = math.ceil((MTA.Factors[target] or 0) / 10)
@@ -282,6 +303,10 @@ if SERVER then
 
 		-- 80 - inf -> elites and shotgunners
 		elseif wanted_lvl >= 80 then
+			if IS_MTA_GM and MTA.HelicopterCount < MTA.MAX_HELIS then
+				return MTA.ManagedSpawnHelicopter(target)
+			end
+
 			spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
 		end
 
@@ -444,17 +469,6 @@ if SERVER then
 		MTA.UpdatePlayerBadge(ply, old_factor)
 	end
 
-	local function is_valid_context()
-		for i = 1, 3 do
-			local stack_info_source = debug.getinfo(i).source
-			if stack_info_source:match("gcompute") or stack_info_source:match("luadev") then
-				return false
-			end
-		end
-
-		return true
-	end
-
 	function MTA.DisallowPlayerEscape(ply)
 		ply.MTAPreventEscape = (ply.MTAPreventEscape or 0) + 1
 	end
@@ -468,10 +482,9 @@ if SERVER then
 	end
 
 	function MTA.IncreasePlayerFactor(ply, amount)
-		if not is_valid_context() then return end
 		if not MTA.IsEnabled() then return end
 
-		local factor = (MTA.Factors[ply] or 0) + amount
+		local factor = (MTA.Factors[ply] or 0) + math.max(0, amount)
 		MTA.Factors[ply] = factor
 
 		ply.MTALastFactorIncrease = CurTime()
@@ -486,8 +499,6 @@ if SERVER then
 	end
 
 	function MTA.DecreasePlayerFactor(ply, amount)
-		if not is_valid_context() then return end
-
 		local old_factor = MTA.Factors[ply] or 0
 		local factor = math.max(old_factor - amount, 0)
 		MTA.Factors[ply] = factor
@@ -599,7 +610,7 @@ if SERVER then
 		-- this is done here, because only here will the proper nodegraph be available
 		local far_combine, setup_combine = include("mta_libs/far_combine.lua")
 		if not far_combine or not setup_combine then
-			warn_log("Could not include far_combine.lua properly")
+			warn_log("Could not include far_combine.lua")
 			return
 		end
 
@@ -608,12 +619,20 @@ if SERVER then
 
 		local constrain_player, release_player = include("mta_libs/wanted_constraints.lua")
 		if not constrain_player or not release_player then
-			warn_log("Could not include wanted_constraints.lua properly")
+			warn_log("Could not include wanted_constraints.lua")
 			return
 		end
 
 		MTA.ConstrainPlayer = constrain_player
 		MTA.ReleasePlayer = release_player
+
+		local spawn_helicopter = include("mta_libs/heli_attack.lua")
+		if not spawn_helicopter then
+			warn_log("Could not include heli_attack.lua")
+			return
+		end
+
+		MTA.SpawnHelicopter = spawn_helicopter
 
 		timer.Create(tag, 0.3, 0, MTA.UpdateState)
 
@@ -730,6 +749,10 @@ if SERVER then
 	end)
 
 	local function ensure_combine_removal(npc)
+		if npc:GetClass() == "npc_helicopter" then
+			MTA.HelicopterCount = math.max(MTA.HelicopterCount - 1, 0)
+		end
+
 		local removed = remove_ent_from_table(npc, MTA.Combines)
 		if not removed then
 			timer.Simple(1, function()
@@ -861,7 +884,7 @@ if SERVER then
 
 			for _, nearby_ent in pairs(ents.FindInSphere(ent:GetPos(), 400)) do
 				if nearby_ent:GetNWBool("MTACombine") then
-					local target = MTA.BadPlayers[math.random(#MTA.BadPlayers)]
+					local target = nearby_ent:GetEnemy()
 					if IsValid(target) then
 						MTA.SetupCombine(ent, target, MTA.BadPlayers)
 					end
