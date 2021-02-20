@@ -473,8 +473,11 @@ local function setup_combine(combine, target, players)
 			next_update = CurTime() + 1
 		end
 
-		if not IsValid(target) and not combine.DontTouchMe then
-			if not combine.TargetIsVehicle then combine:Remove() end
+		if not IsValid(target) then
+			if not combine.TargetIsVehicle and not combine.DontTouchMe then
+				combine:Remove()
+			end
+
 			return
 		end
 
