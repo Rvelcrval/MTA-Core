@@ -1250,7 +1250,7 @@ if CLIENT then
 		if not IsValid(ent) then return false end
 
 		if ent:GetNWBool("MTACombine") then return true end
-		if ent:GetNWInt("MTABountyHunter") ~= "" then return true end
+		if ent:GetNWString("MTABountyHunter") ~= "" then return true end
 		if ent:GetNWInt("MTAFactor") > 0 then return true end
 		if ent:GetNWBool("MTABomb") then return true end
 
