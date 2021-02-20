@@ -473,7 +473,7 @@ local function setup_combine(combine, target, players)
 			next_update = CurTime() + 1
 		end
 
-		if not IsValid(target) then
+		if not IsValid(target) and not combine.DontTouchMe then
 			if not combine.TargetIsVehicle then combine:Remove() end
 			return
 		end
@@ -481,7 +481,7 @@ local function setup_combine(combine, target, players)
 		combine:AddEntityRelationship(target, D_HT, 99)
 		combine:SetEnemy(target, old_target ~= target)
 
-		local age = combine.IgnoreAge and 0 or curtime - creation_time
+		local age = curtime - creation_time
 		local enemy = combine:GetEnemy()
 		if enemy ~= target then
 			if not IsValid(enemy) then enemy = nil end
@@ -527,12 +527,12 @@ local function setup_combine(combine, target, players)
 			combine:UpdateEnemyMemory(target, target:GetPos())
 		end
 
-		if age > 10 then
+		if not combine.DontTouchMe and age > 10 then
 			check_teleport(combine, target, onesec, curtime)
 		end
 
 		-- purge ancient NPCs
-		if age > 60 and not target:TestPVS(combine:GetPos()) then
+		if not combine.DontTouchMe and age > 60 and not target:TestPVS(combine:GetPos()) then
 			combine:Remove()
 		end
 	end)

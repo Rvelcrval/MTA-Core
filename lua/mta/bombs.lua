@@ -193,7 +193,7 @@ if SERVER then
 	end
 
 	local function do_distance_checks(combine)
-		if combine:GetClass() == "npc_helicopter" then return end
+		if combine.DontTouchMe then return end
 
 		local enemy = combine:GetEnemy()
 		local enemy_pos = enemy:WorldSpaceCenter()
