@@ -460,8 +460,8 @@ local function setup_combine(combine, target, players)
 			-- if the target is in a vehicle, try to target the vehicle
 			combine.TargetIsVehicle = false
 			if IsValid(new_ply) and new_ply:InVehicle() then
-				new_ply = new_ply:GetVehicle()
-				combine.TargetIsVehicle = true
+				--new_ply = new_ply:GetVehicle()
+				--combine.TargetIsVehicle = true
 			end
 
 			if IsValid(target) and target ~= new_ply and not table.HasValue(players, target) then
@@ -481,7 +481,7 @@ local function setup_combine(combine, target, players)
 		combine:AddEntityRelationship(target, D_HT, 99)
 		combine:SetEnemy(target, old_target ~= target)
 
-		local age = curtime - creation_time
+		local age = combine.IgnoreAge and 0 or curtime - creation_time
 		local enemy = combine:GetEnemy()
 		if enemy ~= target then
 			if not IsValid(enemy) then enemy = nil end
