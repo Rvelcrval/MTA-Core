@@ -9,7 +9,7 @@ pcall(require, "metalog")
 pcall(include, "autorun/translation.lua")
 local L = translation and translation.L or function(s) return s end
 
-local is_refresh_lua = _G.MTA ~= nil
+local is_refresh_lua = _G.MTA ~= nil and _G.MTA.Reset ~= nil
 if is_refresh_lua then
 	_G.MTA.Reset()
 end
