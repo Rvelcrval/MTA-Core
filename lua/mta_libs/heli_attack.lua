@@ -100,6 +100,7 @@ local function create_track(prev_tack, pos)
 	return track
 end
 
+local DISTANCE_TO_TELEPORT = 4000
 local function spawn_helicopter(ply)
 	local closest_node = navmesh.GetNearestNavArea(ply:WorldSpaceCenter())
 	if not IsValid(closest_node) then return false, "no useable node" end
@@ -140,7 +141,7 @@ local function spawn_helicopter(ply)
 
 		local ret = a_star(npc, start_area, goal_area)
 		if not istable(ret) then
-			if ret == false then
+			if ret == false and npc:GetPos():Distance(ply:WorldSpaceCenter()) >= DISTANCE_TO_TELEPORT then
 				if path_find_fails > 1 then -- so from two fails, 10 seconds, half the escape time
 					npc:SetPos(goal_area:GetCenter() + Z_OFFSET)
 					path_find_fails = 0
