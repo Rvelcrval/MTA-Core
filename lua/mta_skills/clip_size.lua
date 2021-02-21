@@ -1,4 +1,4 @@
-if SERVER then
+if SERVER and not IS_MTA_GM then
 	local Tag = "MTA_ClipSizeSkill"
 
 	-- awaiting Weapon:SetMaxClip# to be added
