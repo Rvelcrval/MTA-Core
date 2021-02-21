@@ -227,12 +227,7 @@ if SERVER then
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
 	local function combine_spawn_callback(combine)
-		if not IsValid(combine) then
-			spawning = math.max(0, spawning - 1)
-			return
-		end
-
-		if #MTA.BadPlayers == 0 or not util.IsInWorld(combine:GetPos()) then
+		if not IsValid(combine) or #MTA.BadPlayers == 0 or not util.IsInWorld(combine:GetPos()) then
 			spawning = math.max(0, spawning - 1)
 			SafeRemoveEntity(combine)
 			return
@@ -272,23 +267,6 @@ if SERVER then
 		end,
 	}
 
-	function MTA.ManagedSpawnHelicopter(target)
-		local succ, ret = MTA.SpawnHelicopter(target)
-		if not succ then
-			return false, ("helicopter could not spawn: %s"):format(ret)
-		end
-
-		MTA.SetupCombine(ret, target, MTA.BadPlayers)
-
-		table.insert(MTA.Combines, ret)
-		ret:SetNWBool("MTACombine", true)
-		ret.ms_notouch = true
-		MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
-		MTA.HelicopterCount = MTA.HelicopterCount + 1
-
-		return true, ret
-	end
-
 	function MTA.TrySpawnCombine(target, pos)
 		if not IsValid(target) then return false, "bad target" end
 		local wanted_lvl = math.ceil((MTA.Factors[target] or 0) / 10)
@@ -307,9 +285,15 @@ if SERVER then
 		-- 80 - inf -> elites, shotgunners and an helicopter
 		elseif wanted_lvl >= 80 then
 			if IS_MTA_GM and MTA.HelicopterCount < MTA.MAX_HELIS then
-				local succ, ret = MTA.ManagedSpawnHelicopter(target)
-				if succ then return true end
-				if not succ then warn_log(ret) end
+				local succ, ret = MTA.SpawnHelicopter(target)
+				if succ then
+					combine_spawn_callback(ret)
+					MTA.HelicopterCount = MTA.HelicopterCount + 1
+					MTA.SetupCombine(ret, target, MTA.BadPlayers)
+					return true
+				else
+					warn_log(("helicopter could not spawn: %s"):format(ret))
+				end
 			end
 
 			spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
