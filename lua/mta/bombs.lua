@@ -198,12 +198,14 @@ if SERVER then
 		local enemy = combine:GetEnemy()
 		if not IsValid(enemy) then return end
 
-		local enemy_pos = enemy:WorldSpaceCenter()
-		if combine:IsUnreachable(enemy) or enemy_pos:Distance(combine:WorldSpaceCenter()) >= FAR_AWAY_DIST then
+		local enemy_pos = enemy:GetPos()
+		if combine:IsUnreachable(enemy) or enemy_pos:Distance(combine:GetPos()) >= FAR_AWAY_DIST then
 			local pos = find_space_ex(combine)
 			if pos:Distance(enemy_pos) <= TOO_CLOSE_DIST then
 				pos = find_space(enemy, combine, 150)
 			end
+
+			pos.z = enemy_pos.z
 
 			SafeRemoveEntity(combine)
 			MTA.ToSpawn = math.min(MTA.MAX_COMBINES, MTA.ToSpawn + 1)

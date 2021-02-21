@@ -118,6 +118,7 @@ local function spawn_helicopter(ply)
 	npc:Fire("StartSprinkleBehavior")
 
 	local track_name = ("MTA_HELI_TRACK_%d"):format(npc:EntIndex())
+	local path_find_fails = 0
 	timer.Create(track_name, 5, 0, function()
 		for _, track in ipairs(ents.FindByClass("path_track")) do
 			if track:GetName() == track_name then
@@ -138,7 +139,18 @@ local function spawn_helicopter(ply)
 			navmesh.GetNearestNavArea(ply:WorldSpaceCenter())
 
 		local ret = a_star(npc, start_area, goal_area)
-		if not istable(ret) then return end
+		if not istable(ret) then
+			if ret == false then
+				if path_find_fails > 1 then -- so from two fails, 10 seconds, half the escape time
+					npc:SetPos(goal_area:GetCenter() + Z_OFFSET)
+					path_find_fails = 0
+				else
+					path_find_fails = path_find_fails + 1
+				end
+			end
+
+			return
+		end
 
 		local prev_track = NULL
 		for i, node in ipairs(ret) do
