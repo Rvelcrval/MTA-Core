@@ -110,10 +110,6 @@ hook.Add("OnNPCKilled", tag, function(npc, ply, _)
 	combine:EmitSound("npc/metropolice/vo/lookout.wav")
 end)
 
-hook.Add("ShouldCollide", tag, function(ent1, ent2)
-	if combines[ent1] and combines[ent2] then return false end
-end)
-
 local function keep_sane(combine, callback)
 	if not next(combines) then
 		hook.Add("Think", tag, think)
@@ -154,7 +150,6 @@ local function create_combine(pos, spawn_function)
 	npc:SetCurrentWeaponProficiency(WEAPON_PROFICIENCY_PERFECT)
 	npc:Input("StartPatrolling")
 	npc:SetHealth(100)
-	npc:SetCustomCollisionCheck(true)
 
 	if not npc:IsFlagSet(FL_FLY) then
 		npc:DropToFloor()
