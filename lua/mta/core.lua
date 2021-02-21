@@ -194,7 +194,9 @@ if SERVER then
 		return ply.MTABad or false
 	end
 
+	local spawning = 0
 	function MTA.RemoveCombines()
+		spawning = 0
 		MTA.ToSpawn = 0
 		for _, combine in ipairs(MTA.Combines) do
 			SafeRemoveEntity(combine)
@@ -223,9 +225,6 @@ if SERVER then
 		end
 	end
 
-	local spawning = 0
-	local spawn_fails = {}
-	local spawn_fail_reps = 0
 	local function combine_spawn_callback(combine)
 		if not IsValid(combine) or #MTA.BadPlayers == 0 or not util.IsInWorld(combine:GetPos()) then
 			spawning = math.max(0, spawning - 1)
@@ -302,6 +301,8 @@ if SERVER then
 		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos)
 	end
 
+	local spawn_fails = {}
+	local spawn_fail_reps = 0
 	function MTA.SpawnCombine(target, pos)
 		local spawning_wait_count = math.max(spawning, 0)
 		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
