@@ -277,6 +277,8 @@ if SERVER then
 	end)
 
 	function MTA.PayPoints(ply, amount)
+		amount = math.Round(amount or 0)
+
 		local cur_ply_points = MTA.GetPlayerStat(ply, "points")
 		if amount > cur_ply_points then return false end
 
