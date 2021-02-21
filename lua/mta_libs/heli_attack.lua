@@ -100,7 +100,7 @@ local function create_track(prev_tack, pos)
 	return track
 end
 
-local function target_player(ply)
+local function spawn_helicopter(ply)
 	local closest_node = navmesh.GetNearestNavArea(ply:WorldSpaceCenter())
 	if not IsValid(closest_node) then return false, "no useable node" end
 
@@ -116,8 +116,6 @@ local function target_player(ply)
 	if IsValid(phys) then phys:EnableCollisions(false) end
 
 	npc:Fire("StartSprinkleBehavior")
-
-	MTA.SetupCombine(npc, ply, MTA.BadPlayers)
 
 	local track_name = ("MTA_HELI_TRACK_%d"):format(npc:EntIndex())
 	timer.Create(track_name, 5, 0, function()
@@ -156,4 +154,4 @@ local function target_player(ply)
 	return true, npc
 end
 
-return target_player
+return spawn_helicopter

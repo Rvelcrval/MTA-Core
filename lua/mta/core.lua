@@ -304,7 +304,9 @@ if SERVER then
 		-- 80 - inf -> elites and shotgunners
 		elseif wanted_lvl >= 80 then
 			if IS_MTA_GM and MTA.HelicopterCount < MTA.MAX_HELIS then
-				return MTA.ManagedSpawnHelicopter(target)
+				local succ, ret = MTA.ManagedSpawnHelicopter(target)
+				if succ then return true end
+				if not succ then warn_log(ret) end
 			end
 
 			spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites

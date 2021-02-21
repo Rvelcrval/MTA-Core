@@ -173,7 +173,7 @@ if SERVER then
 
 	local FAR_AWAY_DIST = 2048
 	local TOO_CLOSE_DIST = 75
-	local function find_space_ex(combine)
+	local function find_space_ex(combine) -- thats an amazing joke I know... Don't hate me pls
 		local enemy = combine:GetEnemy()
 		local c_pos = combine:WorldSpaceCenter()
 		local e_pos = enemy:WorldSpaceCenter()
@@ -196,8 +196,10 @@ if SERVER then
 		if combine.DontTouchMe then return end
 
 		local enemy = combine:GetEnemy()
+		if not IsValid(enemy) then return end
+
 		local enemy_pos = enemy:WorldSpaceCenter()
-		if IsValid(enemy) and (combine:IsUnreachable(enemy) or enemy_pos:Distance(combine:WorldSpaceCenter()) >= FAR_AWAY_DIST) then
+		if combine:IsUnreachable(enemy) or enemy_pos:Distance(combine:WorldSpaceCenter()) >= FAR_AWAY_DIST then
 			local pos = find_space_ex(combine)
 			if pos:Distance(enemy_pos) <= TOO_CLOSE_DIST then
 				pos = find_space(enemy, combine, 150)
