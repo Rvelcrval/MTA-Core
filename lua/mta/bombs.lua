@@ -207,7 +207,7 @@ if SERVER then
 
 			SafeRemoveEntity(combine)
 			MTA.ToSpawn = math.min(MTA.MAX_COMBINES, MTA.ToSpawn + 1)
-			MTA.TrySpawnCombine(enemy, pos)
+			MTA.SpawnCombine(enemy, pos)
 		end
 	end
 

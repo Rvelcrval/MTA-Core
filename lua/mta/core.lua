@@ -227,10 +227,13 @@ if SERVER then
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
 	local function combine_spawn_callback(combine)
-		if not IsValid(combine) then return end
+		if not IsValid(combine) then
+			spawning = math.max(0, spawning - 1)
+			return
+		end
 
 		if #MTA.BadPlayers == 0 or not util.IsInWorld(combine:GetPos()) then
-			spawning = spawning - 1
+			spawning = math.max(0, spawning - 1)
 			SafeRemoveEntity(combine)
 			return
 		end
@@ -240,8 +243,8 @@ if SERVER then
 		combine.ms_notouch = true
 		dont_transmit_combine(combine)
 
-		MTA.ToSpawn = MTA.ToSpawn - 1
-		spawning = spawning - 1
+		MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
+		spawning = math.max(0, spawning - 1)
 	end
 
 	local combine_types = {
@@ -280,7 +283,7 @@ if SERVER then
 		table.insert(MTA.Combines, ret)
 		ret:SetNWBool("MTACombine", true)
 		ret.ms_notouch = true
-		MTA.ToSpawn = MTA.ToSpawn - 1
+		MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
 		MTA.HelicopterCount = MTA.HelicopterCount + 1
 
 		return true, ret
@@ -301,7 +304,7 @@ if SERVER then
 		elseif wanted_lvl >= 60 and wanted_lvl < 80 then
 			spawn_function = combine_types.elites
 
-		-- 80 - inf -> elites and shotgunners
+		-- 80 - inf -> elites, shotgunners and an helicopter
 		elseif wanted_lvl >= 80 then
 			if IS_MTA_GM and MTA.HelicopterCount < MTA.MAX_HELIS then
 				local succ, ret = MTA.ManagedSpawnHelicopter(target)
@@ -312,18 +315,16 @@ if SERVER then
 			spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
 		end
 
-		-- TODO: Helicopters n shit ?
-
 		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos)
 	end
 
-	function MTA.SpawnCombine(target)
+	function MTA.SpawnCombine(target, pos)
 		local spawning_wait_count = math.max(spawning, 0)
 		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
 		if (#MTA.Combines + spawning_wait_count) >= MTA.MAX_COMBINES then return end
 		if #MTA.BadPlayers == 0 then return end
 
-		local succ, ret = MTA.TrySpawnCombine(target)
+		local succ, ret = MTA.TrySpawnCombine(target, pos)
 		if succ then
 			spawning = spawning + 1
 		else
@@ -388,7 +389,7 @@ if SERVER then
 
 		if count >= 1 then
 			if count < factor then -- spawn remaining combines
-				MTA.ToSpawn = math.min(MTA.MAX_COMBINES, count_to_spawn - count)
+				MTA.ToSpawn = math.max(0, count_to_spawn - count)
 			end
 		else
 			MTA.ToSpawn = count_to_spawn
@@ -894,7 +895,7 @@ if SERVER then
 					table.insert(MTA.Combines, ent)
 					ent:SetNWBool("MTACombine", true)
 					ent.ms_notouch = true
-					MTA.ToSpawn = MTA.ToSpawn - 1
+					MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
 
 					break
 				end
