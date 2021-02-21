@@ -178,6 +178,8 @@ if SERVER then
 		dmg_info:ScaleDamage((1 + (0.01 * multiplier)) * 2) -- up to 4x the damage
 	end)
 
+	local MAX_DMG_SCALING = 3
+	local DMG_SCALING_STEP = 35
 	hook.Add("ScalePlayerDamage", tag, function(ply, _, dmg_info)
 		if not ply.MTABad then return end
 
@@ -188,7 +190,7 @@ if SERVER then
 
 		-- we scale combine damage up depending on wanted level here because it needs to be done
 		-- before the resistance upgrade
-		local dmg = dmg_info:GetDamage() + (dmg_info:GetDamage() * (ply:GetNWInt("MTAFactor") / 30))
+		local dmg = dmg_info:GetDamage() + (dmg_info:GetDamage() * math.min(MAX_DMG_SCALING, (ply:GetNWInt("MTAFactor") / DMG_SCALING_STEP)))
 
 		local dmg_blocked = ((dmg / 100) * (multiplier * 0.75)) -- up to 80% of the damages blocked
 		dmg_info:SetDamage(dmg - dmg_blocked)
