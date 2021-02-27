@@ -1,17 +1,8 @@
-local Z_OFFSET = Vector(0, 0, 700)
+local Z_OFFSET = Vector(0, 0, 800)
 local NPC_CLASS = "npc_helicopter"
 
 for _, npc in ipairs(ents.FindByClass(NPC_CLASS)) do
 	npc:Remove()
-end
-
-local function get_proper_offset(pos)
-	local offset = Z_OFFSET
-	if not util.IsInWorld(pos + Z_OFFSET) then
-		offset = Z_OFFSET / 2
-	end
-
-	return Z_OFFSET
 end
 
 local function heuristic_cost_estimate(start, goal)
@@ -91,7 +82,7 @@ local function create_track(prev_tack, pos)
 	track:Spawn()
 
 	track:SetSaveValue("m_pprevious", prev_tack)
-	track:SetPos(pos + get_proper_offset(pos))
+	track:SetPos(pos + Z_OFFSET)
 
 	if IsValid(prev_track) then
 		prev_tack:SetSaveValue("m_pnext", track)
@@ -117,6 +108,8 @@ local function spawn_helicopter(ply)
 	if IsValid(phys) then phys:EnableCollisions(false) end
 
 	npc:Fire("StartSprinkleBehavior")
+	npc:Fire("EnableDeadlyShooting")
+	npc:Fire("StartLongCycleShooting")
 
 	local track_name = ("MTA_HELI_TRACK_%d"):format(npc:EntIndex())
 	local path_find_fails = 0
