@@ -107,6 +107,8 @@ local function spawn_helicopter(ply)
 	local phys = npc:GetPhysicsObject()
 	if IsValid(phys) then phys:EnableCollisions(false) end
 
+	constraint.NoCollide(npc, game.GetWorld())
+
 	npc:Fire("StartSprinkleBehavior")
 	npc:Fire("EnableDeadlyShooting")
 	npc:Fire("StartLongCycleShooting")
