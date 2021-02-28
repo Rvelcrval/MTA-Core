@@ -213,11 +213,12 @@ if SERVER then
 		end
 	end
 
-	timer.Create("mta_combine_fallback_tp", 4, 0, function()
+	-- ok this is buggy
+	--[[timer.Create("mta_combine_fallback_tp", 4, 0, function()
 		for _, combine in ipairs(MTA.Combines) do
 			do_distance_checks(combine)
 		end
-	end)
+	end)]]--
 end
 
 if CLIENT then
