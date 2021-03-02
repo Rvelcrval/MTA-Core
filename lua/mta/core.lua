@@ -986,28 +986,30 @@ if CLIENT then
 	local red_color = Color(255, 0, 0)
 	local white_color = Color(255, 255, 255)
 
-	function MTA.HighlightPosition(pos, text, color)
+	function MTA.HighlightPosition(pos, text, color, no_matrix)
 		if MTA.IsOptedOut() then return end
 
 		local screen_pos = pos:ToScreen()
 		if not screen_pos.visible then return end
 
-		local time = RealTime()
-		local matrix, translation = Matrix(), Vector(screen_pos.x, screen_pos.y)
-		local size = 1.5 + (math.sin(time * 4) / 2)
-		local scale, angle = Vector(size, size, size), Angle(0, (time * 100) % 360, 0)
-
-		matrix:Translate(translation)
-		matrix:SetAngles(angle)
-		matrix:Scale(scale)
-		matrix:Translate(-translation)
-
 		surface.SetDrawColor(color)
 
-		cam.PushModelMatrix(matrix)
-			surface.DrawOutlinedRect(screen_pos.x - 25, screen_pos.y - 25, 50, 50)
-			surface.DrawOutlinedRect(screen_pos.x - 20, screen_pos.y - 20, 40, 40)
-		cam.PopModelMatrix()
+		if not no_matrix then
+			local time = RealTime()
+			local matrix, translation = Matrix(), Vector(screen_pos.x, screen_pos.y)
+			local size = 1.5 + (math.sin(time * 4) / 2)
+			local scale, angle = Vector(size, size, size), Angle(0, (time * 100) % 360, 0)
+
+			matrix:Translate(translation)
+			matrix:SetAngles(angle)
+			matrix:Scale(scale)
+			matrix:Translate(-translation)
+
+			cam.PushModelMatrix(matrix)
+				surface.DrawOutlinedRect(screen_pos.x - 25, screen_pos.y - 25, 50, 50)
+				surface.DrawOutlinedRect(screen_pos.x - 20, screen_pos.y - 20, 40, 40)
+			cam.PopModelMatrix()
+		end
 
 		surface.SetTextColor(color)
 		surface.SetFont("MTAIndicatorFont")
@@ -1021,13 +1023,13 @@ if CLIENT then
 		surface.DrawText(text)
 	end
 
-	function MTA.HighlightEntity(ent, text, color)
-		MTA.HighlightPosition(ent:WorldSpaceCenter(), text, color)
+	function MTA.HighlightEntity(ent, text, color, no_matrix)
+		MTA.HighlightPosition(ent:WorldSpaceCenter(), text, color, no_matrix)
 	end
 
 	local MIN_DIST_TO_SHOW = 300
 	local DIST_TO_ENT = 50
-	function MTA.ManagedHighlightEntity(ent, text, color)
+	function MTA.ManagedHighlightEntity(ent, text, color, no_matrix)
 		if CurTime() >= (ent.NextHighlightCheck or 0) then
 			ent.NextHighlightCheck = CurTime() + 1
 
@@ -1051,15 +1053,16 @@ if CLIENT then
 		end
 
 		if ent.ShouldHighlight then
-			MTA.HighlightEntity(ent, text, color)
+			MTA.HighlightEntity(ent, text, color, no_matrix)
 		end
 	end
 
 	local registered_ents = {}
-	function MTA.RegisterEntityForHighlight(ent, text, color)
+	function MTA.RegisterEntityForHighlight(ent, text, color, no_matrix)
 		registered_ents[ent] = {
 			Text = text,
 			Color = color,
+			NoMatrix = no_matrix or false,
 		}
 	end
 
@@ -1154,7 +1157,7 @@ if CLIENT then
 	hook.Add("HUDPaint", tag, function()
 		for ent, draw_info in pairs(registered_ents) do
 			if IsValid(ent) then
-				MTA.ManagedHighlightEntity(ent, draw_info.Text, draw_info.Color)
+				MTA.ManagedHighlightEntity(ent, draw_info.Text, draw_info.Color, draw_info.NoMatrix)
 			else
 				registered_ents[ent] = nil
 			end
