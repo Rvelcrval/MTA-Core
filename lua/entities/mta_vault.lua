@@ -62,7 +62,7 @@ if SERVER then
 		MTA.DisallowPlayerEscape(ply)
 		MTA.IncreasePlayerFactor(ply, 10)
 
-		hook.Run("MTADrillStart", ply)
+		hook.Run("MTADrillStart", ply, self)
 		MTA.Print(("%s started drilling a vault"):format(ply))
 	end
 
@@ -111,7 +111,7 @@ if SERVER then
 		MTA.AllowPlayerEscape(ply)
 		vault:ResetDrill()
 		timer.Remove(("MTA_VAULT_%d_%s"):format(vault:EntIndex(), ply:SteamID()))
-		hook.Run("MTADrillFailed", ply)
+		hook.Run("MTADrillFailed", ply, vault)
 	end
 
 	local VAULT_DISTANCE_LIMIT = 3000
@@ -148,7 +148,7 @@ if SERVER then
 					timer.Simple(600, function()
 						if IsValid(self) then self:ResetDrill() end
 					end)
-					hook.Run("MTADrillSuccess", activator)
+					hook.Run("MTADrillSuccess", activator, self)
 				end
 			end
 		end)
