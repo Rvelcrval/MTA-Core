@@ -366,18 +366,22 @@ if SERVER then
 			MTA.Print(tostring(ply) .. " is now a criminal")
 		end
 
-		local count = #MTA.Combines
 		local base_divider = 3
 		local count_to_spawn = IS_MTA_GM
 			and math.max(1, math.floor(factor / 10 / base_divider))
 			or math.max(1, math.floor(factor / 2))
 
-		if count >= 1 then
-			if count < factor then -- spawn remaining combines
-				MTA.ToSpawn = math.max(0, count_to_spawn - count)
+		local count = 0
+		for _, combine in ipairs(MTA.Combines) do
+			if combine:GetEnemy() == ply then
+				count = count + 1
 			end
+		end
+
+		if count == 0 then
+			MTA.ToSpawn = MTA.ToSpawn + count_to_spawn
 		else
-			MTA.ToSpawn = count_to_spawn
+			MTA.ToSpawn = MTA.ToSpawn + math.max(0, count_to_spawn - count)
 		end
 	end
 
