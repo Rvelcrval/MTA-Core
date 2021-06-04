@@ -83,7 +83,7 @@ end
 if CLIENT then
 	local poop_color = Color(89, 48, 1, 230)
 
-	local display_distance = 128^2
+	local display_distance = 128
 	local hit_pos_distance = 25^2
 	hook.Add("HUDPaint", tag, function()
 		local lp = LocalPlayer()
