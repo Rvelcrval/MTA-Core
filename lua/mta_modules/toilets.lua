@@ -81,11 +81,44 @@ if SERVER then
 end
 
 if CLIENT then
-	local poop_color = Color(89, 48, 1, 230)
+	local toilets = {}
+	-- _G.THETOILETS=toilets
 
-	local display_distance = 128
+	local function NotifyShouldTransmit(ent, should)
+		if should then
+			if ent:GetModel() == model then
+				--print("maybe toilet?", ent)
+
+				if ent:GetNWBool("MapToilet") then
+					--print("toilet!", ent)
+					toilets[ent] = ent:GetNetworkOrigin() -- GetPos is nil here
+				end
+			end
+		else --if toilets[ent] then
+			--print("toilet gone", ent)
+			toilets[ent] = nil
+		end
+	end
+	hook.Add("NotifyShouldTransmit", tag, NotifyShouldTransmit)
+	
+	-- preseed for development
+	for k,v in pairs(ents.GetAll()) do
+		if not v:IsDormant() then
+			NotifyShouldTransmit(v,true)
+		end
+	end
+	
+	local poop_color = Color(89, 48, 1, 230)
+	local TOILET_TRACE={
+		mask = MASK_VISIBLE,
+		output={}
+	}
+
+	local display_distance = 128^2
 	local hit_pos_distance = 25^2
 	hook.Add("HUDPaint", tag, function()
+		
+		
 		local lp = LocalPlayer()
 		if lp:GetNWBool("IsDefecating") then
 			local bind = input.LookupBinding("+jump", true)
@@ -110,27 +143,27 @@ if CLIENT then
 			surface.DrawText(text)
 			return
 		end
-
-		local bind = MTA.GetBindKey("+use")
-		if not bind then return end
-
-		local text = ("/// Defecate [%s] ///"):format(bind)
+		
 		local eye_pos = lp:EyePos()
-		for _, toilet in pairs(ents.FindInSphere(eye_pos, display_distance)) do
-			if toilet:GetNWBool("MapToilet") and toilet:GetModel() == model then
-				local pos = toilet:GetPos()
+		
+		for toilet,toiletpos in pairs(toilets) do
+			--debugoverlay.Text( toiletpos, tostring(toilet), 0.1, false )
+			if toilet:IsValid() and toiletpos:DistToSqr(eye_pos) < display_distance then
 				if not toilet:GetNWBool("ToiletInUse") then
-					local tr = util.TraceLine({
-						start = eye_pos,
-						endpos = pos,
-						mask = MASK_VISIBLE,
-					})
+					
+					local bind = MTA.GetBindKey("+use")
+					if not bind then return end
+					
+					TOILET_TRACE.start = eye_pos
+					TOILET_TRACE.endpos = toiletpos
+					local tr = util.TraceLine(TOILET_TRACE)
 
-					if tr.HitPos:DistToSqr(pos) < hit_pos_distance then
-						MTA.HighlightPosition(toilet:GetPos() - toilet:GetUp() * 30, text, color_white)
+					if tr.HitPos:DistToSqr(toiletpos) < hit_pos_distance then
+						MTA.HighlightPosition(toiletpos - toilet:GetUp() * 30, ("/// Defecate [%s] ///"):format(bind), color_white)
 					end
 				end
 			end
 		end
+		
 	end)
 end
