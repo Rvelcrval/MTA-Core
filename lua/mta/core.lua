@@ -475,6 +475,7 @@ if SERVER then
 
 	function MTA.IncreasePlayerFactor(ply, amount)
 		if not MTA.IsEnabled() then return end
+		if MTA.IsOptedOut(ply) then return end -- do it here as well because some third-party scripts dont check
 
 		local factor = (MTA.Factors[ply] or 0) + math.max(0, amount)
 		MTA.Factors[ply] = factor
@@ -1195,7 +1196,8 @@ if CLIENT then
 	end)
 
 	if not IS_MTA_GM then
-		hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
+		-- disable this as we #3 is not MTA anymore i guess
+		--[[hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 			if is_wanted then return end
 			if ply ~= LocalPlayer() then return end
 			Derma_Query(
@@ -1207,7 +1209,7 @@ if CLIENT then
 				"Remain here",
 				function() end
 			)
-		end)
+		end)]]--
 	end
 
 	net.Receive(NET_WANTED_STATE, function()
