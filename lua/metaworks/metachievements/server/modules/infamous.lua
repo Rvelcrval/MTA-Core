@@ -10,7 +10,7 @@ local PRESTIGE_LEVEL = 5
 local function get_statistics(req, ply, stats)
 	local count = istable(stats) and stats.count
 	return ("Prestige: %d / %d")
-		:format((isnumber(count) and count or 0), PRESTIGE_LEVEL)
+		:format(isnumber(count) and count or 0, PRESTIGE_LEVEL)
 end
 
 local function get_progress(req, ply, stats)

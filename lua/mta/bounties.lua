@@ -132,7 +132,7 @@ if SERVER then
 		local targets = hunters[atck]
 		if atck:IsPlayer() and targets and table.HasValue(targets, ply) then
 			local point_amount = math.ceil(ply:GetNWInt("MTAFactor") * 0.8) * (1 + MTA.GetPlayerStat(ply, "prestige_level"))
-			local total_points = MTA.GivePoints(atck, point_amount)
+			--local total_points = MTA.GivePoints(atck, point_amount)
 
 			if atck.GiveCoins then
 				atck:GiveCoins(point_amount * 300)

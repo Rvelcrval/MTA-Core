@@ -171,7 +171,7 @@ if SERVER then
 		end
 	end)
 
-	local FAR_AWAY_DIST = 2048
+	--[[local FAR_AWAY_DIST = 2048
 	local TOO_CLOSE_DIST = 75
 	local function find_space_ex(combine) -- thats an amazing joke I know... Don't hate me pls
 		local enemy = combine:GetEnemy()
@@ -211,7 +211,7 @@ if SERVER then
 			MTA.ToSpawn = math.min(MTA.MAX_COMBINES, MTA.ToSpawn + 1)
 			MTA.SpawnCombine(enemy, pos)
 		end
-	end
+	end]]--
 
 	-- ok this is buggy
 	--[[timer.Create("mta_combine_fallback_tp", 4, 0, function()

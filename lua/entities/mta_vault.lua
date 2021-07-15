@@ -228,7 +228,7 @@ if CLIENT then
 		return vault.CachedIndicatorCheck
 	end
 
-	local black_color = Color(0, 0, 0, 150)
+	--local black_color = Color(0, 0, 0, 150)
 	local orange_color = Color(244, 135, 2)
 	local verb = L"Drill"
 	hook.Add("HUDPaint", tag, function()

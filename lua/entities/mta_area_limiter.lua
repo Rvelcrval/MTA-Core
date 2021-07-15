@@ -217,12 +217,12 @@ if CLIENT then
 	end
 
 
-	local angle_sides = Angle(0, 0, 90)
+	--local angle_sides = Angle(0, 0, 90)
 	function ENT:Draw()
 		if MTA.IsOptedOut() then return end
 		if not MTA.IsWanted() then return end
 
-		local alpha = 10 + math.abs((math.sin(CurTime() * 3) * 150))
+		local alpha = 10 + math.abs(math.sin(CurTime() * 3) * 150)
 		local side_pos = self:GetPos() - self:GetForward() * 100
 		local left_pos = side_pos - self:GetRight() * 100
 

@@ -9,7 +9,7 @@ ENT.AdminOnly = false
 ENT.PhysgunDisabled = true
 ENT.lobbyok = true
 
-local MTA_SHIELD_TEXTURE_UPDATE = "MTA_SHIELD_TEXTURE_UPDATE"
+--local MTA_SHIELD_TEXTURE_UPDATE = "MTA_SHIELD_TEXTURE_UPDATE"
 
 if SERVER then
 	resource.AddFile("materials/models/cloud/ballshield.vmt")

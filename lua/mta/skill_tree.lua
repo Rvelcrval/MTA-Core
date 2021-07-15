@@ -75,7 +75,7 @@ function MTA.RegisterSkill(skill_id, skill_branch, skill_level, skill_name, skil
 end
 
 do -- load skills
-	for _, f in pairs((file.Find("mta_skills/*.lua", "LUA"))) do
+	for _, f in pairs(file.Find("mta_skills/*.lua", "LUA")) do
 		local path = "mta_skills/" .. f
 		AddCSLuaFile(path)
 		include(path)
@@ -449,7 +449,6 @@ if CLIENT then
 		surface.SetTextColor(244, 135, 2)
 
 		local text = ("Points: %d"):format(MTA.GetPlayerStat("points"))
-		local tw, th = surface.GetTextSize(text)
 		surface.SetTextPos(10, h - 22)
 		surface.DrawText(text)
 

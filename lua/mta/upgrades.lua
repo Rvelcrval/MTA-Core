@@ -190,7 +190,7 @@ if SERVER then
 
 		-- we scale combine damage up depending on wanted level here because it needs to be done
 		-- before the resistance upgrade
-		local dmg = dmg_info:GetDamage() + (dmg_info:GetDamage() * math.min(MAX_DMG_SCALING, (ply:GetNWInt("MTAFactor") / DMG_SCALING_STEP)))
+		local dmg = dmg_info:GetDamage() + (dmg_info:GetDamage() * math.min(MAX_DMG_SCALING, ply:GetNWInt("MTAFactor") / DMG_SCALING_STEP))
 
 		local dmg_blocked = ((dmg / 100) * (multiplier * 0.75)) -- up to 80% of the damages blocked
 		dmg_info:SetDamage(dmg - dmg_blocked)
@@ -237,8 +237,8 @@ if SERVER then
 		end)
 
 		if aowl then
-			aowl.AddCommand("dealer", "Teleports you to the MTA dealer", function(ply)
-				ply:ConCommand("aowl goto dealer")
+			aowl.AddCommand("dealer", "Teleports you to the MTA dealer", function(caller)
+				caller:ConCommand("aowl goto dealer")
 			end)
 
 			aowl.AddCommand("mtastats", "Gets the MTA stats of a player", function(caller, _, target)
@@ -621,7 +621,7 @@ if CLIENT then
 		beam_point_origin_2:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
 
-		for i=1, CANNON_AMT do
+		for i = 1, CANNON_AMT do
 			local ang = ((i * 36) * math.pi) / 180
 			local turn = Vector(math.sin(ang), math.cos(ang), 0) * 2
 			timer.Simple(i / CANNON_AMT, function()
@@ -647,7 +647,7 @@ if CLIENT then
 
 			local center = ply:GetPos() - Vector(0,0,50)
 			local emitter = ParticleEmitter(center)
-			for i=1, PARTICLES_AMT do
+			for i = 1, PARTICLES_AMT do
 			local part = emitter:Add("sprites/light_glow02_add", center + Vector(math.sin(i / PARTICLES_AMT * 2 * math.pi), math.cos(i / PARTICLES_AMT * 2 * math.pi), 0) * 50)
 				if part then
 					local c = orange_color

@@ -44,13 +44,13 @@ local function a_star(ent, start, goal)
 
 		for _, neighbor in pairs(current:GetAdjacentAreas()) do
 			local new_cost_so_far = current:GetCostSoFar() + heuristic_cost_estimate(current, neighbor)
-			local tr = util.TraceLine({
+			--[[local tr = util.TraceLine({
 				start = current:GetCenter() + Z_OFFSET,
 				endpos = neighbor:GetCenter() + Z_OFFSET,
 				filter = ent,
 				mask = MASK_PLAYERSOLID_BRUSHONLY,
 				collisiongroup = COLLISION_GROUP_DEBRIS,
-			})
+			})]]--
 
 			--if tr.Fraction >= 0.75 then
 				if not ((neighbor:IsOpen() or neighbor:IsClosed()) and neighbor:GetCostSoFar() <= new_cost_so_far) then

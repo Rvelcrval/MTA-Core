@@ -156,6 +156,7 @@ if CLIENT then
 
 						if not IsValid(frame) then return end
 						if not IsValid(music) then return end
+
 						UI_STATION = music
 						UI_STATION:Play()
 						UI_STATION:SetVolume(1)
@@ -170,7 +171,7 @@ if CLIENT then
 
 			preview_is_playing = not preview_is_playing
 
-			local text = (preview_is_playing) and "STOP" or "PREVIEW"
+			local text = preview_is_playing and "STOP" or "PREVIEW"
 			self:SetText(text)
 		end
 

@@ -363,8 +363,8 @@ if CLIENT then
 		local scaled_x = (x - self.OffsetX - self.TextureResolutionX / 2) * self.ZoomLevel + self:GetWide() / 2
 		local scaled_y = (y - self.OffsetY - self.TextureResolutionY / 2) * self.ZoomLevel + self:GetTall() / 2
 		]]
-		local grid_x = (x - self:GetWide() / 2) / self.ZoomLevel + self.OffsetX + (self.TextureResolutionX) / 2
-		local grid_y = (y - self:GetTall() / 2) / self.ZoomLevel + self.OffsetY + (self.TextureResolutionY) / 2
+		local grid_x = (x - self:GetWide() / 2) / self.ZoomLevel + self.OffsetX + self.TextureResolutionX / 2
+		local grid_y = (y - self:GetTall() / 2) / self.ZoomLevel + self.OffsetY + self.TextureResolutionY / 2
 		return math.floor(grid_x), math.floor(grid_y)
 	end
 
@@ -460,8 +460,8 @@ if CLIENT then
 									self.TextureResolutionY * self.ZoomLevel,
 									0, 0, aspect_ratio * zoom_level, zoom_level)
 
-		rt_scale_x = (self.TextureResolutionX) / 1024
-		rt_scale_y = (self.TextureResolutionY) / 1024
+		rt_scale_x = self.TextureResolutionX / 1024
+		rt_scale_y = self.TextureResolutionY / 1024
 		sub_x = 0.5 / 1024
 		sub_y = 0.5 / 1024
 		surface.SetDrawColor(255, 255, 255, 255)

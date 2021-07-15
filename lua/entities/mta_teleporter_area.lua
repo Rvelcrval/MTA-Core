@@ -19,7 +19,7 @@ if SERVER then
 		self.TeleportTime = 0
 
 		self:SetMoveType(MOVETYPE_NONE)
-        self:SetSolid(SOLID_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
 		self:SetUnFreezable(true)
 		self:SetModel("models/hunter/plates/plate6x6.mdl")
 		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
@@ -28,10 +28,10 @@ if SERVER then
 		self:PhysWake()
 
 		local trigger = ents.Create("base_brush")
-        trigger:SetPos(self:GetPos())
-        trigger:SetParent(self)
-        trigger:SetTrigger(true)
-        trigger:SetSolid(SOLID_BBOX)
+		trigger:SetPos(self:GetPos())
+		trigger:SetParent(self)
+		trigger:SetTrigger(true)
+		trigger:SetSolid(SOLID_BBOX)
 		trigger:SetNotSolid(true)
 
 		local maxs = self:OBBMaxs() / 2
@@ -138,7 +138,7 @@ if CLIENT then
 	function ENT:Draw()
 		if MTA.IsOptedOut() then return end
 
-		local alpha = 50 + math.abs((math.sin(CurTime() * 3) * 150))
+		local alpha = 50 + math.abs(math.sin(CurTime() * 3) * 150)
 		local pos = self:GetPos() - (self:GetForward()) * 100 - (self:GetRight() * 100)
 		cam.Start3D2D(pos, self:GetAngles(), 0.5)
 			surface.SetDrawColor(255, 0, 0, alpha)

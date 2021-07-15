@@ -109,9 +109,9 @@ if CLIENT then
 	end
 
 	local poop_color = Color(89, 48, 1, 230)
-	local TOILET_TRACE={
+	local TOILET_TRACE = {
 		mask = MASK_VISIBLE,
-		output={}
+		output = {}
 	}
 
 	local display_distance = 128^2
@@ -137,7 +137,7 @@ if CLIENT then
 
 			local text = ("Mash [%s]"):format(bind)
 			surface.SetFont("MTALargeFont")
-			local tw, th = surface.GetTextSize(text)
+			local tw, _ = surface.GetTextSize(text)
 			surface.SetTextPos((sw_half - tw / 2) + coef, sh_half - 140)
 			surface.SetTextColor(255, 255 - i, 255 - i)
 			surface.DrawText(text)

@@ -177,7 +177,7 @@ if CLIENT then
 		local uv_x = 0
 		self.Paint = function(self, w, h)
 			if self.shouldexpand then
-				local start = self.realtime - RealTime()
+				--local start = self.realtime - RealTime()
 				--local a = math.abs(math.sin(start * 3))
 				local color = math.abs((((self.realtime - RealTime()) * 2) % 2) - 1)
 				color = color * 255

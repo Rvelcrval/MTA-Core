@@ -2,7 +2,7 @@ local NET_FAR_COMBINE_SPAWN_EFFECT = "FAR_COMBINE_SPAWN_EFFECT"
 
 if CLIENT then
 	local CANNON_AMT = 50
-	local PARTICLES_AMT = 25
+	--local PARTICLES_AMT = 25
 	local function do_spawn_effect(pos)
 		local spawn_pos_ent = ents.CreateClientProp("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
 		spawn_pos_ent:Spawn()
@@ -18,7 +18,7 @@ if CLIENT then
 		beam_point_origin_2:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
 
-		for i=1, CANNON_AMT do
+		for i = 1, CANNON_AMT do
 			local ang = ((i * 36) * math.pi) / 180
 			local turn = Vector(math.sin(ang), math.cos(ang), 0) * 2
 			timer.Simple(i / CANNON_AMT, function()
@@ -158,9 +158,9 @@ local function create_combine(pos, spawn_function)
 	return npc
 end
 
-local function ID(a)
+--[[local function ID(a)
 	return ("%x"):format(util.CRC(tostring(a)))
-end
+end]]--
 
 local NODE_TYPE_GROUND = NODE_TYPE_GROUND
 
@@ -295,7 +295,7 @@ local function find_cadidate_node(ply, n, t)
 			local half = node_candidate.pos * 0.5
 
 			for k, v in next, node_candidate.neighbor do
-				local a = v.pos
+				--local a = v.pos
 				local b = v.pos * 0.5 + half
 
 				if not would_combine_stuck(b) then
@@ -425,7 +425,7 @@ local function setup_combine(combine, target, players)
 		if try_teleport and is_alive(target) and teleports < 3 and not target:TestPVS(combine:GetPos()) and not combine:IsUnreachable(target) then
 			last_teleport = curtime
 			teleports = teleports + 1
-			local oldpos = combine:GetPos()
+			--local oldpos = combine:GetPos()
 			local n_new = get_nearest_node(target, MAX_SPAWN_DISTANCE)
 
 			if n_new then
@@ -442,7 +442,7 @@ local function setup_combine(combine, target, players)
 	end
 
 	local creation_time = combine:GetCreationTime()
-	local first = true
+	-- local first = true
 	-- for sound emissions
 	local converged, sighted
 
@@ -459,10 +459,10 @@ local function setup_combine(combine, target, players)
 
 			-- if the target is in a vehicle, try to target the vehicle
 			combine.TargetIsVehicle = false
-			if IsValid(new_ply) and new_ply:InVehicle() then
+			--if IsValid(new_ply) and new_ply:InVehicle() then
 				--new_ply = new_ply:GetVehicle()
 				--combine.TargetIsVehicle = true
-			end
+			--end
 
 			if IsValid(target) and target ~= new_ply and not table.HasValue(players, target) then
 				combine:AddEntityRelationship(target, D_LI, 99)

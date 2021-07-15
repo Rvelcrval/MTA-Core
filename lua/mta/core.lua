@@ -446,8 +446,8 @@ if SERVER then
 		if not removed then
 			warn_log(("failed to reset citizenship of %s properly, cleaning up data."):format(tostring(ply)))
 			timer.Simple(1, function()
-				for i, ply in pairs(MTA.BadPlayers) do
-					if not ply.MTABad or not IsValid(ply) then
+				for i, bad_ply in pairs(MTA.BadPlayers) do
+					if not bad_ply.MTABad or not IsValid(bad_ply) then
 						table.remove(MTA.BadPlayers, i)
 					end
 				end
@@ -1112,7 +1112,7 @@ if CLIENT then
 			DrawMotionBlur(0.4, 0.8, 0.05)
 			surface.SetDrawColor(0, 0, 0, 25)
 			surface.DrawRect(0,0, scrw, scrh)
-			local alpha = 10 + math.abs((math.sin(CurTime() * 3) * 100))
+			local alpha = 10 + math.abs(math.sin(CurTime() * 3) * 100)
 			surface.SetDrawColor(255, 0, 0, alpha)
 			surface.DrawRect(0, 0, scrw, scrh)
 		end
@@ -1287,7 +1287,7 @@ if CLIENT then
 	end)
 end
 
-for _, f in pairs((file.Find("mta_modules/*.lua", "LUA"))) do
+for _, f in pairs(file.Find("mta_modules/*.lua", "LUA")) do
 	local path = "mta_modules/" .. f
 	AddCSLuaFile(path)
 	include(path)

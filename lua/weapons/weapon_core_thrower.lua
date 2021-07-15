@@ -21,7 +21,7 @@ SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "none"
 
 function SWEP:PrimaryAttack()
-	self.Weapon:SetNextPrimaryFire(CurTime() + 0.1)
+	self:SetNextPrimaryFire(CurTime() + 0.1)
 	self:ThrowCore()
 end
 
@@ -89,7 +89,7 @@ function SWEP:ThrowCore()
 	if CLIENT then return end
 
 	local ent = ents.Create("prop_physics")
-	if not IsValid(ent)then return end
+	if not IsValid(ent) then return end
 	ent:SetModel("models/hunter/blocks/cube025x025x025.mdl")
 	local owner = self:GetOwner()
 	ent:SetPos(owner:EyePos() + (owner:GetAimVector() * 50))

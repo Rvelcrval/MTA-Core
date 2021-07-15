@@ -3,7 +3,7 @@ pcall(require, "coinsys")
 IS_MTA_GM = false
 MTA_CONFIG = {}
 
-for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
+for _, f in pairs(file.Find("mta_cfg/*.lua", "LUA")) do
 	local path = "mta_cfg/" .. f
 	AddCSLuaFile(path)
 end
@@ -37,7 +37,7 @@ end
 hook.Add("PostGamemodeLoaded", "MTA", function()
 	IS_MTA_GM = (gmod.GetGamemode() or GM or GAMEMODE).Name == "MTA"
 
-	for _, f in pairs((file.Find("mta_cfg/*.lua", "LUA"))) do
+	for _, f in pairs(file.Find("mta_cfg/*.lua", "LUA")) do
 		local path = "mta_cfg/" .. f
 		MTA_CONFIG[f:StripExtension()] = include(path)
 	end
