@@ -1,5 +1,5 @@
 -- on normal meta it collides with the pop-up for joining #3
-if IS_MTA_GM then return end
+if not IS_MTA_GM then return end
 
 local tag = "MTASkill_CPR"
 
