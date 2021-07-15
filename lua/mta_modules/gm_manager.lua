@@ -33,9 +33,9 @@ local function on_join()
 
 	local dot_count = 0
 	local next_dot = 0
-	hook.Add("HUDPaint", tag, function()
+	hook.Add("PostDrawHUD", tag, function()
 		if not waiting_server then
-			hook.Remove("HUDPaint", tag)
+			hook.Remove("PostDrawHUD", tag)
 			return
 		end
 
@@ -76,7 +76,7 @@ hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 	if is_wanted then return end
 	if ply ~= LocalPlayer() then return end
 	if waiting_server then return end
-	if not gm_request then return end
+	if gm_request and gm_request:IsHostServer() then return end
 
 	Derma_Query(
 		"Looks like you're enjoying MTA, do you wish to join the dedicated MTA server? (we have guns, pvp and a gamemode :eyes:)",
