@@ -732,10 +732,12 @@ if SERVER then
 			end
 		end
 
+		-- shop npcs used to kill you
+		--[[
 		-- prevent players from losing their progress just because they accidentally hit a shop npc
 		if type(atck) == "Player" and atck.MTABad and ent:GetClass() == "lua_npc" then
 			return true
-		end
+		end]]--
 
 		local coef_data = MTA.Coeficients[ent:GetClass()]
 		MTA.IncreasePlayerFactor(atck, dmg_info:GetDamage() >= ent:Health() and coef_data.kill_coef or coef_data.damage_coef)
