@@ -126,6 +126,8 @@ if SERVER then
 		if self:GetNWBool("Drilling", false) then return end
 		if IsValid(activator:GetNWEntity("MTAVault")) then return end
 
+		if MTA_GM and not MTA.Inventory.HasItem(activator, "drill", 1) then return end
+
 		self:StartDrill(activator)
 		timer.Create(("MTA_VAULT_%d_%s"):format(self:EntIndex(), activator:SteamID()), 3, 100, function()
 			if IsValid(self) and IsValid(activator) then
@@ -229,6 +231,7 @@ if CLIENT then
 	end
 
 	--local black_color = Color(0, 0, 0, 150)
+	local red_color = Color(255, 0, 0)
 	local orange_color = Color(244, 135, 2)
 	local verb = L"Drill"
 	hook.Add("HUDPaint", tag, function()
@@ -240,8 +243,13 @@ if CLIENT then
 		for _, vault in ipairs(ents.FindByClass("mta_vault")) do
 			if show_vault_indicator(vault) then
 				if not vault:GetNWBool("Drilling", false) then
-					local text = ("/// %s [%s] ///"):format(verb, bind)
-					MTA.HighlightEntity(vault, text, orange_color)
+					if MTA_GM and not MTA.Inventory.HasItem(LocalPlayer(), "drill", 1) then
+						local text = ("/// %s [%s] ///"):format(verb, bind)
+						MTA.HighlightEntity(vault, text, orange_color)
+					else
+						local text = ("/// You don't have a drill! ///"):format(verb, bind)
+						MTA.HighlightEntity(vault, text, red_color)
+					end
 				else
 					local driller = vault:GetNWEntity("DrillingPlayer", NULL)
 					local driller_nick = IsValid(driller) and UndecorateNick(driller:Nick()) or "???"
