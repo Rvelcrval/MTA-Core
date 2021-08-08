@@ -126,7 +126,7 @@ if SERVER then
 		if self:GetNWBool("Drilling", false) then return end
 		if IsValid(activator:GetNWEntity("MTAVault")) then return end
 
-		if MTA_GM then
+		if IS_MTA_GM then
 			local succ, x, y = MTA.Inventory.FindItemSlot(activator, "drill")
 			if succ and not MTA.Inventory.RemoveItem(activator, "drill", x, y, 1) then return end
 		end
@@ -246,7 +246,7 @@ if CLIENT then
 		for _, vault in ipairs(ents.FindByClass("mta_vault")) do
 			if show_vault_indicator(vault) then
 				if not vault:GetNWBool("Drilling", false) then
-					if MTA_GM and not MTA.Inventory.HasItem(LocalPlayer(), "drill", 1) then
+					if IS_MTA_GM and not MTA.Inventory.HasItem(LocalPlayer(), "drill", 1) then
 						local text = ("/// You don't have a drill! ///"):format(verb, bind)
 						MTA.HighlightEntity(vault, text, red_color)
 					else
