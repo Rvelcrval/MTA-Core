@@ -276,16 +276,17 @@ if SERVER then
 		-- under 10 -> only metrocops
 		local spawn_function = combine_types.metrocops
 
-		if IS_MTA_GM and math.random(0, 100) <= 7 then
-			spawn_function = combine_types.hunters
-
 		-- 10 to 60 -> metrocops and soldiers that become more and more common
-		elseif wanted_lvl < 60 and wanted_lvl >= 10 then
+		if wanted_lvl < 60 and wanted_lvl >= 10 then
 			spawn_function = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
 
 		-- 60 - 80 -> only elites
 		elseif wanted_lvl >= 60 and wanted_lvl < 80 then
-			spawn_function = combine_types.elites
+			if IS_MTA_GM and math.random(0, 100) <= 7 then
+				spawn_function = combine_types.hunter
+			else
+				spawn_function = combine_types.elites
+			end
 
 		-- 80 - inf -> elites, shotgunners and an helicopter
 		elseif wanted_lvl >= 80 then
@@ -301,7 +302,11 @@ if SERVER then
 				end
 			end
 
-			spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
+			if IS_MTA_GM and math.random(0, 100) <= 7 then
+				spawn_function = combine_types.hunter
+			else
+				spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
+			end
 		end
 
 		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos)
