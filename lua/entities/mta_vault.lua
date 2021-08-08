@@ -128,7 +128,9 @@ if SERVER then
 
 		if IS_MTA_GM then
 			local succ, x, y = MTA.Inventory.FindItemSlot(activator, "drill")
-			if succ and not MTA.Inventory.RemoveItem(activator, "drill", x, y, 1) then return end
+			if not succ then return end
+
+			if not MTA.Inventory.RemoveItem(activator, "drill", x, y, 1) then return end
 		end
 
 		self:StartDrill(activator)
