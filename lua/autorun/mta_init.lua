@@ -36,7 +36,7 @@ end
 
 -- custom mta combine skins
 if SERVER then
-	resource.AddFile("materials/models/mta/combinesoldiersheet_police.vmt")
+	resource.AddFile("materials/models/mta/police_skins/combinesoldiersheet_police.vmt")
 end
 
 hook.Add("PostGamemodeLoaded", "MTA", function()
