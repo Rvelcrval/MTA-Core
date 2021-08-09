@@ -17,7 +17,7 @@ ENT.dont_televate = true
 if SERVER then
 	function ENT:Initialize()
 		self:SetMoveType(MOVETYPE_NONE)
-        self:SetSolid(SOLID_VPHYSICS)
+		self:SetSolid(SOLID_VPHYSICS)
 		self:SetUnFreezable(true)
 		self:SetModel("models/dav0r/hoverball.mdl")
 		self:SetMaterial("models/alyx/emptool_glow")
