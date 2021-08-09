@@ -251,7 +251,7 @@ if SERVER then
 		soldiers = function() --  this includes shotgunners
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", math.random() < 0.25 and "weapon_shotgun" or "weapon_smg1")
-			npc:SetMaterial("models/mta/combinesoldiersheet_police.vmt")
+			npc:SetMaterial("models/mta/police_skins/combinesoldiersheet_police.vmt")
 			return npc
 		end,
 		elites = function()
@@ -263,7 +263,7 @@ if SERVER then
 		shotgunners = function()
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_shotgun")
-			npc:SetMaterial("models/mta/combinesoldiersheet_police.vmt")
+			npc:SetMaterial("models/mta/police_skins/combinesoldiersheet_police.vmt")
 			return npc
 		end,
 		hunters = function()
