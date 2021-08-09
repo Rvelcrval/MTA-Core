@@ -283,7 +283,7 @@ if SERVER then
 		-- 60 - 80 -> only elites
 		elseif wanted_lvl >= 60 and wanted_lvl < 80 then
 			if IS_MTA_GM and math.random(0, 100) <= 7 then
-				spawn_function = combine_types.hunter
+				spawn_function = combine_types.hunters
 			else
 				spawn_function = combine_types.elites
 			end
@@ -303,7 +303,7 @@ if SERVER then
 			end
 
 			if IS_MTA_GM and math.random(0, 100) <= 7 then
-				spawn_function = combine_types.hunter
+				spawn_function = combine_types.hunters
 			else
 				spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
 			end
