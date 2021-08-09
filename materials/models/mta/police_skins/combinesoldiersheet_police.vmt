@@ -10,17 +10,6 @@
 	"$phongexponenttexture" "models/combine_soldier/combinesoldier_phong"
 	"$phongalbedotint" "1"
 	"$phongfresnelranges"	"[.1 .5 1.0]"
-
-	// Use separate self-illum mask on Pre DX9 hardware
-	">=dx90_20b"
-	{
-		"$baseTexture" 		"models/mta/police_skins/combinesoldier_police_noalpha"
-		"$selfillummask" 	"models/combine_soldier/combinesoldierselfillummask"
-	}
-
-	// Use redundant self-illum in base alpha on Pre DX9 hardware
-	"<dx90_20b"
-	{
-		"$baseTexture" 	"models/mta/police_skins/combinesoldiersheet_police"
-	}
+	"$selfillummask" 	"models/combine_soldier/combinesoldierselfillummask"
+	"$baseTexture" 	"models/mta/police_skins/combinesoldiersheet_police"
 }
