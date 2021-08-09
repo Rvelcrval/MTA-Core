@@ -34,6 +34,11 @@ do
 	game.AddParticles("particles/weapon_fx.pcf")
 end
 
+-- custom mta combine skins
+if SERVER then
+	resource.AddFile("materials/models/mta/combinesoldiersheet_police.vmt")
+end
+
 hook.Add("PostGamemodeLoaded", "MTA", function()
 	IS_MTA_GM = (gmod.GetGamemode() or GM or GAMEMODE).Name == "MTA"
 
