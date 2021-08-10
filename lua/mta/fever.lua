@@ -49,6 +49,10 @@ if SERVER then
 				atck.MTAInFever = true
 				atck.MTANextFever = CurTime() + FEVER_TIMEOUT
 
+				if IS_MTA_GM then
+					MTA.Statuses.AddStatus(atck, "fever", "Fever", Color(255, 0, 0), CurTime() + FEVER_TIMEOUT)
+				end
+
 				timer.Simple(FEVER_TIME, function()
 					if not IsValid(atck) then return end
 					stop_fever(atck)
@@ -105,30 +109,32 @@ if CLIENT then
 		surface.DrawRect(0, 0, scrw, scrh)
 	end)
 
-	local red_color = Color(255, 0, 0)
-	local black_color = Color(0, 0, 0, 150)
-	hook.Add("MTAPaint", tag, function()
-		if not in_fever then return end
+	if not IS_MTA_GM then
+		local red_color = Color(255, 0, 0)
+		local black_color = Color(0, 0, 0, 150)
+		hook.Add("MTAPaint", tag, function()
+			if not in_fever then return end
 
-		local scrw, scrh = ScrW(), ScrH()
-		surface.SetTextColor(red_color)
-		surface.SetFont("MTALargeFont")
+			local scrw, scrh = ScrW(), ScrH()
+			surface.SetTextColor(red_color)
+			surface.SetFont("MTALargeFont")
 
-		local diff = math.max(fever_end_time - CurTime(), 0)
-		local s, ms = math.floor(diff), math.Round(math.fmod(diff, 1) * 1000)
-		local time_left = ("/// %d:%d ///"):format(s, ms)
-		local tw, th = surface.GetTextSize(time_left)
-		local pos_x, pos_y = scrw / 2 - tw / 2, scrh / 2 - th / 2
+			local diff = math.max(fever_end_time - CurTime(), 0)
+			local s, ms = math.floor(diff), math.Round(math.fmod(diff, 1) * 1000)
+			local time_left = ("/// %d:%d ///"):format(s, ms)
+			local tw, th = surface.GetTextSize(time_left)
+			local pos_x, pos_y = scrw / 2 - tw / 2, scrh / 2 - th / 2
 
-		surface.SetDrawColor(black_color)
-		surface.DrawRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
+			surface.SetDrawColor(black_color)
+			surface.DrawRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
 
-		surface.SetDrawColor(red_color)
-		surface.DrawOutlinedRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
+			surface.SetDrawColor(red_color)
+			surface.DrawOutlinedRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
 
-		surface.SetTextPos(pos_x, pos_y)
-		surface.DrawText(time_left)
-	end)
+			surface.SetTextPos(pos_x, pos_y)
+			surface.DrawText(time_left)
+		end)
+	end
 
 	hook.Add("EntityEmitSound", tag, function(data)
 		if not in_fever then return end
