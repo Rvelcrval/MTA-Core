@@ -36,8 +36,13 @@ end
 
 -- custom mta combine skins
 if SERVER then
-	resource.AddFile("materials/models/mta/police_skins/combinesoldiersheet_police.vmt")
-	resource.AddFile("materials/models/mta/police_skins/metrocop_sheet_police.vmt")
+	local skin_path = "materials/models/mta/police_skins/"
+	for _, f in pairs(file.Find(skin_path .. "*", "GAME")) do
+		local ext = string.GetExtensionFromFilename(f)
+		if ext == "vtf" or ext == "vmt" then
+			resource.AddSingleFile(skin_path .. f)
+		end
+	end
 end
 
 hook.Add("PostGamemodeLoaded", "MTA", function()
