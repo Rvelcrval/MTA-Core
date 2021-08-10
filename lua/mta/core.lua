@@ -1269,6 +1269,15 @@ if CLIENT then
 		if not MTA.IsOptedOut() then
 			if mta_classes[ent:GetClass()] then
 				ent.RenderOverride = mta_render_override
+
+				-- fix custom skins showing as error textures for some people
+				local mat_name = ent:GetMaterial()
+				if #mat_name > 0 then
+					local mat = Material(mat_name)
+					if mat:IsError() then
+						ent:SetMaterial("")
+					end
+				end
 			end
 
 			return
