@@ -244,6 +244,7 @@ if SERVER then
 	local combine_types = {
 		metrocops = function()
 			local npc = ents.Create("npc_metropolice")
+			npc:SetMaterial("models/mta/police_skins/metrocop_sheet_police")
 			npc:SetKeyValue("additionalequipment", math.random() > 0.5 and "weapon_pistol" or "weapon_stunstick")
 			npc:SetKeyValue("manhacks", tostring(math.random(0, 2)))
 			return npc
