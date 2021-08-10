@@ -50,7 +50,7 @@ if SERVER then
 				atck.MTANextFever = CurTime() + FEVER_TIMEOUT
 
 				if IS_MTA_GM then
-					MTA.Statuses.AddStatus(atck, "fever", "Fever", Color(255, 0, 0), CurTime() + FEVER_TIMEOUT)
+					MTA.Statuses.AddStatus(atck, "fever", "Fever", Color(255, 0, 0), CurTime() + FEVER_TIME)
 				end
 
 				timer.Simple(FEVER_TIME, function()
