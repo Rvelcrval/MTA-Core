@@ -29,8 +29,15 @@ local function constrain(ply, constraint_reason)
     end
 
     ply:SetGravity(DEFAULT_GRAVITY)
-    ply:SetWalkSpeed(DEFAULT_WALK_SPEED)
-    ply:SetRunSpeed(DEFAULT_RUN_SPEED)
+
+    if ply:GetWalkSpeed() > DEFAULT_WALK_SPEED then
+        ply:SetWalkSpeed(DEFAULT_WALK_SPEED)
+    end
+
+    if ply:GetRunSpeed() > DEFAULT_RUN_SPEED then
+        ply:SetRunSpeed(DEFAULT_RUN_SPEED)
+    end
+
     ply:SetSlowWalkSpeed(DEFAULT_SLOW_WALK_SPEED)
     ply:SetDuckSpeed(DEFAULT_DUCK_SPEED)
     ply:SetJumpPower(DEFAULT_JUMP_POWER)
@@ -77,6 +84,8 @@ local function constrain(ply, constraint_reason)
             end
         end
     end
+
+    hook.Run("MTAPlayerConstraintUpdate", ply, true)
 end
 
 local function release(ply)
@@ -85,6 +94,8 @@ local function release(ply)
     if ply.SetSuperJumpMultiplier then
         ply:SetSuperJumpMultiplier(1.5)
     end
+
+    hook.Run("MTAPlayerConstraintUpdate", ply, false)
 end
 
 local function is_constrained(ply)
