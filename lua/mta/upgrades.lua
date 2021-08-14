@@ -549,9 +549,8 @@ if CLIENT then
 			criminal_count = "Times Wanted"
 		}
 
-		local stat__height_margin = 10
+		local stat_height_margin = 10
 		local stat_width_margin = 20
-
 		function frame:PaintOver(w, h)
 			local current_width = 0
 			local i = 1
@@ -561,7 +560,7 @@ if CLIENT then
 
 				local text = ("%s: %d"):format(proper_name, MTA.GetPlayerStat(stat_name))
 				local tw, th = surface.GetTextSize(text)
-				surface.SetTextPos(i * stat_width_margin + current_width, h - (th + stat__height_margin))
+				surface.SetTextPos(i * stat_width_margin + current_width, h - (th + stat_height_margin))
 				surface.DrawText(text)
 
 				current_width = current_width + tw
