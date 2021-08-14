@@ -12,7 +12,6 @@ function PANEL:Init()
 
         local dealer_av = header:Add("DModelPanel")
         dealer_av:Dock(LEFT)
-        dealer_av:SetModel(npc:GetModel())
         self.HeaderAvatar = dealer_av
 
         local bone_number = dealer_av.Entity:LookupBone("ValveBiped.Bip01_Head1")
