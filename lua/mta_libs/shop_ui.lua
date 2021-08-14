@@ -37,12 +37,14 @@ function PANEL:SetHeader(npc, header_text)
     if IsValid(npc) then
         self.HeaderAvatar:SetModel(npc:GetModel())
 
-        local bone_number = npc:LookupBone("ValveBiped.Bip01_Head1")
+        local bone_number = self.HeaderAvatar.Entity:LookupBone("ValveBiped.Bip01_Head1")
         if bone_number then
-            local head_pos = npc:GetBonePosition(bone_number)
+            local head_pos = self.HeaderAvatar.Entity:GetBonePosition(bone_number)
             if head_pos then
                 self.HeaderAvatar:SetLookAt(head_pos)
                 self.HeaderAvatar:SetCamPos(head_pos - Vector(-13, 0, 0))
+
+                print(self.HeaderAvatar)
             end
         end
     end
