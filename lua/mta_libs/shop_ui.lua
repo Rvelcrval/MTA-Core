@@ -12,16 +12,8 @@ function PANEL:Init()
 
         local dealer_av = header:Add("DModelPanel")
         dealer_av:Dock(LEFT)
+        dealer_av:SetModel("models/props_junk/PopCan01a.mdl")
         self.HeaderAvatar = dealer_av
-
-        local bone_number = dealer_av.Entity:LookupBone("ValveBiped.Bip01_Head1")
-        if bone_number then
-            local head_pos = dealer_av.Entity:GetBonePosition(bone_number)
-            if head_pos then
-                dealer_av:SetLookAt(head_pos)
-                dealer_av:SetCamPos(head_pos - Vector(-13, 0, 0))
-            end
-        end
 
         function dealer_av:LayoutEntity(ent)
             ent:SetSequence(ent:LookupSequence("idle_subtle"))
@@ -44,6 +36,15 @@ end
 function PANEL:SetHeader(npc, header_text)
     if IsValid(npc) then
         self.HeaderAvatar:SetModel(npc:GetModel())
+
+        local bone_number = npc:LookupBone("ValveBiped.Bip01_Head1")
+        if bone_number then
+            local head_pos = npc:GetBonePosition(bone_number)
+            if head_pos then
+                self.HeaderAvatar:SetLookAt(head_pos)
+                self.HeaderAvatar:SetCamPos(head_pos - Vector(-13, 0, 0))
+            end
+        end
     end
 
     header_text = (header_text or ""):Trim()
