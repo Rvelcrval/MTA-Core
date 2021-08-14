@@ -407,58 +407,22 @@ if CLIENT then
 	end
 
 	local function show_dealer_frame(npc)
-		local frame = vgui.Create("DFrame")
+		local frame = vgui.Create("mta_shop")
 		frame:SetSize(640, 480)
 		frame:Center()
 		frame:DockPadding(5, 30, 5, 30)
 		frame:SetTitle("MTA Dealer")
 		frame:MakePopup()
-		frame:SetSkin("MTA")
 		frame.btnMinim:Hide()
 		frame.btnMaxim:Hide()
 
-		derma.RefreshSkins()
-
-		-- header
-		do
-			local header = frame:Add("DPanel")
-			header:Dock(TOP)
-			header:DockPadding(5, 5, 5, 5)
-			header:SetTall(50)
-
-			local dealer_av = header:Add("DModelPanel")
-			dealer_av:Dock(LEFT)
-			dealer_av:SetModel(npc:GetModel())
-
-			local bone_number = dealer_av.Entity:LookupBone("ValveBiped.Bip01_Head1")
-			if bone_number then
-				local head_pos = dealer_av.Entity:GetBonePosition(bone_number)
-				if head_pos then
-					dealer_av:SetLookAt(head_pos)
-					dealer_av:SetCamPos(head_pos - Vector(-13, 0, 0))
-				end
-			end
-
-			function dealer_av:LayoutEntity(ent)
-				ent:SetSequence(ent:LookupSequence("idle_subtle"))
-				self:RunAnimation()
-			end
-
-			local intro = header:Add("DLabel")
-			intro:Dock(FILL)
-			intro:SetText([[Pssst... Hey kid, interested in some upgrades? I got plenty of things here.
-			What? What's MTA? That's the system in place to prevent you from rebelling against the gov' of course!]])
-			intro:SetWrap(true)
-		end
+		frame:SetHeader(npc, [[Pssst... Hey kid, interested in some upgrades? I got plenty of things here.
+		What? What's MTA? That's the system in place to prevent you from rebelling against the gov' of course!]])
 
 		-- actions
 		do
-			local content = frame:Add("DScrollPanel")
-			content:Dock(FILL)
-			content:DockMargin(5, 10, 5, 5)
-
 			local function add_action(description, action, callback)
-				local panel = content:Add("DPanel")
+				local panel = frame.Content:Add("DPanel")
 				panel:Dock(TOP)
 				panel:DockMargin(0, 10, 0, 0)
 				panel:SetTall(50)
@@ -535,43 +499,6 @@ if CLIENT then
 				self:SetText(("Buy (%dc)"):format(price))
 				self:SetDisabled(lp:GetCoins() < price)
 			end
-		end
-
-		function frame:OnKeyCodePressed(key_code)
-			if key_code == KEY_ESCAPE or key_code == KEY_E then
-				self:Remove()
-			end
-		end
-
-		local proper_stat_names = {
-			points = "Points",
-			killed_cops = "Killed Cops",
-			criminal_count = "Times Wanted"
-		}
-
-		local stat_height_margin = 10
-		local stat_width_margin = 20
-		function frame:PaintOver(w, h)
-			local current_width = 0
-			local i = 1
-			for stat_name, proper_name in pairs(proper_stat_names) do
-				surface.SetFont("DermaDefault")
-				surface.SetTextColor(244, 135, 2)
-
-				local text = ("%s: %d"):format(proper_name, MTA.GetPlayerStat(stat_name))
-				local tw, th = surface.GetTextSize(text)
-				surface.SetTextPos(i * stat_width_margin + current_width, h - (th + stat_height_margin))
-				surface.DrawText(text)
-
-				current_width = current_width + tw
-				i = i + 1
-			end
-
-			surface.SetDrawColor(244, 135, 2)
-			surface.DrawOutlinedRect(0, h - 30, w, 30, 2)
-
-			surface.SetDrawColor(244, 135, 2, 10)
-			surface.DrawRect(0, h - 30, w, 30)
 		end
 	end
 

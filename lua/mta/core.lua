@@ -1,5 +1,6 @@
 AddCSLuaFile()
 AddCSLuaFile("mta_libs/far_combine.lua")
+AddCSLuaFile("mta_libs/shop_ui.lua")
 
 -- when is that going to get added ???
 AddCSLuaFile("metalog_handlers/ml_console_printer.lua")
@@ -959,6 +960,7 @@ end
 
 if CLIENT then
 	include("mta_libs/far_combine.lua")
+	include("mta_libs/shop_ui.lua")
 
 	local MTA_OPT_OUT = CreateClientConVar("mta_opt_out", "0", true, true, "Disable criminal events in the lobby for yourself")
 	local MTA_SHOW_WANTEDS = CreateClientConVar("mta_show_wanteds", "1", true, false, "Displays other wanted players")
