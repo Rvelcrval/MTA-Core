@@ -1126,15 +1126,6 @@ if CLIENT then
 		local health, armor = lp:Health(), lp:Armor()
 		local scrw, scrh = ScrW(), ScrH()
 
-		if health <= LOW_HEALTH then
-			DrawMotionBlur(0.4, 0.8, 0.05)
-			surface.SetDrawColor(0, 0, 0, 25)
-			surface.DrawRect(0,0, scrw, scrh)
-			local alpha = 10 + math.abs(math.sin(CurTime() * 3) * 100)
-			surface.SetDrawColor(255, 0, 0, alpha)
-			surface.DrawRect(0, 0, scrw, scrh)
-		end
-
 		surface.SetTextColor(white_color)
 		surface.SetFont("MTALargeFont")
 		local text = ("/// WANTED LEVEL %d ///"):format(LocalPlayer():GetNWInt("MTAFactor"))
@@ -1187,6 +1178,7 @@ if CLIENT then
 		end
 
 		if not MTA.IsWanted() then return end
+
 		draw_hud()
 
 		if not MTA_SHOW_WANTEDS:GetBool() then return end
@@ -1247,43 +1239,8 @@ if CLIENT then
 		end
 	end
 
-	local mta_classes = {
-		npc_metropolice = true,
-		npc_manhack = true,
-		npc_combine_s = true
-	}
-	local debug_white = Material("models/debug/debugwhite")
-	local function mta_render_override(self)
-		if MTA.IsWanted() and LocalPlayer():Health() <= LOW_HEALTH then
-			cam.IgnoreZ(true)
-				render.SetLightingMode(2)
-					render.MaterialOverride(debug_white)
-						self:DrawModel()
-					render.MaterialOverride()
-				render.SetLightingMode(0)
-			cam.IgnoreZ(false)
-		else
-			self:DrawModel()
-		end
-	end
-
 	hook.Add("OnEntityCreated", tag, function(ent)
-		if not MTA.IsOptedOut() then
-			if mta_classes[ent:GetClass()] then
-				ent.RenderOverride = mta_render_override
-
-				-- fix custom skins showing as error textures for some people
-				local mat_name = ent:GetMaterial()
-				if #mat_name > 0 then
-					local mat = Material(mat_name)
-					if mat:IsError() then
-						ent:SetMaterial("")
-					end
-				end
-			end
-
-			return
-		end
+		if not MTA.IsOptedOut() then return end
 
 		timer.Simple(0.5, function()
 			if not IsValid(ent) then return end
