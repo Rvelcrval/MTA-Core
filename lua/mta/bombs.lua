@@ -148,8 +148,10 @@ if SERVER then
 
 	local CAMPING_DIST = MTA_CONFIG.bombs.CampingDistance
 	local START_CAMPING_DURATION = MTA_CONFIG.bombs.CampingInterval
+	local WARNING_DURATION = 20
 
 	local campers = {}
+	local red_color = Color(255, 0, 0)
 	timer.Create(tag, 1, 0, function()
 		for _, ply in ipairs(MTA.BadPlayers) do
 			if ply:IsValid() then
@@ -157,11 +159,19 @@ if SERVER then
 				local camping_state = campers[ply]
 				if camping_state and camping_state.LastPos:Distance(pos) <= CAMPING_DIST then
 					camping_state.Times = camping_state.Times + 1
+
+					if IS_MTA_GM and not ply.MTATpBombWarned and camping_state.Times >= START_CAMPING_DURATION - WARNING_DURATION then
+						MTA.Statuses.AddStatus(ply, "tp_bomb", "Incoming Bomb", red_color, CurTime() + WARNING_DURATION)
+						ply.MTATpBombWarned = true
+					end
+
 					if camping_state.Times >= START_CAMPING_DURATION then
 						MTA.TeleportBombToPlayer(ply)
 						campers[ply] = nil -- reset for next run
 					end
 				else
+					MTA.Statuses.RemoveStatus(ply, "tp_bomb")
+					ply.MTATpBombWarned = nil
 					campers[ply] = {
 						LastPos = pos,
 						Times = 0
