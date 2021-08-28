@@ -406,6 +406,93 @@ if CLIENT then
 		return cur_value
 	end
 
+	do -- prestige popup UI
+		local green_color = Color(0, 255, 0)
+		local red_color = Color(255, 0, 0)
+		local PANEL = {}
+
+		function PANEL:Init()
+			self:SetBackgroundBlur(true)
+			self:SetSize(500, 350)
+			self:SetTitle("Criminal Prestige")
+
+			local gains_header = self:Add("DLabel")
+			gains_header:Dock(TOP)
+			gains_header:SetText("Prestiging will get you:")
+
+			local gains = self:Add("DLabel")
+			gains:Dock(TOP)
+			gains:DockMargin(20, 5, 5, 5)
+			gains:SetWrap(true)
+			gains:SetTall(75)
+			gains:SetColor(green_color)
+			gains:SetText([[
+			● A lower chance to be hunted by other players
+			● An additional custom song slot (available at the jukebox)
+			● A fancy scoreboard icon
+			● A higher ranking in the overall leaderboard]])
+
+			local losses_header = self:Add("DLabel")
+			losses_header:SetText("Prestiging will reset:")
+			losses_header:Dock(TOP)
+			losses_header:DockMargin(5, 15, 5, 5)
+
+			local losses = self:Add("DLabel")
+			losses:Dock(TOP)
+			losses:DockMargin(20, 5, 5, 5)
+			losses:SetWrap(true)
+			losses:SetTall(75)
+			losses:SetColor(red_color)
+			losses:SetText([[
+			● Your points
+			● Your weapons
+			● Your damage multiplier
+			● Your resistance multiplier
+			● Your healing multiplier]])
+
+			local btn_prestige = self:Add("DButton")
+			btn_prestige:SetText("Prestige Up")
+			btn_prestige:SetFont("Trebuchet24")
+			btn_prestige:SetColor(color_white)
+			btn_prestige:SetPos(80, self:GetTall() - 60)
+			btn_prestige:SetSize(150, 30)
+			function btn_prestige:Paint(w, h)
+				surface.SetDrawColor(122, 219, 105)
+				surface.DrawRect(0, 0, w, h)
+
+				if self:IsHovered() then
+					surface.SetDrawColor(color_white)
+					surface.DrawOutlinedRect(0, 0, w, h, 2)
+				end
+			end
+
+			function btn_prestige:DoClick()
+				net.Start(NET_PRESTIGE)
+				net.SendToServer()
+			end
+
+			local btn_cancel = self:Add("DButton")
+			btn_cancel:SetText("Cancel")
+			btn_cancel:SetFont("Trebuchet24")
+			btn_cancel:SetColor(color_white)
+			btn_cancel:SetPos(270, self:GetTall() - 60)
+			btn_cancel:SetSize(150, 30)
+			function btn_cancel:Paint(w, h)
+				surface.SetDrawColor(219, 105, 105)
+				surface.DrawRect(0, 0, w, h)
+
+				if self:IsHovered() then
+					surface.SetDrawColor(color_white)
+					surface.DrawOutlinedRect(0, 0, w, h, 2)
+				end
+			end
+
+			btn_cancel.DoClick = function() self:Close() end
+		end
+
+		vgui.Register("mta_prestige", PANEL, "DFrame")
+	end
+
 	local function show_dealer_frame(npc)
 		local frame = vgui.Create("mta_shop")
 		frame:SetSize(640, 480)
@@ -446,15 +533,9 @@ if CLIENT then
 			end
 
 			local btn_prestige = add_action("Upgrade your \"Criminal Prestige\"", "Upgrade", function()
-				Derma_Query(
-					"To upgrade your Criminal Prestige your stats will be reset along with your points, are you sure that you want to upgrade?",
-					"Criminal Prestige",
-					"Confirm", function()
-						net.Start(NET_PRESTIGE)
-						net.SendToServer()
-					end,
-					"Cancel", function()
-					end)
+				local popup = vgui.Create("mta_prestige")
+				popup:Center()
+				popup:MakePopup()
 			end)
 			function btn_prestige:Think()
 				self:SetDisabled(not can_prestige_upgrade())
