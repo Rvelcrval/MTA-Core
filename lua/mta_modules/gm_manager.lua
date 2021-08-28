@@ -178,7 +178,9 @@ hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 	if ply ~= LocalPlayer() then return end
 	if waiting_server then return end
 	if gm_request and gm_request:IsHostServer() then return end
-	if ply:GetNWInt("MTAFactor") <= 1 then return end -- dont bother if its a player mistake
+
+	-- this doesnt work for some reason
+	--if ply:GetNWInt("MTAFactor") <= 1 then return end -- dont bother if its a player mistake
 
 	http.Fetch(MTA_CONFIG.core.GMInfoAPI .. MTA_CONFIG.core.GMServerID, function(body)
 		local data = util.JSONToTable(body)
