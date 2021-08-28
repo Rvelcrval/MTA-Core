@@ -106,4 +106,4 @@ if CLIENT then
 end
 
 scripted_ents.Register(ENT, "mta_mobile_emp")
-MTA.RegisterSkill("mobile_emp", "defense_multiplier", 25, "Mobile EMP", ("Fires an electro-magnetic shockwave breaking all nearby manhacks every %d seconds"):format(INTERVAL))
+MTA.RegisterSkill("mobile_emp", "defense_multiplier", 25, "Mobile EMP", ("Fires an electro-magnetic shockwave breaking all nearby manhacks and disabling combine weapons every %d seconds"):format(INTERVAL))
