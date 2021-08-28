@@ -25,6 +25,7 @@ if SERVER then
 		self:DrawShadow(false)
 	end
 
+	local status_color = Color(109, 169, 214)
 	local function do_emp(ply)
 		if not IsValid(ply) then return end
 
@@ -46,6 +47,10 @@ if SERVER then
 				ent:TakeDamageInfo(dmg_info)
 			end
 		end
+
+		if IS_MTA_GM then
+			MTA.Statuses.AddStatus(ply, "emp", "Mobile EMP", status_color, CurTime() + INTERVAL)
+		end
 	end
 
 	local function get_timer_id(ply)
@@ -56,6 +61,11 @@ if SERVER then
 		if MTA.IsWanted(ply) and MTA.HasSkill(ply, "defense_multiplier", "mobile_emp") then
 			local timer_id = get_timer_id(ply)
 			if timer.Exists(timer_id) then return end
+
+			if IS_MTA_GM then
+				MTA.Statuses.AddStatus(ply, "emp", "Mobile EMP", status_color, CurTime() + INTERVAL)
+			end
+
 			timer.Create(timer_id, INTERVAL, 0, function() do_emp(ply) end)
 		end
 	end)
@@ -63,9 +73,17 @@ if SERVER then
 	hook.Add("MTAWantedStateUpdate", "MTASkill_MobileEMP", function(ply, is_wanted)
 		local timer_id = get_timer_id(ply)
 		if is_wanted and MTA.HasSkill(ply, "defense_multiplier", "mobile_emp") then
+			if IS_MTA_GM then
+				MTA.Statuses.AddStatus(ply, "emp", "Mobile EMP", status_color, CurTime() + INTERVAL)
+			end
+
 			timer.Create(timer_id, INTERVAL, 0, function() do_emp(ply) end)
 		elseif not is_wanted then
 			timer.Remove(timer_id)
+
+			if IS_MTA_GM then
+				MTA.Statuses.RemoveStatus(ply, "emp")
+			end
 		end
 	end)
 end
