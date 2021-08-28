@@ -395,7 +395,7 @@ if SERVER then
 
 		local count = 0
 		for _, combine in ipairs(MTA.Combines) do
-			if combine:GetEnemy() == ply then
+			if IsValid(combine) and combine:GetEnemy() == ply then
 				count = count + 1
 			end
 		end
