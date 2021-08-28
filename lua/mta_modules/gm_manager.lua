@@ -156,6 +156,8 @@ function PANEL:Init()
 			surface.DrawOutlinedRect(0, 0, w, h, 2)
 		end
 	end
+
+	btn_remain.DoClick = function() self:Close() end
 end
 
 function PANEL:SetData(player_count, max_players, map_name)
