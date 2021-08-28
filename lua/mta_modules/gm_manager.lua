@@ -4,18 +4,20 @@ if SERVER then return end
 local tag = "mta_wait"
 local orange_color = Color(244, 135, 2)
 local white_color = Color(255, 255, 255)
+local green_color = Color(0, 255, 0)
 local waiting_server = false
 local waiting_error = ""
 local function on_join()
 	if not gm_request then return end
 
-	if gm_request:IsServerGamemode(3, "MTA") then
-		RunConsoleCommand("aowl", "goto", "#3")
+	local serverid = "#" .. MTA_CONFIG.core.GMServerID
+	if gm_request:IsServerGamemode(MTA_CONFIG.core.GMServerID, "MTA") then
+		RunConsoleCommand("aowl", "goto", serverid)
 		return
 	end
 
 	waiting_server = true
-	gm_request:RequestGamemodeChange("MTA", 3, function(success)
+	gm_request:RequestGamemodeChange("MTA", MTA_CONFIG.core.GMServerID, function(success)
 		-- give 5 seconds before dropping the notification
 		timer.Simple(5, function()
 			waiting_server = false
@@ -28,7 +30,7 @@ local function on_join()
 		end
 
 		waiting_server = false
-		RunConsoleCommand("aowl", "goto", "#3")
+		RunConsoleCommand("aowl", "goto", serverid)
 	end)
 
 	local dot_count = 0
@@ -72,16 +74,128 @@ local function on_join()
 	end)
 end
 
+local PANEL = {}
+
+function PANEL:Init()
+	self:SetBackgroundBlur(true)
+	self:SetSize(500, 500)
+	self:SetTitle("MTA")
+	self:SetSkin("MTA")
+	derma.RefreshSkins()
+
+	self.lblTitle:SetFont("Trebuchet24")
+
+	local header = self:Add("DLabel")
+	header:Dock(TOP)
+	header:SetWrap(true)
+	header:SetFont("Trebuchet24")
+	header:SetTall(100)
+	header:SetColor(green_color)
+	header:SetText("Looks like you're causing chaos in the lobby. "
+		.. "Our forces tried to/stopped you. Would you like to join the server where you have an actual chance to fight back?")
+
+	local gains_header = self:Add("DLabel")
+	gains_header:SetText("You will gain")
+	gains_header:Dock(TOP)
+	gains_header:SetFont("Trebuchet24")
+	gains_header:DockMargin(5, 15, 5, 5)
+
+	local gains = self:Add("DLabel")
+	gains:Dock(TOP)
+	gains:SetWrap(true)
+	gains:SetTall(140)
+	gains:SetFont("Trebuchet24")
+	gains:SetColor(orange_color)
+	gains:SetText([[
+	● Proper weapons
+	● More CPs (criminal points) and coins
+	● Skills and boosts
+	● Vehicles
+	● Items
+	● Chaos >:)]])
+
+	local info_header = self:Add("DLabel")
+	info_header:SetText("Server Info")
+	info_header:Dock(TOP)
+	info_header:SetFont("Trebuchet24")
+	info_header:DockMargin(5, 15, 5, 5)
+
+	local btn_join = self:Add("DButton")
+	btn_join:SetText("Join")
+	btn_join:SetFont("Trebuchet24")
+	btn_join:SetColor(color_white)
+	btn_join:SetPos(80, self:GetTall() - 60)
+	btn_join:SetSize(150, 30)
+	function btn_join:Paint(w, h)
+		surface.SetDrawColor(122, 219, 105)
+		surface.DrawRect(0, 0, w, h)
+
+		if self:IsHovered() then
+			surface.SetDrawColor(color_white)
+			surface.DrawOutlinedRect(0, 0, w, h, 2)
+		end
+	end
+
+	function btn_join:DoClick()
+		on_join()
+	end
+
+	local btn_remain = self:Add("DButton")
+	btn_remain:SetText("Remain Here")
+	btn_remain:SetFont("Trebuchet24")
+	btn_remain:SetColor(color_white)
+	btn_remain:SetPos(270, self:GetTall() - 60)
+	btn_remain:SetSize(150, 30)
+	function btn_remain:Paint(w, h)
+		surface.SetDrawColor(219, 105, 105)
+		surface.DrawRect(0, 0, w, h)
+
+		if self:IsHovered() then
+			surface.SetDrawColor(color_white)
+			surface.DrawOutlinedRect(0, 0, w, h, 2)
+		end
+	end
+end
+
+function PANEL:SetData(player_count, max_players, map_name)
+	local info_map = self:Add("DLabel")
+	info_map:SetText("Map: " .. map_name)
+	info_map:Dock(TOP)
+	info_map:SetFont("Trebuchet24")
+	info_map:DockMargin(20, 5, 5, 5)
+
+	local info_players = self:Add("DLabel")
+	info_players:SetText(("Players: %d/%d"):format(player_count + 1, max_players))
+	info_players:Dock(TOP)
+	info_players:SetFont("Trebuchet24")
+	info_players:DockMargin(20, 5, 5, 5)
+end
+
+vgui.Register("mta_join", PANEL, "DFrame")
+
 hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 	if is_wanted then return end
 	if ply ~= LocalPlayer() then return end
 	if waiting_server then return end
 	if gm_request and gm_request:IsHostServer() then return end
+	if ply:GetNWInt("MTAFactor") <= 1 then return end -- dont bother if its a player mistake
 
-	Derma_Query(
-		"Looks like you're enjoying MTA, do you wish to join the dedicated MTA server? (we have guns, pvp and a gamemode :eyes:)",
-		"MTA",
-		"Join", on_join,
-		"Remain here", function() end
-	)
+	http.Fetch(MTA_CONFIG.core.GMInfoAPI .. MTA_CONFIG.core.GMServerID, function(body)
+		local data = util.JSONToTable(body)
+		local player_count = data and #data.players or 1
+		local max_player_count = data and data.serverinfo and data.serverinfo.maxplayers or 123
+		local map_name = data and data.serverinfo and data.serverinfo.map or "unknown"
+
+		local panel = vgui.Create("mta_join")
+		panel:Center()
+		panel:MakePopup()
+		panel:SetData(player_count, max_player_count, map_name)
+	end, function()
+		-- errored, but still display the prompt
+		local panel = vgui.Create("mta_join")
+		panel:Center()
+		panel:MakePopup()
+		panel:SetData(1, 123, "unknown")
+	end)
+
 end)

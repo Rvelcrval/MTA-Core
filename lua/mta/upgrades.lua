@@ -142,11 +142,11 @@ if SERVER then
 
 		local chat_print_args = IS_MTA_GM
 			and { ", you can spend them with the ", new_value_color, "dealer." }
-			or { ", you can spend them on ", new_value_color, "server #3", color_white, " with the ", new_value_color, "dealer." }
+			or { ", you can spend them on ", new_value_color, "the MTA server", color_white, " with the ", new_value_color, "dealer." }
 		MTA.ChatPrint(ply, color_white, "You've earned ", new_value_color, amount .. " criminal points",
 			total_value_color, (" (Total: %d)"):format(total_points), color_white, unpack(chat_print_args))
 		if not IS_MTA_GM then
-			MTA.ChatPrint(ply, total_value_color, "Type !goto 3 to join the MTA server")
+			MTA.ChatPrint(ply, total_value_color, "Type \"!goto mta\" to join the MTA server!")
 		end
 
 		return total_points
