@@ -102,6 +102,7 @@ function PANEL:Init()
 
 	local gains = self:Add("DLabel")
 	gains:Dock(TOP)
+	gains:DockMargin(20, 5, 5, 5)
 	gains:SetWrap(true)
 	gains:SetTall(140)
 	gains:SetFont("Trebuchet24")
