@@ -43,10 +43,11 @@ if SERVER then
 		dmg_info:SetDamageType(DMG_SHOCK)
 
 		for _, ent in ipairs(ents.FindInSphere(shockwave:GetPos(), DISTANCE)) do
+			if not ent:IsNPC() then continue end
 			if ent:GetClass() == "npc_manhack" then
 				ent:TakeDamageInfo(dmg_info)
 			elseif ent:GetNWBool("MTACombine") then
-				local wep = ent:GetActiveWeapon()
+				local wep = ent.GetActiveWeapon and ent:GetActiveWeapon()
 				if IsValid(wep) then
 					ent.MTAEMP = true
 					timer.Simple(INTERVAL / 2, function()
