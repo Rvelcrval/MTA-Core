@@ -45,6 +45,15 @@ if SERVER then
 		for _, ent in ipairs(ents.FindInSphere(shockwave:GetPos(), DISTANCE)) do
 			if ent:GetClass() == "npc_manhack" then
 				ent:TakeDamageInfo(dmg_info)
+			elseif ent:GetNWBool("MTACombine") then
+				local wep = ent:GetActiveWeapon()
+				if IsValid(wep) then
+					ent.MTAEMP = true
+					timer.Simple(INTERVAL / 2, function()
+						if not IsValid(ent) then return end
+						ent.MTAEMP = nil
+					end)
+				end
 			end
 		end
 
@@ -85,6 +94,10 @@ if SERVER then
 				MTA.Statuses.RemoveStatus(ply, "emp")
 			end
 		end
+	end)
+
+	hook.Add("EntityFireBullets", "MTASkill_MobileEMP", function(ent)
+		if ent:GetNWBool("MTACombine") and ent.MTAEMP then return false end
 	end)
 end
 

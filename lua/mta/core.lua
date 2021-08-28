@@ -271,6 +271,9 @@ if SERVER then
 		hunters = function()
 			return ents.Create("npc_hunter")
 		end,
+		manhacks = function()
+			return ents.Create("npc_manhack")
+		end,
 	}
 
 	function MTA.TrySpawnCombine(target, pos)
@@ -280,8 +283,12 @@ if SERVER then
 		-- under 10 -> only metrocops
 		local spawn_function = combine_types.metrocops
 
+		-- manhacks drop crucial parts, so they need to constantly spawn
+		if IS_MTA_GM and math.random(0, 100) <= 10 then
+			spawn_function = combine_types.manhacks
+
 		-- 10 to 60 -> metrocops and soldiers that become more and more common
-		if wanted_lvl < 60 and wanted_lvl >= 10 then
+		elseif wanted_lvl < 60 and wanted_lvl >= 10 then
 			spawn_function = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
 
 		-- 60 - 80 -> only elites
