@@ -110,12 +110,21 @@ if SERVER then
 end
 
 if CLIENT then
-	local MTA_PAYDAY = CreateClientConVar("mta_payday", "1", true, false, "Enable the payday assault")
+	local MTA_SONGS = CreateClientConVar("mta_songs", "1", true, false, "Enable MTA songs")
+	local MTA_SONGS_VOLUME = CreateClientConVar("mta_songs_volume", "0.65", true, false, "MTA songs volume")
 
 	local BASE_SONG_AMOUNT = 14
-	local SONG_VOLUME = 0.65
-	local WIDTH = ScrW() * 0.24
+	local SONG_VOLUME = MTA_SONGS_VOLUME:GetFloat()
+	--local WIDTH = ScrW() * 0.24
 	local is_assault = false
+
+	cvars.RemoveChangeCallback("mta_songs", "mta_songs_volume") -- for reloading
+	cvars.AddChangeCallback("mta_songs_volume", function()
+		SONG_VOLUME = MTA_SONGS_VOLUME:GetFloat()
+		if IsValid(MTA.SongStation) then
+			MTA.SongStation:SetVolume(SONG_VOLUME)
+		end
+	end, "mta_songs_volume")
 
 	file.CreateDir("mta")
 	local function get_custom_content(url, name, cb)
@@ -159,7 +168,7 @@ if CLIENT then
 		end
 	end)
 
-	local PANEL = {}
+	--[[local PANEL = {}
 	function PANEL:Init()
 		self:SetSize(WIDTH, ScrH() * 0.06)
 		self:SetPos(ScrW() - WIDTH, 0)
@@ -272,11 +281,11 @@ if CLIENT then
 
 		self.icon = icon
 	end
-	vgui.Register("payday_assault", PANEL, "EditablePanel")
+	vgui.Register("payday_assault", PANEL, "EditablePanel")]]--
 
-	local payday_assault
+	--local payday_assault
 	local function start_assault(song_file_name)
-		if not IsValid(payday_assault) then
+		--[[if not IsValid(payday_assault) then
 			payday_assault = vgui.Create("payday_assault")
 
 			_G.payday_assault = payday_assault
@@ -287,7 +296,7 @@ if CLIENT then
 		icon.should_draw = true
 		icon.material = Material("mta/policeassault_icon.png")
 		icon.flash_amount = 10
-		icon.last_flash = 0
+		icon.last_flash = 0]]--
 
 		if IsValid(MTA.SongStation) then
 			MTA.SongStation:Stop()
@@ -313,13 +322,13 @@ if CLIENT then
 	end
 
 	local function end_assault(instant)
-		if IsValid(payday_assault) then
+		--[[if IsValid(payday_assault) then
 			payday_assault:HideText()
 
 			if instant then
 				payday_assault.size = nil
 			end
-		end
+		end]]--
 
 		is_assault = nil
 
@@ -368,7 +377,7 @@ if CLIENT then
 			return end_assault()
 		end
 
-		if not MTA_PAYDAY:GetBool() then return end
+		if not MTA_SONGS:GetBool() then return end
 
 		if not on_going_assault() and is_wanted then
 			fetch_song()
