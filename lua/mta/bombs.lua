@@ -170,8 +170,11 @@ if SERVER then
 						campers[ply] = nil -- reset for next run
 					end
 				else
-					MTA.Statuses.RemoveStatus(ply, "tp_bomb")
-					ply.MTATpBombWarned = nil
+					if IS_MTA_GM then
+						MTA.Statuses.RemoveStatus(ply, "tp_bomb")
+						ply.MTATpBombWarned = nil
+					end
+
 					campers[ply] = {
 						LastPos = pos,
 						Times = 0
