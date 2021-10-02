@@ -1,10 +1,71 @@
 local TAG = "MTAHalloween"
 
+local coefs = {
+	["player"] = {
+		["kill_coef"] = 2.5,
+		["damage_coef"] = 0,
+	},
+	["npc_manhack"] = {
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.75,
+	},
+	["lua_npc"] = {
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.5,
+	},
+	["lua_npc_wander"] = {
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.5,
+	},
+	["npc_combine_s"] = {
+		["kill_coef"] = 1.5,
+		["damage_coef"] = 1,
+	},
+	["npc_metropolice"] = {
+		["kill_coef"] = 1.5,
+		["damage_coef"] = 1,
+	},
+	["npc_zombie"] = {
+		["kill_coef"] = 1.5,
+		["damage_coef"] = 1,
+	},
+	["npc_poisonzombie"] = {
+		["kill_coef"] = 1.5,
+		["damage_coef"] = 1,
+	},
+	["npc_fastzombie"] = {
+		["kill_coef"] = 1.5,
+		["damage_coef"] = 1,
+	},
+	["npc_zombine"] = {
+		["kill_coef"] = 1.5,
+		["damage_coef"] = 1,
+	},
+	["npc_headcrab"] = {
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.75,
+	},
+	["npc_headcrab_black"] = {
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.75,
+	},
+	["npc_headcrab_fast"] = {
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.75,
+	},
+}
+
 local is_halloween = false
 local function check_halloween()
 	-- dont enable on MTA gamemode, we can make this infinitely better,
 	-- this is just a tiny easter egg thing
 	is_halloween = os.date("%m") == "10" and not IS_MTA_GM
+
+	if is_halloween then
+		MTA.Coeficients = coefs
+	else
+		MTA.Coeficients = MTA_CONFIG.core.Coeficients
+	end
 end
 
 timer.Create(TAG, 60, 0, check_halloween)
@@ -55,6 +116,33 @@ if SERVER then
 			local candy = CreateCandy(npc:WorldSpaceCenter(), Angle(0, 0, 0))
 			candy:SetVelocity(VectorRand() * 100)
 		end
+	end)
+
+	local headcrab_classes = {
+		npc_headcrab = true,
+		npc_headcrab_black = true,
+		npc_headcrab_fast = true,
+	}
+	hook.Add("OnEntityCreated", tag, function(ent)
+		if not is_halloween then return end
+		if not headcrab_classes[ent:GetClass()] then return end
+
+		-- cant do it right away, its too early
+		timer.Simple(1, function()
+			if not IsValid(ent) then return end
+			if ent.CPPIGetOwner and IsValid(ent:CPPIGetOwner()) then return end
+			if #MTA.BadPlayers == 0 then return end
+
+			local target = MTA.BadPlayers[math.random(#MTA.BadPlayers)]
+			if IsValid(target) then
+				MTA.SetupCombine(ent, target, MTA.BadPlayers)
+			end
+
+			table.insert(MTA.Combines, ent)
+			ent:SetNWBool("MTACombine", true)
+			ent.ms_notouch = true
+			MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
+		end)
 	end)
 end
 
