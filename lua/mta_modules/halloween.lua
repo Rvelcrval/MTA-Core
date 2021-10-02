@@ -129,9 +129,10 @@ if SERVER then
 		if attacker:IsPlayer() then
 			if not GiveCandy then return end
 
+			local origin_pos = npc:WorldSpaceCenter()
 			timer.Create(("%s_DROP_%d"):format(TAG, npc:EntIndex()), 0.25, candy_count, function()
 				local candy = ents.Create("sent_candy")
-				candy:SetPos(npc:WorldSpaceCenter())
+				candy:SetPos(origin_pos)
 				candy:SetAngles(Angle(0,0,0))
 				candy.AllowCollect = false
 
