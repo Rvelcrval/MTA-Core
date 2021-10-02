@@ -7,10 +7,6 @@ local MINIMUM_LEVEL = MTA_CONFIG.bounties.MinimumLevel
 local MAX_BOUNTIES_PER_HUNTER = MTA_CONFIG.bounties.MaxBountiesPerHunter
 local TIME_TO_BOUNTY_REFRESH = MTA_CONFIG.bounties.TimeToBountyRefresh
 
-local color_white = Color(255, 255, 255)
-local header_col = Color(250, 58, 60)
-local green_col = Color(58, 252, 113)
-
 if SERVER then
 	util.AddNetworkString(NET_MTA_BOUNTIES)
 	util.AddNetworkString(NET_MTA_ACCEPT_BOUNTY)
@@ -77,7 +73,7 @@ if SERVER then
 		if wanted_level < (MINIMUM_LEVEL + (MTA.GetPlayerStat(ply, "prestige_level") * 10)) then return end
 		if bounties[ply] then return end
 
-		MTA.ChatPrint(ply, "A bounty has been ", header_col, "issued for you!")
+		MTA.ChatPrint(ply, "A bounty has been ", MTA.OldValueColor, "issued for you!")
 		bounties[ply] = true
 		net.Start(NET_MTA_BOUNTIES)
 		net.WriteEntity(ply)
@@ -93,10 +89,10 @@ if SERVER then
 		end
 
 		if was_hunted then
-			MTA.ChatPrint(filter, bounty, color_white, "'s bounty was claimed by ", hunter, color_white,
-				" for ", green_col, ("%d criminal points"):format(points_earned))
+			MTA.ChatPrint(filter, bounty, MTA.TextColor, "'s bounty was claimed by ", hunter, MTA.TextColor,
+				" for ", MTA.NewValueColor, ("%d criminal points"):format(points_earned))
 		else
-			MTA.ChatPrint(filter, bounty, color_white, "'s bounty was ", header_col, "cleared", color_white, " by the police")
+			MTA.ChatPrint(filter, bounty, MTA.TextColor, "'s bounty was ", MTA.OldValueColor, "cleared", MTA.TextColor, " by the police")
 		end
 	end
 
@@ -104,8 +100,8 @@ if SERVER then
 		-- the bounty gains points for killing its hunters
 		if hunters[ply] and table.HasValue(hunters[ply], atck) then
 			MTA.GivePoints(atck, 15)
-			MTA.ChatPrint(ply, "You have ", header_col, "failed", color_white, " to collect the bounty for ", atck,
-				color_white, " you can try again in ", green_col, "30s")
+			MTA.ChatPrint(ply, "You have ", MTA.OldValueColor, "failed", MTA.TextColor, " to collect the bounty for ", atck,
+				MTA.TextColor, " you can try again in ", MTA.NewValueColor, "30s")
 			finish_bounty(ply)
 
 			timer.Simple(30, function()
@@ -197,7 +193,7 @@ if SERVER then
 		if not IsValid(target) then return end
 
 		if blocked_hunters[ply:SteamID()] then
-			MTA.ChatPrint(ply, "Bounty quota ", header_col, "exceeded", color_white, " try again in ", green_col, "2 hours")
+			MTA.ChatPrint(ply, "Bounty quota ", MTA.OldValueColor, "exceeded", MTA.TextColor, " try again in ", MTA.NewValueColor, "2 hours")
 			return
 		end
 
@@ -210,7 +206,7 @@ if SERVER then
 		ply:Spawn()
 		hook.Run("MTABountyHunterStateUpdate", ply, true)
 
-		MTA.ChatPrint(target, ply, color_white, " has accepted a bounty for your head!")
+		MTA.ChatPrint(target, ply, MTA.TextColor, " has accepted a bounty for your head!")
 	end)
 end
 
@@ -238,8 +234,8 @@ if CLIENT then
 		clear_invalid_bounties()
 
 		local bind = (input.LookupBinding("+menu_context", true) or "c"):upper()
-		chat.AddText(header_col, "[MTA] ", bounty, color_white, " has become a ", green_col, "valuable target!", color_white,
-			" Accept the bounty in the ", green_col, ("context menu [PRESS %s]"):format(bind), color_white, " to get ", green_col, "points and coins!")
+		chat.AddText(MTA.OldValueColor, "[MTA] ", bounty, MTA.TextColor, " has become a ", MTA.NewValueColor, "valuable target!", MTA.TextColor,
+			" Accept the bounty in the ", MTA.NewValueColor, ("context menu [PRESS %s]"):format(bind), MTA.TextColor, " to get ", MTA.NewValueColor, "points and coins!")
 	end)
 
 	net.Receive(NET_MTA_REMOVE_BOUNTY, function()
@@ -280,13 +276,13 @@ if CLIENT then
 
 			local btn_accept = frame:Add("DButton")
 			btn_accept:SetText("Hunt")
-			btn_accept:SetTextColor(color_white)
+			btn_accept:SetTextColor(MTA.TextColor)
 			btn_accept:Dock(TOP)
 			btn_accept:DockMargin(5, 5, 5, 5)
 
 			local label_gains = frame:Add("DLabel")
 			label_gains:SetText(("Potential Gains: %dpts"):format(math.ceil(bounty:GetNWInt("MTAFactor") * 0.8) * (1 + bounty:GetNWInt("MTAStat_prestige_level"))))
-			label_gains:SetTextColor(Color(244, 135, 2))
+			label_gains:SetTextColor(MTA.PrimaryColor)
 			label_gains:Dock(TOP)
 			label_gains:DockPadding(10, 10, 10, 10)
 			label_gains:DockMargin(5, 5, 5, 5)
@@ -305,7 +301,7 @@ if CLIENT then
 				table.RemoveByValue(bounties, bounty)
 
 				frame:Close()
-				chat.AddText(header_col, "[MTA] ", color_white, "You have ", green_col, "accepted", color_white, " the bounty for ", bounty)
+				chat.AddText(MTA.OldValueColor, "[MTA] ", MTA.TextColor, "You have ", MTA.NewValueColor, "accepted", MTA.TextColor, " the bounty for ", bounty)
 			end
 
 			cur_x = cur_x + frame:GetWide() + 20
@@ -345,13 +341,12 @@ if CLIENT then
 		return ret
 	end
 
-	local red_color = Color(255, 0, 0)
 	hook.Add("HUDPaint", tag, function()
 		if not MTA.IsWanted() then return end
 
 		for _, ply in ipairs(player.GetAll()) do
 			if is_player_hunter(ply) then
-				MTA.HighlightEntity(ply, "/// BOUNTY HUNTER ///", red_color)
+				MTA.HighlightEntity(ply, "/// BOUNTY HUNTER ///", MTA.DangerColor)
 			end
 		end
 	end)

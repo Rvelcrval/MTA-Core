@@ -2,9 +2,6 @@ if IS_MTA_GM then return end
 if SERVER then return end
 
 local tag = "mta_wait"
-local orange_color = Color(244, 135, 2)
-local white_color = Color(255, 255, 255)
-local green_color = Color(0, 255, 0)
 local waiting_server = false
 local waiting_error = ""
 local function on_join()
@@ -46,7 +43,7 @@ local function on_join()
 
 		surface.SetDrawColor(0,0,0,150)
 		surface.DrawRect(x, y, w, h)
-		surface.SetDrawColor(orange_color)
+		surface.SetDrawColor(MTA.PrimaryColor)
 		surface.DrawOutlinedRect(x, y, w, h, 2)
 
 		local text
@@ -66,7 +63,7 @@ local function on_join()
 		end
 
 		surface.SetFont("DermaLarge")
-		surface.SetTextColor(white_color)
+		surface.SetTextColor(MTA.TextColor)
 
 		local tw, th = surface.GetTextSize(text)
 		surface.SetTextPos(x + (w / 2 - tw / 2), y + (h / 2 - th / 2))
@@ -90,7 +87,7 @@ function PANEL:Init()
 	header:SetWrap(true)
 	header:SetFont("Trebuchet24")
 	header:SetTall(100)
-	header:SetColor(green_color)
+	header:SetColor(MTA.NewValueColor)
 	header:SetText("Looks like you're causing chaos in the lobby. "
 		.. "Our forces tried to/stopped you. Would you like to join the server where you have an actual chance to fight back?")
 
@@ -106,7 +103,7 @@ function PANEL:Init()
 	gains:SetWrap(true)
 	gains:SetTall(140)
 	gains:SetFont("Trebuchet24")
-	gains:SetColor(orange_color)
+	gains:SetColor(MTA.PrimaryColor)
 	gains:SetText([[
 	● Proper weapons
 	● More CPs (criminal points) and coins
@@ -124,15 +121,15 @@ function PANEL:Init()
 	local btn_join = self:Add("DButton")
 	btn_join:SetText("Join")
 	btn_join:SetFont("Trebuchet24")
-	btn_join:SetColor(color_white)
+	btn_join:SetColor(MTA.TextColor)
 	btn_join:SetPos(80, self:GetTall() - 60)
 	btn_join:SetSize(150, 30)
 	function btn_join:Paint(w, h)
-		surface.SetDrawColor(122, 219, 105)
+		surface.SetDrawColor(MTA.NewValueColor)
 		surface.DrawRect(0, 0, w, h)
 
 		if self:IsHovered() then
-			surface.SetDrawColor(color_white)
+			surface.SetDrawColor(MTA.TextColor)
 			surface.DrawOutlinedRect(0, 0, w, h, 2)
 		end
 	end
@@ -144,15 +141,15 @@ function PANEL:Init()
 	local btn_remain = self:Add("DButton")
 	btn_remain:SetText("Remain Here")
 	btn_remain:SetFont("Trebuchet24")
-	btn_remain:SetColor(color_white)
+	btn_remain:SetColor(MTA.TextColor)
 	btn_remain:SetPos(270, self:GetTall() - 60)
 	btn_remain:SetSize(150, 30)
 	function btn_remain:Paint(w, h)
-		surface.SetDrawColor(219, 105, 105)
+		surface.SetDrawColor(MTA.OldValueColor)
 		surface.DrawRect(0, 0, w, h)
 
 		if self:IsHovered() then
-			surface.SetDrawColor(color_white)
+			surface.SetDrawColor(MTA.TextColor)
 			surface.DrawOutlinedRect(0, 0, w, h, 2)
 		end
 	end

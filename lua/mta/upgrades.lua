@@ -25,8 +25,6 @@ CREATE TABLE mta_stats (
 )
 ]]--
 
-local color_white = Color(255, 255, 255)
-
 local valid_stats = {
 	criminal_count = 0,
 	points = 0,
@@ -92,8 +90,6 @@ if SERVER then
 		return cur_value
 	end
 
-	local old_value_color = Color(252, 71, 58)
-	local new_value_color = Color(58, 252, 113)
 	local old_values = {}
 	function MTA.IncreasePlayerStat(ply, stat_name, amount, should_log)
 		if not IsValid(ply) then return -1 end
@@ -115,7 +111,7 @@ if SERVER then
 		timer.Create(log_name, 5, 1, function()
 			if should_log then
 				local log_func = metalog and function(...) metalog.infoColor("MTA", nil, ...) end or function(...) Msg("[MTA] ") MsgC(...) Msg("\n") end
-				log_func(color_white, ("%s %s: "):format(ply, stat_name), old_value_color, old_values[log_name], color_white, " -> ", new_value_color, new_value)
+				log_func(MTA.TextColor, ("%s %s: "):format(ply, stat_name), MTA.OldValueColor, old_values[log_name], MTA.TextColor, " -> ", MTA.NewValueColor, new_value)
 			end
 
 			old_values[log_name] = nil
@@ -133,7 +129,6 @@ if SERVER then
 		end
 	end)
 
-	local total_value_color = Color(200, 200, 200)
 	function MTA.GivePoints(ply, amount)
 		if amount < 2 then return end
 
@@ -141,12 +136,12 @@ if SERVER then
 		if total_points == -1 then return -1 end
 
 		local chat_print_args = IS_MTA_GM
-			and { ", you can spend them with the ", new_value_color, "dealer." }
-			or { ", you can spend them on ", new_value_color, "the MTA server", color_white, " with the ", new_value_color, "dealer." }
-		MTA.ChatPrint(ply, color_white, "You've earned ", new_value_color, amount .. " criminal points",
-			total_value_color, (" (Total: %d)"):format(total_points), color_white, unpack(chat_print_args))
+			and { ", you can spend them with the ", MTA.NewValueColor, "dealer." }
+			or { ", you can spend them on ", MTA.NewValueColor, "the MTA server", MTA.TextColor, " with the ", MTA.NewValueColor, "dealer." }
+		MTA.ChatPrint(ply, MTA.TextColor, "You've earned ", MTA.NewValueColor, amount .. " criminal points",
+			MTA.AdditionalValueColor, (" (Total: %d)"):format(total_points), MTA.TextColor, unpack(chat_print_args))
 		if not IS_MTA_GM then
-			MTA.ChatPrint(ply, total_value_color, "Type \"!goto mta\" to join the MTA server!")
+			MTA.ChatPrint(ply, MTA.AdditionalValueColor, "Type \"!goto mta\" to join the MTA server!")
 		end
 
 		return total_points
@@ -379,7 +374,7 @@ if SERVER then
 			MTA.IncreasePlayerStat(ply, stat_name, -MTA.GetPlayerStat(ply, stat_name), true)
 		end
 
-		MTA.ChatPrint(player.GetAll(), ply, "'s ", new_value_color, "Criminal Prestige", color_white, " is growing! ", total_value_color, ("(Prestige Level %d)"):format(new_prestige))
+		MTA.ChatPrint(player.GetAll(), ply, "'s ", MTA.NewValueColor, "Criminal Prestige", MTA.TextColor, " is growing! ", MTA.AdditionalValueColor, ("(Prestige Level %d)"):format(new_prestige))
 		timer.Simple(0, function()
 			net.Start(NET_PRESTIGE)
 			net.WriteEntity(ply)
@@ -407,8 +402,6 @@ if CLIENT then
 	end
 
 	do -- prestige popup UI
-		local green_color = Color(0, 255, 0)
-		local red_color = Color(255, 0, 0)
 		local PANEL = {}
 
 		function PANEL:Init()
@@ -425,7 +418,7 @@ if CLIENT then
 			gains:DockMargin(20, 5, 5, 5)
 			gains:SetWrap(true)
 			gains:SetTall(75)
-			gains:SetColor(green_color)
+			gains:SetColor(MTA.NewValueColor)
 			gains:SetText([[
 			● A lower chance to be hunted by other players
 			● An additional custom song slot (available at the jukebox)
@@ -442,7 +435,7 @@ if CLIENT then
 			losses:DockMargin(20, 5, 5, 5)
 			losses:SetWrap(true)
 			losses:SetTall(75)
-			losses:SetColor(red_color)
+			losses:SetColor(MTA.OldValueColor)
 			losses:SetText([[
 			● Your points
 			● Your weapons
@@ -453,7 +446,7 @@ if CLIENT then
 			local btn_prestige = self:Add("DButton")
 			btn_prestige:SetText("Prestige Up")
 			btn_prestige:SetFont("Trebuchet24")
-			btn_prestige:SetColor(color_white)
+			btn_prestige:SetColor(MTA.TextColor)
 			btn_prestige:SetPos(80, self:GetTall() - 60)
 			btn_prestige:SetSize(150, 30)
 			function btn_prestige:Paint(w, h)
@@ -461,7 +454,7 @@ if CLIENT then
 				surface.DrawRect(0, 0, w, h)
 
 				if self:IsHovered() then
-					surface.SetDrawColor(color_white)
+					surface.SetDrawColor(MTA.TextColor)
 					surface.DrawOutlinedRect(0, 0, w, h, 2)
 				end
 			end
@@ -474,7 +467,7 @@ if CLIENT then
 			local btn_cancel = self:Add("DButton")
 			btn_cancel:SetText("Cancel")
 			btn_cancel:SetFont("Trebuchet24")
-			btn_cancel:SetColor(color_white)
+			btn_cancel:SetColor(MTA.TextColor)
 			btn_cancel:SetPos(270, self:GetTall() - 60)
 			btn_cancel:SetSize(150, 30)
 			function btn_cancel:Paint(w, h)
@@ -482,7 +475,7 @@ if CLIENT then
 				surface.DrawRect(0, 0, w, h)
 
 				if self:IsHovered() then
-					surface.SetDrawColor(color_white)
+					surface.SetDrawColor(MTA.TextColor)
 					surface.DrawOutlinedRect(0, 0, w, h, 2)
 				end
 			end
@@ -524,7 +517,7 @@ if CLIENT then
 				btn:Dock(RIGHT)
 				btn:DockMargin(5, 5, 5, 5)
 				btn:SetText(action)
-				btn:SetTextColor(color_white)
+				btn:SetTextColor(MTA.TextColor)
 				btn:SetWide(125)
 				btn.DoClick = callback
 				btn.Description = label
@@ -608,7 +601,7 @@ if CLIENT then
 		if not bind then return end
 
 		local text = ("/// Dealer [%s] ///"):format(bind)
-		MTA.ManagedHighlightEntity(dealer_npc, text, color_white)
+		MTA.ManagedHighlightEntity(dealer_npc, text, MTA.TextColor)
 	end)
 
 	net.Receive(NET_MTA_GUI, function()
@@ -618,7 +611,6 @@ if CLIENT then
 
 	local CANNON_AMT = 50
 	local PARTICLES_AMT = 25
-	local orange_color = Color(244, 135, 2)
 	local function do_prestige_effects(ply)
 		local beam_point_origin_1 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
 		beam_point_origin_1:SetNoDraw(true)
@@ -657,7 +649,7 @@ if CLIENT then
 			for i = 1, PARTICLES_AMT do
 			local part = emitter:Add("sprites/light_glow02_add", center + Vector(math.sin(i / PARTICLES_AMT * 2 * math.pi), math.cos(i / PARTICLES_AMT * 2 * math.pi), 0) * 50)
 				if part then
-					local c = orange_color
+					local c = MTA.PrimaryColor
 					part:SetColor(c.r, c.g, c.b, c.a)
 					part:SetVelocity(Vector(0, 0, 100))
 					part:SetDieTime(3)

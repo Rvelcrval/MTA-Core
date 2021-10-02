@@ -55,7 +55,6 @@ if CLIENT then
 		{ Model = "models/props_c17/tools_wrench01a.mdl", Position = Vector(-1, 5, 30), Angle = Angle(75, 90, -90) }
 	}
 
-	local color_white = Color(255, 255, 255)
 	local verb = L"Customize Shield"
 	function ENT:Initialize()
 		self.Models = {}
@@ -71,7 +70,7 @@ if CLIENT then
 		if not bind then return end
 
 		local text = ("/// %s [%s] ///"):format(verb, bind)
-		MTA.RegisterEntityForHighlight(self, text, color_white)
+		MTA.RegisterEntityForHighlight(self, text, MTA.TextColor)
 	end
 
 	function ENT:OnRemove()
@@ -169,7 +168,7 @@ if CLIENT then
 		Base = "DPanel"
 	}
 	function PIXEL_EDITOR:Init()
-		self.ActiveColor = Color(255, 0, 0)
+		self.ActiveColor = MTA.DangerColor
 		self.TextureResolutionX = CUSTOM_TEXTURE_WIDTH
 		self.TextureResolutionY = CUSTOM_TEXTURE_HEIGHT
 		self.ZoomLevel = 1

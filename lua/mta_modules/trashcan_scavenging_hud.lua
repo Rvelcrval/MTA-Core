@@ -44,7 +44,7 @@ hook.Add("HUDPaint", "trashcans", function()
 			})
 
 			if tr.HitPos:DistToSqr(pos) < hit_pos_distance then
-				MTA.HighlightPosition(pos, text, color_white)
+				MTA.HighlightPosition(pos, text, MTA.TextColor)
 			end
 		end
 	end

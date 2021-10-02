@@ -55,14 +55,13 @@ if CLIENT then
 	pcall(include, "autorun/translation.lua")
 	local L = translation and translation.L or function(s) return s end
 
-	local color_white = Color(255, 255, 255)
 	local verb = L "Jukebox"
 	function ENT:Initialize()
 		local bind = MTA.GetBindKey("+use")
 		if not bind then return end
 
 		local text = ("/// %s [%s] ///"):format(verb, bind)
-		MTA.RegisterEntityForHighlight(self, text, color_white)
+		MTA.RegisterEntityForHighlight(self, text, MTA.TextColor)
 	end
 
 	file.CreateDir("mta")
@@ -116,7 +115,7 @@ if CLIENT then
 		local songs_combobox = songs:Add("DComboBox")
 		songs_combobox:SetSize(300, 20)
 		songs_combobox:SetPos(10, 50)
-		songs_combobox:SetTextColor(Color(255, 255, 255))
+		songs_combobox:SetTextColor(MTA.TextColor)
 		songs_combobox:SetSortItems(false)
 
 		local custom_songs_amount = #MTA.Songs
@@ -137,7 +136,7 @@ if CLIENT then
 		local songs_preview_btn = songs:Add("DButton")
 		songs_preview_btn:SetSize(60, 20)
 		songs_preview_btn:SetPos(330, 50)
-		songs_preview_btn:SetTextColor(color_white)
+		songs_preview_btn:SetTextColor(MTA.TextColor)
 		songs_preview_btn:SetText("PREVIEW")
 		local preview_is_playing = false
 		local is_loading = false
@@ -178,7 +177,7 @@ if CLIENT then
 		local songs_remove_btn = songs:Add("DButton")
 		songs_remove_btn:SetSize(50, 20)
 		songs_remove_btn:SetPos(400, 50)
-		songs_remove_btn:SetTextColor(color_white)
+		songs_remove_btn:SetTextColor(MTA.TextColor)
 		songs_remove_btn:SetText("REMOVE")
 		function songs_remove_btn:DoClick()
 			local _, data = songs_combobox:GetSelected()
@@ -199,14 +198,14 @@ if CLIENT then
 		songs_customs_textentry:SetPlaceholderText("Type url here..") -- This didn't even work by itself so uhh
 		songs_customs_textentry:SetPaintBackground(false)
 		function songs_customs_textentry:Paint(w, h)
-			surface.SetDrawColor(255, 150, 0, 255)
+			surface.SetDrawColor(MTA.PrimaryColor)
 			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
 
 			if not self:HasFocus() and self:GetText():Trim() == "" then
 				self:SetText(self:GetPlaceholderText())
 			end
 
-			local col = (self:GetText() == self:GetPlaceholderText()) and Color(150, 150, 150) or Color(255, 255, 255)
+			local col = (self:GetText() == self:GetPlaceholderText()) and MTA.AdditionalValueColor or MTA.TextColor
 			self:SetTextColor(col)
 
 			derma.SkinHook("Paint", "TextEntry", self, w, h)
@@ -231,7 +230,7 @@ if CLIENT then
 		local songs_customs_add_btn = songs:Add("DButton")
 		songs_customs_add_btn:SetPos(330, 120)
 		songs_customs_add_btn:SetSize(40, 20)
-		songs_customs_add_btn:SetTextColor(color_white)
+		songs_customs_add_btn:SetTextColor(MTA.TextColor)
 		songs_customs_add_btn:SetText("ADD")
 		function songs_customs_add_btn:DoClick()
 			local url = songs_customs_textentry:GetText()
@@ -265,7 +264,7 @@ if CLIENT then
 			SMOOTH_DATA[I] = 0
 		end
 		function visualizer:Paint(w, h)
-			surface.SetDrawColor(100, 100, 100, 200)
+			surface.SetDrawColor(MTA.AdditionalValueColor)
 			surface.DrawOutlinedRect(0, 0, w, h, 3)
 
 			local station = IsValid(UI_STATION) and UI_STATION or MTA.SongStation
@@ -277,14 +276,14 @@ if CLIENT then
 					if FFT_DATA[I] then
 						SMOOTH_DATA[I] = Lerp(FrameTime() * 15, SMOOTH_DATA[I], FFT_DATA[I])
 
-						surface.SetDrawColor(255, 255, 255, 255)
+						surface.SetDrawColor(MTA.TextColor)
 						local height = math.min(SMOOTH_DATA[I] * 600, h - 6)
 						surface.DrawRect(3 + I * (w - 6) / COUNT - (w - 6) / COUNT, h - height - 3, w / COUNT + 1, height)
 					end
 				end
 			else
 				for I = 1, COUNT do
-					surface.SetDrawColor(255, 255, 255, 255)
+					surface.SetDrawColor(MTA.TextColor)
 					local height = math.min(math.abs(math.sin(CurTime() + I * 50) * 40), h - 6)
 					height = math.max(height, 10)
 					surface.DrawRect(3 + I * (w - 6) / COUNT - (w - 6) / COUNT, h - height - 3, w / COUNT + 1, height)

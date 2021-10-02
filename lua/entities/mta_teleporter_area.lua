@@ -141,13 +141,15 @@ if CLIENT then
 		local alpha = 50 + math.abs(math.sin(CurTime() * 3) * 150)
 		local pos = self:GetPos() - (self:GetForward()) * 100 - (self:GetRight() * 100)
 		cam.Start3D2D(pos, self:GetAngles(), 0.5)
-			surface.SetDrawColor(255, 0, 0, alpha)
+			local d_r, d_g, d_b = MTA.DangerColor:Unpack()
+
+			surface.SetDrawColor(d_r, d_g, d_b, alpha)
 			surface.DrawOutlinedRect(0, 0, 400, 400, 5)
 
-			surface.SetDrawColor(200, 0, 0, alpha - 150)
+			surface.SetDrawColor(d_r, d_g, d_b, alpha - 150)
 			surface.DrawRect(0, 0, 400, 400)
 
-			surface.SetTextColor(255, 0, 0, alpha)
+			surface.SetTextColor(d_r, d_g, d_b, alpha)
 			surface.SetFont("MTALargeFont")
 
 			local tw, th = surface.GetTextSize(text)

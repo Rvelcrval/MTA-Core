@@ -151,7 +151,6 @@ if SERVER then
 	local WARNING_DURATION = 20
 
 	local campers = {}
-	local red_color = Color(255, 0, 0)
 	timer.Create(tag, 1, 0, function()
 		for _, ply in ipairs(MTA.BadPlayers) do
 			if ply:IsValid() then
@@ -161,7 +160,7 @@ if SERVER then
 					camping_state.Times = camping_state.Times + 1
 
 					if IS_MTA_GM and not ply.MTATpBombWarned and camping_state.Times >= START_CAMPING_DURATION - WARNING_DURATION then
-						MTA.Statuses.AddStatus(ply, "tp_bomb", "Incoming Bomb", red_color, CurTime() + WARNING_DURATION)
+						MTA.Statuses.AddStatus(ply, "tp_bomb", "Incoming Bomb", MTA.DangerColor, CurTime() + WARNING_DURATION)
 						ply.MTATpBombWarned = true
 					end
 
@@ -235,12 +234,11 @@ if SERVER then
 end
 
 if CLIENT then
-	local red_color = Color(255, 0, 0)
 	hook.Add("HUDPaint", tag, function()
 		if not MTA.IsWanted() then return end
 		for _, bomb in ipairs(ents.FindByClass("grenade_helicopter")) do
 			if bomb:GetNWBool("MTABomb") then
-				MTA.HighlightEntity(bomb, "Teleported Bomb", red_color)
+				MTA.HighlightEntity(bomb, "Teleported Bomb", MTA.DangerColor)
 			end
 		end
 	end)

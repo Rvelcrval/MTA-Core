@@ -159,7 +159,7 @@ if CLIENT then
 					local tr = util.TraceLine(TOILET_TRACE)
 
 					if tr.HitPos:DistToSqr(toiletpos) < hit_pos_distance then
-						MTA.HighlightPosition(toiletpos - toilet:GetUp() * 30, ("/// Defecate [%s] ///"):format(bind), color_white)
+						MTA.HighlightPosition(toiletpos - toilet:GetUp() * 30, ("/// Defecate [%s] ///"):format(bind), MTA.TextColor)
 					end
 				end
 			end

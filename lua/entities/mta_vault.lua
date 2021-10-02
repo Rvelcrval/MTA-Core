@@ -235,9 +235,6 @@ if CLIENT then
 		return vault.CachedIndicatorCheck
 	end
 
-	--local black_color = Color(0, 0, 0, 150)
-	local red_color = Color(255, 0, 0)
-	local orange_color = Color(244, 135, 2)
 	local verb = L"Drill"
 	hook.Add("HUDPaint", tag, function()
 		if MTA.IsOptedOut() then return end
@@ -250,16 +247,16 @@ if CLIENT then
 				if not vault:GetNWBool("Drilling", false) then
 					if IS_MTA_GM and not MTA.Inventory.HasItem(LocalPlayer(), "drill", 1) then
 						local text = ("/// You don't have a drill! ///"):format(verb, bind)
-						MTA.HighlightEntity(vault, text, red_color)
+						MTA.HighlightEntity(vault, text, MTA.DangerColor)
 					else
 						local text = ("/// %s [%s] ///"):format(verb, bind)
-						MTA.HighlightEntity(vault, text, orange_color)
+						MTA.HighlightEntity(vault, text, MTA.PrimaryColor)
 					end
 				else
 					local driller = vault:GetNWEntity("DrillingPlayer", NULL)
 					local driller_nick = IsValid(driller) and UndecorateNick(driller:Nick()) or "???"
 					local text = ("/// %s's %s: %d%% ///"):format(driller_nick, verb, vault:GetNWInt("DrillingProgress", 0))
-					MTA.HighlightEntity(vault, text, orange_color)
+					MTA.HighlightEntity(vault, text, MTA.PrimaryColor)
 				end
 			end
 		end

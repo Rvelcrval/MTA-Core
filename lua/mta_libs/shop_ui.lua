@@ -70,11 +70,13 @@ local proper_stat_names = {
 local stat_height_margin = 10
 local stat_width_margin = 20
 function PANEL:PaintOver(w, h)
+    local p_r, p_g, p_b = MTA.PrimaryColor:Unpack()
+
     local current_width = 0
     local i = 1
     for stat_name, proper_name in pairs(proper_stat_names) do
         surface.SetFont("DermaDefault")
-        surface.SetTextColor(244, 135, 2)
+        surface.SetTextColor(p_r, p_g, p_b)
 
         local text = ("%s: %d"):format(proper_name, MTA.GetPlayerStat(stat_name))
         local tw, th = surface.GetTextSize(text)
@@ -85,10 +87,10 @@ function PANEL:PaintOver(w, h)
         i = i + 1
     end
 
-    surface.SetDrawColor(244, 135, 2)
+    surface.SetDrawColor(p_r, p_g, p_b)
     surface.DrawOutlinedRect(0, h - 30, w, 30, 2)
 
-    surface.SetDrawColor(244, 135, 2, 10)
+    surface.SetDrawColor(p_r, p_g, p_b, 10)
     surface.DrawRect(0, h - 30, w, 30)
 end
 

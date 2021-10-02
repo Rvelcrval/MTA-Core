@@ -50,7 +50,7 @@ if SERVER then
 				atck.MTANextFever = CurTime() + FEVER_TIMEOUT
 
 				if IS_MTA_GM then
-					MTA.Statuses.AddStatus(atck, "fever", "Fever", Color(255, 0, 0), CurTime() + FEVER_TIME)
+					MTA.Statuses.AddStatus(atck, "fever", "Fever", MTA.DangerColor, CurTime() + FEVER_TIME)
 				end
 
 				timer.Simple(FEVER_TIME, function()
@@ -110,13 +110,11 @@ if CLIENT then
 	end)
 
 	if not IS_MTA_GM then
-		local red_color = Color(255, 0, 0)
-		local black_color = Color(0, 0, 0, 150)
 		hook.Add("MTAPaint", tag, function()
 			if not in_fever then return end
 
 			local scrw, scrh = ScrW(), ScrH()
-			surface.SetTextColor(red_color)
+			surface.SetTextColor(MTA.DangerColor)
 			surface.SetFont("MTALargeFont")
 
 			local diff = math.max(fever_end_time - CurTime(), 0)
@@ -125,10 +123,10 @@ if CLIENT then
 			local tw, th = surface.GetTextSize(time_left)
 			local pos_x, pos_y = scrw / 2 - tw / 2, scrh / 2 - th / 2
 
-			surface.SetDrawColor(black_color)
+			surface.SetDrawColor(MTA.BackgroundColor)
 			surface.DrawRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
 
-			surface.SetDrawColor(red_color)
+			surface.SetDrawColor(MTA.DangerColor)
 			surface.DrawOutlinedRect(pos_x - 5, pos_y - 5, tw + 10, th + 10)
 
 			surface.SetTextPos(pos_x, pos_y)

@@ -200,13 +200,12 @@ if CLIENT then
 		pickpockets[npc] = nil
 	end)
 
-	local orange_color = Color(244, 135, 2)
 	local thief_name = L"Thief"
 	hook.Add("HUDPaint", tag, function()
 		for npc, amount in pairs(pickpockets) do
 			if npc:IsValid() and not npc:IsDormant() then
 				local text = ("/// %s (%d c) ///"):format(thief_name, amount)
-				MTA.HighlightEntity(npc, text, orange_color)
+				MTA.HighlightEntity(npc, text, MTA.PrimaryColor)
 			end
 		end
 	end)

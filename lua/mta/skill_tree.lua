@@ -1,10 +1,3 @@
-local color_white = Color(255, 255, 255)
-local color_black = Color(0, 0, 0)
-local color_orange = Color(244, 135, 2)
-
-local old_value_color = Color(252, 71, 58)
-local new_value_color = Color(58, 252, 113)
-
 local NET_UPGRADE = "MTA_UPGRADE"
 local POINT_MULTIPLIER = MTA_CONFIG.upgrades.PointMultiplier
 
@@ -97,7 +90,7 @@ if CLIENT then
 		self.btnMaxim:Hide()
 
 		function self.btnClose:Paint(w, h)
-			surface.SetTextColor(220, 0, 50)
+			surface.SetTextColor(MTA.DangerColor)
 			surface.SetFont("DermaDefault")
 
 			local tw, th = surface.GetTextSize("X")
@@ -115,14 +108,14 @@ if CLIENT then
 		self.Info.Title:DockMargin(5, 5, 5, 0)
 		self.Info.Title:SetTall(25)
 		self.Info.Title:SetFont("DermaLarge")
-		self.Info.Title:SetTextColor(color_orange)
+		self.Info.Title:SetTextColor(MTA.PrimaryColor)
 
 		self.Info.Description = self.Info:Add("DLabel")
 		self.Info.Description:Dock(TOP)
 		self.Info.Description:DockMargin(5, 0, 5, 0)
 		self.Info.Description:SetTall(25)
 		self.Info.Description:SetFont("DermaDefaultBold")
-		self.Info.Description:SetTextColor(color_orange)
+		self.Info.Description:SetTextColor(MTA.PrimaryColor)
 
 		self.Info.Changes = self.Info:Add("DPanel")
 		self.Info.Changes:Dock(TOP)
@@ -134,20 +127,20 @@ if CLIENT then
 		self.Info.Changes.OldValue:SetPos(5, 5)
 		self.Info.Changes.OldValue:SetSize(100, 60)
 		self.Info.Changes.OldValue:SetFont("DermaLarge")
-		self.Info.Changes.OldValue:SetTextColor(old_value_color)
+		self.Info.Changes.OldValue:SetTextColor(MTA.OldValueColor)
 
 		self.Info.Changes.Arrow = self.Info.Changes:Add("DLabel")
 		self.Info.Changes.Arrow:SetPos(120, 3)
 		self.Info.Changes.Arrow:SetSize(100, 60)
 		self.Info.Changes.Arrow:SetFont("DermaLarge")
-		self.Info.Changes.Arrow:SetTextColor(color_white)
+		self.Info.Changes.Arrow:SetTextColor(MTA.TextColor)
 		self.Info.Changes.Arrow:SetText("»»")
 
 		self.Info.Changes.NewValue = self.Info.Changes:Add("DLabel")
 		self.Info.Changes.NewValue:SetPos(150, 5)
 		self.Info.Changes.NewValue:SetSize(100, 60)
 		self.Info.Changes.NewValue:SetFont("DermaLarge")
-		self.Info.Changes.NewValue:SetTextColor(new_value_color)
+		self.Info.Changes.NewValue:SetTextColor(MTA.NewValueColor)
 
 		self.Info.Unlock = self.Info:Add("DButton")
 		self.Info.Unlock:SetSize(220, 50)
@@ -166,20 +159,22 @@ if CLIENT then
 		end
 
 		function self.Info.Unlock:Paint(w, h)
+			local p_r, p_g, p_b = MTA.PrimaryColor:Unpack()
+
 			if self.Locked then
 				surface.SetDrawColor(252, 71, 58, 10)
 				surface.DrawRect(0, 0, w, h)
 
-				surface.SetDrawColor(252, 71, 58)
+				surface.SetDrawColor(MTA.OldValueColor)
 				surface.DrawOutlinedRect(0, 0, w, h, 2)
 				return
 			end
 
 			if not self:IsEnabled() then
-				surface.SetDrawColor(244, 135, 2, 10)
+				surface.SetDrawColor(p_r, p_g, p_b, 10)
 				surface.DrawRect(0, 0, w, h)
 
-				surface.SetDrawColor(244, 135, 2)
+				surface.SetDrawColor(MTA.PrimaryColor)
 				surface.DrawOutlinedRect(0, 0, w, h, 2)
 				return
 			end
@@ -187,25 +182,27 @@ if CLIENT then
 			if not self:IsHovered() then
 				surface.SetDrawColor(30, 30, 30)
 			else
-				surface.SetDrawColor(244, 135, 2, 10)
+				surface.SetDrawColor(p_r, p_g, p_b, 10)
 			end
 
 			surface.DrawRect(0, 0, w, h)
 
 			if not self:IsHovered() then
-				surface.SetDrawColor(255, 255, 255)
+				surface.SetDrawColor(MTA.TextColor)
 			else
-				surface.SetDrawColor(244, 135, 2)
+				surface.SetDrawColor(p_r, p_g, p_b)
 			end
 
 			surface.DrawOutlinedRect(0, 0, w, h, 2)
 		end
 
 		function self.Info:Paint(w, h)
-			surface.SetDrawColor(244, 135, 2)
+			local p_r, p_g, p_b = MTA.PrimaryColor:Unpack()
+
+			surface.SetDrawColor(p_r, p_g, p_b)
 			surface.DrawOutlinedRect(0, 0, w, h, 2)
 
-			surface.SetDrawColor(244, 135, 2, 10)
+			surface.SetDrawColor(p_r, p_g, p_b, 10)
 			surface.DrawRect(0, 0, w, h)
 		end
 	end
@@ -231,11 +228,11 @@ if CLIENT then
 		local completable = level_panel.Level == cur_level + 1
 
 		local text = "Unlock"
-		local text_color = color_white
+		local text_color = MTA.TextColor
 		local locked = false
 		if completed then
 			text = "Unlocked ✓"
-			text_color = color_orange
+			text_color = MTA.PrimaryColor
 			locked = false
 		elseif completable then
 			local cur_points = MTA.GetPlayerStat("points")
@@ -243,12 +240,12 @@ if CLIENT then
 
 			text = ("Unlock (%dpts)"):format(required_points)
 			local unlockable = cur_points >= required_points
-			text_color = unlockable and color_white or old_value_color
+			text_color = unlockable and MTA.TextColor or MTA.OldValueColor
 			locked = false
 			level_panel.Unlockable = unlockable
 		else
 			text = "Locked ✘"
-			text_color = old_value_color
+			text_color = MTA.OldValueColor
 			locked = true
 		end
 
@@ -269,7 +266,7 @@ if CLIENT then
 
 		local label = branch_row:Add("DLabel")
 		label:SetText(branch_data.Name or "???")
-		label:SetTextColor(color_white)
+		label:SetTextColor(MTA.TextColor)
 		label:Dock(LEFT)
 		label:DockMargin(10, 0, 10, 0)
 
@@ -284,7 +281,7 @@ if CLIENT then
 			level_panel:SetSize(level_size, level_size)
 			level_panel:SetPos(cur_x + level_margin, branch_row:GetTall() / 2 - level_size / 2)
 			level_panel:SetText(tostring(i))
-			level_panel:SetTextColor(i <= cur_level and color_black or color_white)
+			level_panel:SetTextColor(i <= cur_level and MTA.BackgroundColor or MTA.TextColor)
 			level_panel.Level = i
 
 			cur_x = cur_x + (level_margin + level_size)
@@ -325,7 +322,7 @@ if CLIENT then
 					hover_panel:SetPos(gui.MouseX(), gui.MouseY())
 					hover_panel:SetDrawOnTop(true)
 					hover_panel:SetFont("DermaDefault")
-					hover_panel:SetTextColor(color_orange)
+					hover_panel:SetTextColor(MTA.PrimaryColor)
 
 					local text = ""
 					for _, skill_name in pairs(level_skills) do
@@ -343,10 +340,11 @@ if CLIENT then
 					function hover_panel:Paint(w, h)
 						surface.DisableClipping(true)
 
-						surface.SetDrawColor(0, 0, 0, 255)
+						local bg_r, bg_g, bg_b = MTA.BackgroundColor:Unpack()
+						surface.SetDrawColor(bg_r, bg_g, bg_b, 255)
 						surface.DrawRect(-4, 10, w + 8, h - 20)
 
-						surface.SetDrawColor(244, 135, 2)
+						surface.SetDrawColor(MTA.PrimaryColor)
 						surface.DrawOutlinedRect(-4, 10, w + 8, h - 20)
 
 						surface.DisableClipping(false)
@@ -374,15 +372,15 @@ if CLIENT then
 					prev_hover_state = is_hovered
 				end
 
-				local cur_level = MTA.GetPlayerStat(stat_name)
-				local completed = i <= cur_level
-				self:SetTextColor(completed and color_black or color_white)
+				local stat_level = MTA.GetPlayerStat(stat_name)
+				local completed = i <= stat_level
+				self:SetTextColor(completed and MTA.BackgroundColor or MTA.TextColor)
 				if completed then
-					surface.SetDrawColor(255, 255, 255)
+					surface.SetDrawColor(MTA.TextColor)
 					surface.DrawRect(0, 0, w, h)
 				else
-					if i == cur_level + 1 then
-						surface.SetDrawColor(255, 255, 255)
+					if i == stat_level + 1 then
+						surface.SetDrawColor(MTA.TextColor)
 					else
 						surface.SetDrawColor(55, 55, 55)
 					end
@@ -390,13 +388,14 @@ if CLIENT then
 				end
 
 				if has_skills then
-					surface.SetDrawColor(244, 135, 2, completed and 255 or 50)
+					local p_r, p_g, p_b = MTA.PrimaryColor:Unpack()
+					surface.SetDrawColor(p_r, p_g, p_b, completed and 255 or 50)
 					surface.DrawOutlinedRect(2, 2, w - 4, h - 4)
 				end
 
 				if self.Selected then
 					surface.DisableClipping(true)
-					surface.SetDrawColor(244, 135, 2)
+					surface.SetDrawColor(MTA.PrimaryColor)
 
 					-- top left
 					surface.DrawLine(-2, -2, -2, 2)
@@ -439,6 +438,8 @@ if CLIENT then
 	end
 
 	function SKILL_TREE_PANEL:Paint(w, h)
+		local p_r, p_g, p_b = MTA.PrimaryColor:Unpack()
+
 		surface.SetDrawColor(0, 0, 0, 240)
 		surface.DrawRect(0, 0, w, 25)
 
@@ -446,16 +447,16 @@ if CLIENT then
 		surface.DrawRect(0, 25, w, h - 25)
 
 		surface.SetFont("DermaDefault")
-		surface.SetTextColor(244, 135, 2)
+		surface.SetTextColor(p_r, p_g, p_b)
 
 		local text = ("Points: %d"):format(MTA.GetPlayerStat("points"))
 		surface.SetTextPos(10, h - 22)
 		surface.DrawText(text)
 
-		surface.SetDrawColor(244, 135, 2)
+		surface.SetDrawColor(p_r, p_g, p_b)
 		surface.DrawOutlinedRect(0, h - 30, w, 30, 2)
 
-		surface.SetDrawColor(244, 135, 2, 10)
+		surface.SetDrawColor(p_r, p_g, p_b, 10)
 		surface.DrawRect(0, h - 30, w, 30)
 	end
 

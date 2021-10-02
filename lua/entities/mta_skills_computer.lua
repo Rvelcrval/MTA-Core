@@ -65,13 +65,12 @@ if CLIENT then
 		end
 	end)
 
-	local color_white = Color(255, 255, 255)
 	local verb = L"Upgrades"
 	function ENT:Initialize()
 		local bind = MTA.GetBindKey("+use")
 		if not bind then return end
 
 		local text = ("/// %s [%s] ///"):format(verb, bind)
-		MTA.RegisterEntityForHighlight(self, text, color_white)
+		MTA.RegisterEntityForHighlight(self, text, MTA.TextColor)
 	end
 end

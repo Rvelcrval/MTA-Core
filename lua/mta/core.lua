@@ -19,6 +19,17 @@ local tag = "mta"
 local MTA = _G.MTA or {}
 _G.MTA = MTA
 
+-- color scheme for most UI of MTA
+MTA.PrimaryColor = Color(244, 135, 2)
+MTA.BackgroundColor = Color(0, 0, 0, 200)
+MTA.TextColor = Color(255, 255, 255)
+
+MTA.DangerColor = Color(255, 0, 0)
+
+MTA.NewValueColor = Color(58, 252, 113)
+MTA.OldValueColor = Color(252, 71, 58)
+MTA.AdditionalValueColor = Color(200, 200, 200)
+
 local function default_log(...)
 	Msg("[MTA] ")
 	print(...)
@@ -132,10 +143,9 @@ if SERVER then
 		return ret
 	end
 
-	local print_header_col = Color(250, 58, 60)
 	function MTA.ChatPrint(ply, ...)
 		if EasyChat then
-			EasyChat.PlayerAddText(ply, print_header_col, "[MTA] ", color_white, ...)
+			EasyChat.PlayerAddText(ply, MTA.OldValueColor, "[MTA] ", MTA.TextColor, ...)
 		else
 			local msg = vargs_join(...)
 			ply:ChatPrint("[MTA] " .. msg)
@@ -755,10 +765,10 @@ if SERVER then
 			if type(inflictor) ~= "Player"
 				and not inflictor:IsWeapon()
 				and not inflictor:IsVehicle()
+				and not IS_MTA_GM
+				and not whitelist[inflictor:GetClass()]
 			then
-				if not IS_MTA_GM and not whitelist[inflictor:GetClass()] then
-					return true
-				end
+				return true
 			end
 		end
 
@@ -1022,11 +1032,6 @@ if CLIENT then
 		extended = true,
 	})
 
-	local black_color = Color(0, 0, 0, 150)
-	local orange_color = Color(244, 135, 2)
-	local red_color = Color(255, 0, 0)
-	local white_color = Color(255, 255, 255)
-
 	function MTA.HighlightPosition(pos, text, color, no_matrix)
 		if MTA.IsOptedOut() then return end
 
@@ -1037,14 +1042,14 @@ if CLIENT then
 
 		if not no_matrix then
 			local time = RealTime()
-			local matrix, translation = Matrix(), Vector(screen_pos.x, screen_pos.y)
+			local matrix, offset = Matrix(), Vector(screen_pos.x, screen_pos.y)
 			local size = 1.5 + (math.sin(time * 4) / 2)
 			local scale, angle = Vector(size, size, size), Angle(0, (time * 100) % 360, 0)
 
-			matrix:Translate(translation)
+			matrix:Translate(offset)
 			matrix:SetAngles(angle)
 			matrix:Scale(scale)
-			matrix:Translate(-translation)
+			matrix:Translate(-offset)
 
 			cam.PushModelMatrix(matrix)
 				surface.DrawOutlinedRect(screen_pos.x - 25, screen_pos.y - 25, 50, 50)
@@ -1057,7 +1062,7 @@ if CLIENT then
 		local tw, th = surface.GetTextSize(text)
 		local tx, ty = screen_pos.x - (tw / 2), screen_pos.y - (th / 2)
 
-		surface.SetDrawColor(black_color)
+		surface.SetDrawColor(MTA.BackgroundColor)
 		surface.DrawRect(tx - 5, ty - 5, tw + 10, th + 10)
 
 		surface.SetTextPos(tx, ty)
@@ -1119,12 +1124,12 @@ if CLIENT then
 		local time = SysTime()
 		local size = 1 + (math.sin(time) / 100)
 		local scale, angle = Vector(size, size, size), Angle(0, math.sin((time / 2) * sign) * 2, 0)
-		local translation = Vector(x + w / 2, y + h / 2)
+		local offset = Vector(x + w / 2, y + h / 2)
 
-		matrix:Translate(translation)
+		matrix:Translate(offset)
 		matrix:SetAngles(angle)
 		matrix:Scale(scale)
-		matrix:Translate(-translation)
+		matrix:Translate(-offset)
 
 		x = x + math.sin(time * sign)
 		y = y + math.sin(time * sign)
@@ -1144,17 +1149,17 @@ if CLIENT then
 		local health, armor = lp:Health(), lp:Armor()
 		local scrw, scrh = ScrW(), ScrH()
 
-		surface.SetTextColor(white_color)
+		surface.SetTextColor(MTA.TextColor)
 		surface.SetFont("MTALargeFont")
 		local text = ("/// WANTED LEVEL %d ///"):format(LocalPlayer():GetNWInt("MTAFactor"))
 		local tw, th = surface.GetTextSize(text)
 		local pos_x, pos_y = scrw / 2 - tw / 2, (scrh / 2 - th / 2) - (450 * (scrh / 1080))
 		surface.SetTextPos(pos_x, pos_y)
 
-		surface.SetDrawColor(black_color)
+		surface.SetDrawColor(MTA.BackgroundColor)
 		surface.DrawRect(pos_x - 10, pos_y - 10, tw + 20, th + 20)
 
-		surface.SetDrawColor(orange_color)
+		surface.SetDrawColor(MTA.PrimaryColor)
 		draw_instable_rect(pos_x - 10, pos_y - 10, tw + 20, th + 20, false)
 		draw_instable_rect(pos_x - 10, pos_y - 10, tw + 20, th + 20, true)
 
@@ -1162,14 +1167,14 @@ if CLIENT then
 
 		if not IS_MTA_GM then
 			surface.SetFont("MTASmallFont")
-			surface.SetDrawColor(health < LOW_HEALTH and red_color or orange_color)
-			surface.SetTextColor(health < LOW_HEALTH and red_color or orange_color)
+			surface.SetDrawColor(health < LOW_HEALTH and MTA.DangerColor or MTA.PrimaryColor)
+			surface.SetTextColor(health < LOW_HEALTH and MTA.DangerColor or MTA.PrimaryColor)
 			surface.DrawRect(pos_x - 10, pos_y + th + 25, (tw / 100) * health, 5, true)
 			surface.SetTextPos(pos_x + (tw / 100) * health, pos_y + th + 20)
 			surface.DrawText(("%d HPs"):format(math.Clamp(health, 0, 100)))
 
-			surface.SetDrawColor(orange_color)
-			surface.SetTextColor(orange_color)
+			surface.SetDrawColor(MTA.PrimaryColor)
+			surface.SetTextColor(MTA.PrimaryColor)
 			surface.DrawRect(pos_x - 10, pos_y + th + 40, (tw / 100) * armor, 5, true)
 			surface.SetTextPos(pos_x + (tw / 100) * armor, pos_y + th + 35)
 			surface.DrawText(("%d SUIT"):format(math.Clamp(armor, 0, 100)))
@@ -1204,7 +1209,7 @@ if CLIENT then
 			local ply_factor = ply:GetNWInt("MTAFactor")
 			if ply_factor >= 1 and ply ~= LocalPlayer() then
 				local text = ("/// WANTED LEVEL %d ///"):format(ply_factor)
-				MTA.HighlightEntity(ply, text, orange_color)
+				MTA.HighlightEntity(ply, text, MTA.PrimaryColor)
 			end
 		end
 	end)

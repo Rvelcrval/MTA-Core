@@ -44,7 +44,6 @@ end
 
 if CLIENT then
 	local verb = L"Mug"
-	local color_white = Color(255, 255, 255)
 	hook.Add("HUDPaint", tag, function()
 		if MTA.IsOptedOut() then return end
 
@@ -57,7 +56,7 @@ if CLIENT then
 		if not bind then return end
 
 		local text = ("/// %s [%s] ///"):format(verb, bind)
-		MTA.HighlightEntity(target, text, color_white)
+		MTA.HighlightEntity(target, text, MTA.TextColor)
 	end)
 end
 
