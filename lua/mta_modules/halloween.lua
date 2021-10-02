@@ -153,7 +153,7 @@ if SERVER then
 					end
 				end
 
-				local phys = c:GetPhysicsObject()
+				local phys = candy:GetPhysicsObject()
 				if IsValid(phys) then
 					phys:EnableCollisions(false)
 					phys:EnableGravity(false)
