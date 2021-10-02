@@ -74,6 +74,10 @@ local function check_halloween()
 	else
 		MTA.Coeficients = MTA_CONFIG.core.Coeficients
 	end
+
+	if CLIENT then
+		MTA.PrimaryColor = is_halloween and Color(255, 0, 0) or Color(244, 135, 2)
+	end
 end
 
 timer.Create(TAG, 60, 0, check_halloween)
