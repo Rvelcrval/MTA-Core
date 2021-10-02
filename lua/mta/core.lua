@@ -30,6 +30,9 @@ MTA.NewValueColor = Color(58, 252, 113)
 MTA.OldValueColor = Color(252, 71, 58)
 MTA.AdditionalValueColor = Color(200, 200, 200)
 
+-- dictionary of some kind
+MTA.WantedText = "WANTED"
+
 local function default_log(...)
 	Msg("[MTA] ")
 	print(...)
@@ -1151,7 +1154,7 @@ if CLIENT then
 
 		surface.SetTextColor(MTA.TextColor)
 		surface.SetFont("MTALargeFont")
-		local text = ("/// WANTED LEVEL %d ///"):format(LocalPlayer():GetNWInt("MTAFactor"))
+		local text = ("/// %s LEVEL %d ///"):format(MTA.WantedText, LocalPlayer():GetNWInt("MTAFactor"))
 		local tw, th = surface.GetTextSize(text)
 		local pos_x, pos_y = scrw / 2 - tw / 2, (scrh / 2 - th / 2) - (450 * (scrh / 1080))
 		surface.SetTextPos(pos_x, pos_y)
@@ -1208,7 +1211,7 @@ if CLIENT then
 		for _, ply in ipairs(player.GetAll()) do
 			local ply_factor = ply:GetNWInt("MTAFactor")
 			if ply_factor >= 1 and ply ~= LocalPlayer() then
-				local text = ("/// WANTED LEVEL %d ///"):format(ply_factor)
+				local text = ("/// %s LEVEL %d ///"):format(MTA.WantedText, ply_factor)
 				MTA.HighlightEntity(ply, text, MTA.PrimaryColor)
 			end
 		end

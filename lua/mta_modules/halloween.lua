@@ -77,6 +77,7 @@ local function check_halloween()
 
 	if CLIENT then
 		MTA.PrimaryColor = is_halloween and Color(255, 0, 0) or Color(244, 135, 2)
+		MTA.WantedText = is_halloween and "HORDE" or "WANTED"
 	end
 end
 
