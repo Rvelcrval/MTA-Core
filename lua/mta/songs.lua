@@ -24,9 +24,9 @@ end
 
 local NET_SONGS_TRANSMIT = "MTA_SONGS_TRANSMIT"
 if SERVER then
-	resource.AddFile("materials/mta/policeassault_corners.png")
-	resource.AddFile("materials/mta/policeassault_icon.png")
-	resource.AddFile("materials/mta/policeassault.png")
+	--resource.AddFile("materials/mta/policeassault_corners.png")
+	--resource.AddFile("materials/mta/policeassault_icon.png")
+	--resource.AddFile("materials/mta/policeassault.png")
 
 	util.AddNetworkString(NET_SONGS_TRANSMIT)
 
@@ -360,13 +360,21 @@ if CLIENT then
 			return
 		end
 
-		local index = get_rand_song_index(id, BASE_SONG_AMOUNT)
-		local file_name = ("song_%d.dat"):format(index)
-		local base_song_url = "https://cdn.zeni.space/meta/song_" .. index .. "%2e" .. "ogg"
-		get_custom_content(base_song_url, file_name, function()
-			if not on_going_assault() then return end
-			start_assault(file_name)
-		end)
+		local custom_url, custom_file_name = hook.Run("MTAGetDefaultSong")
+		if isstring(custom_url) and custom_url:StartWith("http") and isstring(custom_file_name) then
+			get_custom_content(custom_url, custom_file_name, function()
+				if not on_going_assault() then return end
+				start_assault(custom_file_name)
+			end)
+		else
+			local index = get_rand_song_index(id, BASE_SONG_AMOUNT)
+			local file_name = ("song_%d.dat"):format(index)
+			local base_song_url = "https://cdn.zeni.space/meta/song_" .. index .. "%2e" .. "ogg"
+			get_custom_content(base_song_url, file_name, function()
+				if not on_going_assault() then return end
+				start_assault(file_name)
+			end)
+		end
 	end
 
 	hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)

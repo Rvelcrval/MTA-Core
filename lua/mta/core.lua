@@ -280,43 +280,51 @@ if SERVER then
 		if not IsValid(target) then return false, "bad target" end
 		local wanted_lvl = math.ceil((MTA.Factors[target] or 0) / 10)
 
-		-- under 10 -> only metrocops
-		local spawn_function = combine_types.metrocops
+		local res = hook.Run("MTANPCSpawnProcess", target, pos, wanted_lvl)
+		if res == false then return false, "spawn denied" end
 
-		-- manhacks drop crucial parts, so they need to constantly spawn
-		if IS_MTA_GM and math.random(0, 100) <= 10 then
-			spawn_function = combine_types.manhacks
+		local spawn_function
+		if isfunction(res) then
+			spawn_function = res
+		else
+			-- under 10 -> only metrocops
+			spawn_function = combine_types.metrocops
 
-		-- 10 to 60 -> metrocops and soldiers that become more and more common
-		elseif wanted_lvl < 60 and wanted_lvl >= 10 then
-			spawn_function = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
+			-- manhacks drop crucial parts, so they need to constantly spawn
+			if IS_MTA_GM and math.random(0, 100) <= 10 then
+				spawn_function = combine_types.manhacks
 
-		-- 60 - 80 -> only elites
-		elseif wanted_lvl >= 60 and wanted_lvl < 80 then
-			if IS_MTA_GM and math.random(0, 100) <= 7 then
-				spawn_function = combine_types.hunters
-			else
-				spawn_function = combine_types.elites
-			end
+			-- 10 to 60 -> metrocops and soldiers that become more and more common
+			elseif wanted_lvl < 60 and wanted_lvl >= 10 then
+				spawn_function = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
 
-		-- 80 - inf -> elites, shotgunners and an helicopter
-		elseif wanted_lvl >= 80 then
-			if IS_MTA_GM and MTA.HelicopterCount < MTA.MAX_HELIS then
-				local succ, ret = MTA.SpawnHelicopter(target)
-				if succ then
-					combine_spawn_callback(ret)
-					MTA.HelicopterCount = MTA.HelicopterCount + 1
-					MTA.SetupCombine(ret, target, MTA.BadPlayers)
-					return true
+			-- 60 - 80 -> only elites
+			elseif wanted_lvl >= 60 and wanted_lvl < 80 then
+				if IS_MTA_GM and math.random(0, 100) <= 7 then
+					spawn_function = combine_types.hunters
 				else
-					warn_log(("helicopter could not spawn: %s"):format(ret))
+					spawn_function = combine_types.elites
 				end
-			end
 
-			if IS_MTA_GM and math.random(0, 100) <= 7 then
-				spawn_function = combine_types.hunters
-			else
-				spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
+			-- 80 - inf -> elites, shotgunners and an helicopter
+			elseif wanted_lvl >= 80 then
+				if IS_MTA_GM and MTA.HelicopterCount < MTA.MAX_HELIS then
+					local succ, ret = MTA.SpawnHelicopter(target)
+					if succ then
+						combine_spawn_callback(ret)
+						MTA.HelicopterCount = MTA.HelicopterCount + 1
+						MTA.SetupCombine(ret, target, MTA.BadPlayers)
+						return true
+					else
+						warn_log(("helicopter could not spawn: %s"):format(ret))
+					end
+				end
+
+				if IS_MTA_GM and math.random(0, 100) <= 7 then
+					spawn_function = combine_types.hunters
+				else
+					spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
+				end
 			end
 		end
 
@@ -783,6 +791,9 @@ if SERVER then
 	end
 
 	local function combine_drops(npc)
+		local ret = hook.Run("MTANPCDrops", npc)
+		if ret == true then return end
+
 		local dissolving = false
 		for _, ent in ipairs(npc:GetChildren()) do
 			if ent:GetClass() == "env_entity_dissolver" then

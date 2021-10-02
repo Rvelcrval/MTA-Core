@@ -135,6 +135,8 @@ end
 
 local function create_combine(pos, spawn_function)
 	local npc = spawn_function()
+	if not IsValid(npc) then return nil end
+
 	npc.ms_notouch = true
 
 	npc:SetPos(pos)
@@ -567,6 +569,11 @@ local function far_combine(target, players, spawn_function, callback, pos)
 
 	timer.Simple(1, function()
 		local combine = create_combine(pos, spawn_function)
+		if not IsValid(combine) then
+			callback()
+			return
+		end
+
 		setup_combine(combine, target, players)
 		combine:EmitSound("ambient/machines/teleport1.wav", 40)
 		callback(combine)
