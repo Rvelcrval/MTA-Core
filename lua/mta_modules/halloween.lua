@@ -119,10 +119,13 @@ if SERVER then
 		if not is_halloween then return end
 		if not CreateCandy then return end
 
-		local candy_count = math.random(0, 5)
+		local candy_count = math.random(0, 3)
 		for _ = 1, candy_count do
 			local candy = CreateCandy(npc:WorldSpaceCenter(), Angle(0, 0, 0))
-			candy:SetVelocity(VectorRand() * 100)
+			local phys = candy:GetPhysicsObject()
+			if IsValid(phys) then
+				phys:SetVelocity(VectorRand() * 150)
+			end
 		end
 	end)
 
