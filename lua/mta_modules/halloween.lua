@@ -53,6 +53,14 @@ local coefs = {
 		["kill_coef"] = 1,
 		["damage_coef"] = 0.75,
 	},
+	["npc_headcrab_poison"] = { -- same as black but for some reason poison?
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.75,
+	},
+	["hwn_pumpkin"] = {
+		["kill_coef"] = 1,
+		["damage_coef"] = 0.75,
+	}
 }
 
 local is_halloween = false
@@ -122,8 +130,9 @@ if SERVER then
 		npc_headcrab = true,
 		npc_headcrab_black = true,
 		npc_headcrab_fast = true,
+		npc_headcrab_poison = true,
 	}
-	hook.Add("OnEntityCreated", tag, function(ent)
+	hook.Add("OnEntityCreated", TAG, function(ent)
 		if not is_halloween then return end
 		if not headcrab_classes[ent:GetClass()] then return end
 
@@ -143,6 +152,10 @@ if SERVER then
 			ent.ms_notouch = true
 			MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
 		end)
+	end)
+
+	hook.Add("MTADisplayJoinPanel", TAG, function()
+		if is_halloween then return false end
 	end)
 end
 

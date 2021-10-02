@@ -182,6 +182,9 @@ hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 	if waiting_server then return end
 	if gm_request and gm_request:IsHostServer() then return end
 
+	local ret = hook.Run("MTADisplayJoinPanel")
+	if ret == false then return end
+
 	-- this doesnt work for some reason
 	--if ply:GetNWInt("MTAFactor") <= 1 then return end -- dont bother if its a player mistake
 
