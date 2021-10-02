@@ -790,8 +790,8 @@ if SERVER then
 		end
 	end
 
-	local function combine_drops(npc)
-		local ret = hook.Run("MTANPCDrops", npc)
+	local function combine_drops(npc, attacker)
+		local ret = hook.Run("MTANPCDrops", npc, attacker)
 		if ret == true then return end
 
 		local dissolving = false
@@ -842,10 +842,10 @@ if SERVER then
 		end
 	end
 
-	hook.Add("OnNPCKilled", tag, function(npc)
+	hook.Add("OnNPCKilled", tag, function(npc, attacker)
 		if not npc:GetNWBool("MTACombine") then return end
 
-		combine_drops(npc)
+		combine_drops(npc, attacker)
 		ensure_combine_removal(npc)
 	end)
 

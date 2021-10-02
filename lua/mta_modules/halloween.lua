@@ -115,16 +115,59 @@ if SERVER then
 		return spawn_function
 	end)
 
-	hook.Add("MTANPCDrops", TAG, function(npc)
+	hook.Add("MTANPCDrops", TAG, function(npc, attacker)
 		if not is_halloween then return end
-		if not CreateCandy then return end
 
 		local candy_count = math.random(0, 3)
-		for _ = 1, candy_count do
-			local candy = CreateCandy(npc:WorldSpaceCenter(), Angle(0, 0, 0))
-			local phys = candy:GetPhysicsObject()
-			if IsValid(phys) then
-				phys:SetVelocity(VectorRand() * 150)
+		if candy_count <= 0 then return end
+
+		if attacker:IsPlayer() then
+			if not GiveCandy then return end
+
+			timer.Create(("%s_DROP_%d"):format(TAG, npc:EntIndex()), 0.25, candy_count, function()
+				local candy = ents.Create("sent_candy")
+				candy:SetPos(npc:WorldSpaceCenter())
+				candy:SetAngles(Angle(0,0,0))
+				candy.AllowCollect = false
+
+				candy:Spawn()
+				candy:Activate()
+
+				local target = attacker
+				function candy:Think()
+					if not IsValid(target) then
+						SafeRemoveEntity(self)
+						return
+					end
+
+					local pos = self:GetPos()
+					local target_pos = target:WorldSpaceCenter()
+					local phys = self:GetPhysicsObject()
+					if IsValid(phys) then
+						phys:SetVelocity((target_pos - pos):GetNormalized() * 1000)
+					end
+
+					if pos:DistToSqr(target_pos) <= 10000 then
+						SafeRemoveEntity(self)
+						GiveCandy(target, 1)
+					end
+				end
+
+				local phys = c:GetPhysicsObject()
+				if IsValid(phys) then
+					phys:EnableCollisions(false)
+					phys:EnableGravity(false)
+				end
+			end)
+		else
+			if not CreateCandy then return end
+
+			for _ = 1, candy_count do
+				local candy = CreateCandy(npc:WorldSpaceCenter(), Angle(0, 0, 0))
+				local phys = candy:GetPhysicsObject()
+				if IsValid(phys) then
+					phys:SetVelocity(VectorRand() * 150)
+				end
 			end
 		end
 	end)
