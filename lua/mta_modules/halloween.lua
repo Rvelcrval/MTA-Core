@@ -157,6 +157,11 @@ if SERVER then
 	hook.Add("MTADisplayJoinPanel", TAG, function()
 		if is_halloween then return false end
 	end)
+
+	hook.Add("MTAMobileEMPShouldDamage", TAG, function(ply, ent)
+		if not is_halloween then return end
+		if headcrab_classes[ent:GetClass()] then return true end
+	end)
 end
 
 if CLIENT then

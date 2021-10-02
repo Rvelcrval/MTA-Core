@@ -44,7 +44,9 @@ if SERVER then
 
 		for _, ent in ipairs(ents.FindInSphere(shockwave:GetPos(), DISTANCE)) do
 			if not ent:IsNPC() then continue end
-			if ent:GetClass() == "npc_manhack" then
+			if hook.Run("MTAMobileEMPShouldDamage", ply, ent, shockwave:GetPos()) then
+				ent:TakeDamageInfo(dmg_info)
+			elseif ent:GetClass() == "npc_manhack" then
 				ent:TakeDamageInfo(dmg_info)
 			elseif ent:GetNWBool("MTACombine") then
 				local wep = ent.GetActiveWeapon and ent:GetActiveWeapon()
