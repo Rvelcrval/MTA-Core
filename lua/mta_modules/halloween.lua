@@ -254,8 +254,8 @@ if SERVER then
 
 		local levels = {
 			default = {
-				title = L "Zombie Massacre",
-				description = L "This tracks how much of a mess you've made against hordes of zombies"
+				title = "Zombie Massacre",
+				description = "This tracks how much of a mess you've made against hordes of zombies"
 			}
 		}
 
