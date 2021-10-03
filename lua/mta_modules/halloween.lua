@@ -139,7 +139,7 @@ if SERVER then
 	function update_badge(ply)
 		local succ, err = pcall(function()
 			if MetaBadges then
-				local cur_lvl = MetaBadges.GetBadgeLevel(ply, "zombie_massacre")
+				local cur_lvl = MetaBadges.GetBadgeLevel(ply, "zombie_massacre") or 0
 				MetaBadges.UpgradeBadge(ply, "zombie_massacre", cur_lvl + 1)
 			end
 		end)
