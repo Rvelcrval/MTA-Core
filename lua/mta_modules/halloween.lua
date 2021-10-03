@@ -86,6 +86,20 @@ timer.Create(TAG, 60, 0, check_halloween)
 if SERVER then
 	resource.AddFile("materials/metabadges/zombie_massacre/s1/default.vmt")
 
+	local function default_log(...)
+		Msg("[MTA] ")
+		print(...)
+	end
+
+	local function warn_log(...)
+		if not metalog then
+			default_log(...)
+			return
+		end
+
+		metalog.warn("MTA", nil, ...)
+	end
+
 	local enemy_types = {
 		zombies = function()
 			return ents.Create("npc_zombie")
