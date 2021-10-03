@@ -51,7 +51,7 @@ function SWEP:AttachCore(parent)
 	core.lobbyok = true
 	core:SetColor(core_color)
 	core:SetSize(10)
-	if core.CPPISetOwner then
+	if core.CPPISetOwner and self:GetOwner():IsPlayer() then
 		core:CPPISetOwner(self:GetOwner())
 	end
 	parent.lobbyok = true
@@ -96,7 +96,7 @@ function SWEP:ThrowCore()
 	ent:Spawn()
 	ent:SetNoDraw(true)
 	--ent:SetNotSolid(true)
-	if ent.CPPISetOwner then
+	if ent.CPPISetOwner and owner:IsPlayer() then
 		ent:CPPISetOwner(owner)
 	end
 	self:AttachCore(ent)
