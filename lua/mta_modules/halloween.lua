@@ -136,11 +136,11 @@ if SERVER then
 		return spawn_function
 	end)
 
-	function update_badge(ply)
+	function update_badge(ply, count)
 		local succ, err = pcall(function()
 			if MetaBadges then
 				local cur_lvl = MetaBadges.GetBadgeLevel(ply, "zombie_massacre") or 0
-				MetaBadges.UpgradeBadge(ply, "zombie_massacre", cur_lvl + 1)
+				MetaBadges.UpgradeBadge(ply, "zombie_massacre", cur_lvl + count)
 			end
 		end)
 
@@ -153,7 +153,7 @@ if SERVER then
 		if not is_halloween then return end
 
 		if attacker:IsPlayer() then
-			update_badge(attacker)
+			attacker.MTAMassacreCount = (attacker.MTAMassacreCount or 0) + 1
 
 			if not GiveCandy then return end
 
@@ -271,6 +271,11 @@ if SERVER then
 		if not succ then
 			warn_log("Could not create badge:", err)
 		end
+	end)
+
+	hook.Add("MTAWantedStateUpdate", TAG, function(ply, is_wanted)
+		update_badge(ply, ply.MTAMassacreCount or 1)
+		ply.MTAMassacreCount = 0
 	end)
 end
 
