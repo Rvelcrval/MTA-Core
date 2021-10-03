@@ -84,6 +84,8 @@ end
 timer.Create(TAG, 60, 0, check_halloween)
 
 if SERVER then
+	resource.AddFile("materials/metabadges/zombie_massacre/s1/default.vmt")
+
 	local enemy_types = {
 		zombies = function()
 			return ents.Create("npc_zombie")
@@ -120,14 +122,29 @@ if SERVER then
 		return spawn_function
 	end)
 
+	function update_badge(ply)
+		local succ, err = pcall(function()
+			if MetaBadges then
+				local cur_lvl = MetaBadges.GetBadgeLevel(ply, "zombie_massacre")
+				MetaBadges.UpgradeBadge(ply, "zombie_massacre", cur_lvl + 1)
+			end
+		end)
+
+		if not succ then
+			warn_log("Failed to update badge for:", ply, err)
+		end
+	end
+
 	hook.Add("MTANPCDrops", TAG, function(npc, attacker)
 		if not is_halloween then return end
 
-		local candy_count = math.random(0, 3)
-		if candy_count <= 0 then return end
-
 		if attacker:IsPlayer() then
+			update_badge(attacker)
+
 			if not GiveCandy then return end
+
+			local candy_count = math.random(0, 3)
+			if candy_count <= 0 then return end
 
 			local origin_pos = npc:WorldSpaceCenter()
 			timer.Create(("%s_DROP_%d"):format(TAG, npc:EntIndex()), 0.25, candy_count, function()
@@ -167,6 +184,9 @@ if SERVER then
 			end)
 		else
 			if not CreateCandy then return end
+
+			local candy_count = math.random(0, 3)
+			if candy_count <= 0 then return end
 
 			for _ = 1, candy_count do
 				local candy = CreateCandy(npc:WorldSpaceCenter(), Angle(0, 0, 0))
@@ -213,6 +233,30 @@ if SERVER then
 	hook.Add("MTAMobileEMPShouldDamage", TAG, function(ply, ent)
 		if not is_halloween then return end
 		if headcrab_classes[ent:GetClass()] then return true end
+	end)
+
+	local function create_badge()
+		if not MetaBadges then return end
+
+		local levels = {
+			default = {
+				title = L "Zombie Massacre",
+				description = L "This tracks how much of a mess you've made against hordes of zombies"
+			}
+		}
+
+		MetaBadges.RegisterBadge("zombie_massacre", {
+			basetitle = "Zombie Massacre",
+			levels = levels,
+			level_interpolation = MetaBadges.INTERPOLATION_FLOOR
+		})
+	end
+
+	hook.Add("InitPostEntity", TAG, function()
+		local succ, err = pcall(create_badge)
+		if not succ then
+			warn_log("Could not create badge:", err)
+		end
 	end)
 end
 
