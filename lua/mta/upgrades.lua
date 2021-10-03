@@ -94,7 +94,7 @@ if SERVER then
 	function MTA.IncreasePlayerStat(ply, stat_name, amount, should_log)
 		if not IsValid(ply) then return -1 end
 		if not can_db() then return -1 end
-		if ply:IsBot() then return -1 end
+		if not ply:IsPlayer() or ply:IsBot() then return -1 end
 		if banni and banni.isbanned(ply) then return -1 end
 
 		local nw_value_name = ("MTAStat_%s"):format(stat_name)
