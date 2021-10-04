@@ -166,8 +166,8 @@ if SERVER then
 		-- allow the bounties to fight back
 		if not IS_MTA_GM and bounties[atck] and hunters[ply] then return true end
 
-		-- dont damage this player if you have a bounty for them
-		if not hunters[atck] and bounties[ply] then
+		-- dont damage this player if there is a bounty for them
+		if not hunters[atck] and bounties[ply] and ply ~= atck and not MTA.IsWanted(atck) then
 			atck:PrintMessage(HUD_PRINTTALK, "You must accept the bounty for this player to kill them")
 			return false
 		end
