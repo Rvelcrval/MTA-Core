@@ -168,7 +168,7 @@ if SERVER then
 
 		-- dont damage this player if there is a bounty for them
 		if not hunters[atck] and bounties[ply] and ply ~= atck and not MTA.IsWanted(atck) then
-			atck:PrintMessage(HUD_PRINTTALK, "You must accept the bounty for this player to kill them")
+			MTA.ChatPrint(atck, "You must accept the bounty for this player to kill them")
 			return false
 		end
 
@@ -176,7 +176,7 @@ if SERVER then
 		if not targets then return end
 
 		if not table.HasValue(targets, ply) then
-			atck:PrintMessage(HUD_PRINTTALK, "You must accept the bounty for this player to kill them")
+			MTA.ChatPrint(atck, "You must accept the bounty for this player to kill them")
 			return false
 		end
 
