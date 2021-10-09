@@ -5,16 +5,22 @@ if CLIENT then
 	--local PARTICLES_AMT = 25
 	local function do_spawn_effect(pos)
 		local spawn_pos_ent = ents.CreateClientProp("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		if not IsValid(spawn_pos_ent) then return end
+
 		spawn_pos_ent:Spawn()
 		spawn_pos_ent:SetPos(pos)
 		spawn_pos_ent:SetNoDraw(true)
 		SafeRemoveEntityDelayed(spawn_pos_ent, 10)
 
 		local beam_point_origin_1 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		if not IsValid(beam_point_origin_1) then return end
+
 		beam_point_origin_1:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_1, 10)
 
 		local beam_point_origin_2 = ClientsideModel("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
+		if not IsValid(beam_point_origin_2) then return end
+
 		beam_point_origin_2:SetNoDraw(true)
 		SafeRemoveEntityDelayed(beam_point_origin_2, 10)
 
