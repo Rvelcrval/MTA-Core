@@ -67,7 +67,7 @@ local is_halloween = false
 local function check_halloween()
 	-- dont enable on MTA gamemode, we can make this infinitely better,
 	-- this is just a tiny easter egg thing
-	is_halloween = os.date("%m") == "10" and not IS_MTA_GM
+	is_halloween = os.date("%m") == "10"
 
 	if is_halloween then
 		MTA.Coeficients = coefs
@@ -122,6 +122,7 @@ if SERVER then
 	}
 	hook.Add("MTANPCSpawnProcess", TAG, function(target, pos, wanted_lvl)
 		if not is_halloween then return end
+		if IS_MTA_GM then return end
 
 		-- below 10 is just zombies
 		local spawn_function = enemy_types.zombies
@@ -157,6 +158,7 @@ if SERVER then
 
 	hook.Add("MTANPCDrops", TAG, function(npc, attacker)
 		if not is_halloween then return end
+		if IS_MTA_GM then return end
 
 		if attacker:IsPlayer() then
 			attacker.MTAMassacreCount = (attacker.MTAMassacreCount or 0) + 1
@@ -226,6 +228,7 @@ if SERVER then
 	}
 	hook.Add("OnEntityCreated", TAG, function(ent)
 		if not is_halloween then return end
+		if IS_MTA_GM then return end
 		if not headcrab_classes[ent:GetClass()] then return end
 
 		ent:SetMaterial("models/alyx/alyxblack")
@@ -246,10 +249,6 @@ if SERVER then
 			ent.ms_notouch = true
 			MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
 		end)
-	end)
-
-	hook.Add("MTADisplayJoinPanel", TAG, function()
-		if is_halloween then return false end
 	end)
 
 	hook.Add("MTAMobileEMPShouldDamage", TAG, function(ply, ent)
@@ -282,6 +281,7 @@ if SERVER then
 	end)
 
 	hook.Add("MTAWantedStateUpdate", TAG, function(ply, is_wanted)
+		if not is_halloween then return end
 		if is_wanted then return end
 		update_badge(ply, ply.MTAMassacreCount or 1)
 		ply.MTAMassacreCount = 0
@@ -289,6 +289,10 @@ if SERVER then
 end
 
 if CLIENT then
+	hook.Add("MTADisplayJoinPanel", TAG, function()
+		if is_halloween then return false end
+	end)
+
 	local songs = {
 		"https://dl.dropboxusercontent.com/s/3yhyi3r516c452r/SIERRA%20TRAPPED.ogg",
 		"https://dl.dropboxusercontent.com/s/rd59wk27r3cjg3o/TARIK%20BOUISFI%20EVIL%20GATEWAY.ogg"
@@ -312,33 +316,37 @@ if CLIENT then
 		-- dont do particles on headcrabs
 		if zombie:GetClass():match("headcrab") then return end
 
-		local pos = zombie:GetPos() -- The origin position of the effect
-		local emitter = ParticleEmitter(pos) -- Particle emitter in this position
 		local spread = 10
 		local amount = 1
+		local pos = zombie:GetPos()
 		local timer_name = "MTAShadowZombie_" .. zombie:EntIndex()
-		timer.Create(timer_name, 0.25, 0, function()
+		local emitter = ParticleEmitter(pos)
+		timer.Create(timer_name, 0.1, 0, function()
 			if not IsValid(zombie) then
 				timer.Remove(timer_name)
 				emitter:Finish()
 				return
 			end
 
+			pos = zombie:WorldSpaceCenter()
+			emitter:SetPos(pos)
+
 			for i = 1, amount  do
 				local offset = Vector(math.random(-spread, spread), math.random(-spread, spread), 0) --math.random(0, zombie:OBBMaxs().z))
 				local part = emitter:Add("particle/smokestack_nofog", pos + offset) -- Create a new particle at pos
 				if part then
-					part:SetDieTime(2.5) -- How long the particle should "live"
+					part:SetDieTime(2.5)
 
-					part:SetStartAlpha(255) -- Starting alpha of the particle
-					part:SetEndAlpha(10) -- Particle size at the end if its lifetime
+					part:SetStartAlpha(255)
+					part:SetEndAlpha(10)
 
-					part:SetStartSize(1) -- Starting size
-					part:SetEndSize(40) -- Size when removed
+					part:SetStartSize(40)
+					part:SetEndSize(1)
 
-					part:SetGravity(Vector(0, 0, 30)) -- Gravity of the particle
-					part:SetVelocity(Vector(1, 1, 1)) -- Initial velocity of the particle
+					part:SetGravity(Vector(0, 0, 30))
+					part:SetVelocity(Vector(1, 1, 1))
 					part:SetColor(0, 0, 0)
+					--part:SetParent(zombie)
 				end
 			end
 		end)
