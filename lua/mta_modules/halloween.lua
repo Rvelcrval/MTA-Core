@@ -242,15 +242,15 @@ if SERVER then
 		if not is_halloween then return end
 		if IS_MTA_GM then return end
 		if not headcrab_classes[ent:GetClass()] then return end
-		if not is_ent_in_lobby(ent) then return end
-
-		ent:SetMaterial("models/alyx/alyxblack")
 
 		-- cant do it right away, its too early
 		timer.Simple(1, function()
 			if not IsValid(ent) then return end
 			if ent.CPPIGetOwner and IsValid(ent:CPPIGetOwner()) then return end
 			if #MTA.BadPlayers == 0 then return end
+			if not is_ent_in_lobby(ent) then return end
+
+			ent:SetMaterial("models/alyx/alyxblack")
 
 			local target = MTA.BadPlayers[math.random(#MTA.BadPlayers)]
 			if IsValid(target) then
