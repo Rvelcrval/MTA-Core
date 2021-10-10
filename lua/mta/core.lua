@@ -271,6 +271,7 @@ if SERVER then
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_ar2")
 			npc:SetModel("models/combine_super_soldier.mdl")
+			npc:SetMaterial("models/mta/police_skins/combine_elite_police")
 			return npc
 		end,
 		shotgunners = function()
