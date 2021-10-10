@@ -288,4 +288,71 @@ if CLIENT then
 		local i = math.random(#songs)
 		return songs[i], ("halloween_%d.dat"):format(i)
 	end)
+
+	local Vector = _G.Vector
+	local black = Material("models/alyx/alyxblack")
+
+	local function make_shadow_zombie(zombie)
+		function zombie:RenderOverride()
+			render.MaterialOverride(black)
+				self:DrawModel()
+			render.MaterialOverride()
+		end
+
+		-- dont do particles on headcrabs
+		if zombie:GetClass():match("headcrab") then return end
+
+		local pos = zombie:GetPos() -- The origin position of the effect
+		local emitter = ParticleEmitter(pos) -- Particle emitter in this position
+		local spread = 10
+		local amount = 2
+		local timer_name = "MTAShadowZombie_" .. zombie:EntIndex()
+		timer.Create(timer_name, 0.25, 0, function()
+			if not IsValid(zombie) then
+				timer.Remove(timer_name)
+				emitter:Finish()
+				return
+			end
+
+			for i = 1, amount * 2 do
+				local offset = Vector(math.random(-spread, spread), math.random(-spread, spread), 0) --math.random(0, zombie:OBBMaxs().z))
+				local part = emitter:Add(i % 2 == 0 and "particle/smokestack_nofog" or "sprites/heatwave", pos + offset) -- Create a new particle at pos
+				if part then
+					part:SetDieTime(2.5) -- How long the particle should "live"
+
+					part:SetStartAlpha(255) -- Starting alpha of the particle
+					part:SetEndAlpha(10) -- Particle size at the end if its lifetime
+
+					part:SetStartSize(1) -- Starting size
+					part:SetEndSize(40) -- Size when removed
+
+					part:SetGravity(Vector(0, 0, 30)) -- Gravity of the particle
+					part:SetVelocity(Vector(1, 1, 1)) -- Initial velocity of the particle
+					part:SetColor(0, 0, 0)
+
+					hook.Add("Think", part, function()
+						if not IsValid(zombie) then
+							hook.Remove("Think", part)
+							return
+						end
+
+						local z_diff = part:GetPos().z - zombie:GetPos().z
+						local target_pos = zombie:GetPos() + offset
+						target_pos.z = zombie:GetPos().z + z_diff
+						part:SetPos(target_pos)
+					end)
+				end
+			end
+		end)
+	end
+
+	hook.Add("OnEntityCreated", TAG, function(ent)
+		if MTA.IsOptedOut() then return end
+
+		timer.Simple(0.5, function()
+			if not IsValid(ent) then return end
+			if not ent:GetNWBool("MTACombine") then return end
+			make_shadow_zombie(ent)
+		end)
+	end)
 end
