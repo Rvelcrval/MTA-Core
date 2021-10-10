@@ -220,6 +220,18 @@ if SERVER then
 		end
 	end)
 
+	local function is_ent_in_lobby(ent)
+		if not ms then return false end
+		if not ms.GetTrigger then return false end
+
+		local trigger = ms.GetTrigger("lobby")
+		if IsValid(trigger) then
+			return (trigger:GetEntities() or {})[ent] ~= nil
+		end
+
+		return false
+	end
+
 	local headcrab_classes = {
 		npc_headcrab = true,
 		npc_headcrab_black = true,
@@ -230,6 +242,7 @@ if SERVER then
 		if not is_halloween then return end
 		if IS_MTA_GM then return end
 		if not headcrab_classes[ent:GetClass()] then return end
+		if not is_ent_in_lobby(ent) then return end
 
 		ent:SetMaterial("models/alyx/alyxblack")
 
