@@ -11,7 +11,7 @@ MetAchievements.RegisterAchievement(id, {
 })
 
 local hook_name = ("%s_%s"):format(tag, id)
-hook.Add("MTADrillSuccess", hook_name, function(ply)
+hook.Add("MTADrillStart", hook_name, function(ply)
 	if MetAchievements.HasAchievement(ply, id) then return end
 	MetAchievements.UnlockAchievement(ply, id)
 end)
