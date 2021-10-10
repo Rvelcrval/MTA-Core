@@ -281,7 +281,10 @@ if SERVER then
 			return npc
 		end,
 		hunters = function()
-			return ents.Create("npc_hunter")
+			local npc = ents.Create("npc_hunter")
+			npc:SetSubMaterial(0, "models/mta/police_skins/mini_skin_basecolor_police")
+			npc:SetSubMaterial(1, "models/mta/police_skins/mini_armor_basecolor_police")
+			return npc
 		end,
 		manhacks = function()
 			return ents.Create("npc_manhack")
