@@ -274,6 +274,7 @@ if SERVER then
 	end)
 
 	hook.Add("MTAWantedStateUpdate", TAG, function(ply, is_wanted)
+		if is_wanted then return end
 		update_badge(ply, ply.MTAMassacreCount or 1)
 		ply.MTAMassacreCount = 0
 	end)
