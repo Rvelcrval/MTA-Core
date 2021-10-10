@@ -83,8 +83,6 @@ local NET_WANTED_STATE = "MTA_WANTED_STATE"
 local NET_SOUND_HACK = "MTA_SOUND_HACK"
 
 if SERVER then
-	resource.AddFile("materials/metabadges/criminal/s1/default.vmt")
-
 	util.AddNetworkString(NET_WANTED_STATE)
 	util.AddNetworkString(NET_SOUND_HACK)
 

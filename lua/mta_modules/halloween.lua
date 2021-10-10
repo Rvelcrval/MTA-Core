@@ -84,8 +84,6 @@ end
 timer.Create(TAG, 60, 0, check_halloween)
 
 if SERVER then
-	resource.AddFile("materials/metabadges/zombie_massacre/s1/default.vmt")
-
 	local function default_log(...)
 		Msg("[MTA] ")
 		print(...)

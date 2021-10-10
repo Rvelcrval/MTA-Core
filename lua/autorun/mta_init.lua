@@ -45,6 +45,14 @@ if SERVER then
 	end
 end
 
+-- badges & achievements that materials that are needed everywhere even if only used
+-- in the gamemode
+if SERVER then
+	resource.AddFile("materials/metabadges/criminal/s1/default.vmt")
+	resource.AddFile("materials/metabadges/daily_commitment/s1/default.vmt")
+	resource.AddFile("materials/metabadges/zombie_massacre/s1/default.vmt")
+end
+
 hook.Add("PostGamemodeLoaded", "MTA", function()
 	IS_MTA_GM = (gmod.GetGamemode() or GM or GAMEMODE).Name == "MTA"
 
@@ -54,6 +62,7 @@ hook.Add("PostGamemodeLoaded", "MTA", function()
 	end
 
 	include("skins/mta.lua")
+	include("mta/gm_badges.lua")
 	include("mta/core.lua")
 	include("mta/songs.lua")
 	include("mta/weapons.lua")
