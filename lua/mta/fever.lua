@@ -15,6 +15,7 @@ if SERVER then
 		ply:StripWeapon(FEVER_WEAPON_CLASS)
 		ply.MTAInFever = nil
 		fever_data[ply] = nil
+		hook.Run("MTAFeverState", ply, false)
 		net.Start(tag)
 		net.WriteBool(false)
 		net.Send(ply)
@@ -48,6 +49,8 @@ if SERVER then
 
 				atck.MTAInFever = true
 				atck.MTANextFever = CurTime() + FEVER_TIMEOUT
+
+				hook.Run("MTAFeverState", atck, true)
 
 				if IS_MTA_GM then
 					MTA.Statuses.AddStatus(atck, "fever", "Fever", MTA.DangerColor, CurTime() + FEVER_TIME)

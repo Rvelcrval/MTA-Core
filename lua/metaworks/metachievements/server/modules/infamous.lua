@@ -1,9 +1,9 @@
 if not MetAchievements then return end
 
-resource.AddFile("materials/metachievements/infamous/s1/icon.png")
-
 local tag = "MetAchievements"
 local id = "infamous"
+
+resource.AddFile("materials/metachievements/" .. id .. "/s1/icon.png")
 
 local PRESTIGE_LEVEL = 5
 

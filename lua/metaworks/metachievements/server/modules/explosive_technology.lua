@@ -1,9 +1,9 @@
 if not MetAchievements then return end
 
-resource.AddFile("materials/metachievements/explosive_technology/s1/icon.png")
-
 local tag = "MetAchievements"
 local id = "explosive_technology"
+
+resource.AddFile("materials/metachievements/" .. id .. "/s1/icon.png")
 
 MetAchievements.RegisterAchievement(id, {
 	title = "Explosive Technology",
