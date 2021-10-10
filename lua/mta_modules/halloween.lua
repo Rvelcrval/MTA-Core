@@ -100,16 +100,24 @@ if SERVER then
 
 	local enemy_types = {
 		zombies = function()
-			return ents.Create("npc_zombie")
+			local z = ents.Create("npc_zombie")
+			z:SetMaterial("models/alyx/alyxblack")
+			return z
 		end,
 		poison_zombies = function()
-			return ents.Create("npc_poisonzombie")
+			local z = ents.Create("npc_poisonzombie")
+			z:SetMaterial("models/alyx/alyxblack")
+			return z
 		end,
 		fast_zombies = function()
-			return ents.Create("npc_fastzombie")
+			local z = ents.Create("npc_fastzombie")
+			z:SetMaterial("models/alyx/alyxblack")
+			return z
 		end,
 		zombines = function()
-			return ents.Create("npc_zombine")
+			local z = ents.Create("npc_zombine")
+			z:SetMaterial("models/alyx/alyxblack")
+			return z
 		end,
 	}
 	hook.Add("MTANPCSpawnProcess", TAG, function(target, pos, wanted_lvl)
@@ -220,6 +228,8 @@ if SERVER then
 		if not is_halloween then return end
 		if not headcrab_classes[ent:GetClass()] then return end
 
+		ent:SetMaterial("models/alyx/alyxblack")
+
 		-- cant do it right away, its too early
 		timer.Simple(1, function()
 			if not IsValid(ent) then return end
@@ -305,7 +315,7 @@ if CLIENT then
 		local pos = zombie:GetPos() -- The origin position of the effect
 		local emitter = ParticleEmitter(pos) -- Particle emitter in this position
 		local spread = 10
-		local amount = 2
+		local amount = 1
 		local timer_name = "MTAShadowZombie_" .. zombie:EntIndex()
 		timer.Create(timer_name, 0.25, 0, function()
 			if not IsValid(zombie) then
@@ -314,9 +324,9 @@ if CLIENT then
 				return
 			end
 
-			for i = 1, amount * 2 do
+			for i = 1, amount  do
 				local offset = Vector(math.random(-spread, spread), math.random(-spread, spread), 0) --math.random(0, zombie:OBBMaxs().z))
-				local part = emitter:Add(i % 2 == 0 and "particle/smokestack_nofog" or "sprites/heatwave", pos + offset) -- Create a new particle at pos
+				local part = emitter:Add("particle/smokestack_nofog", pos + offset) -- Create a new particle at pos
 				if part then
 					part:SetDieTime(2.5) -- How long the particle should "live"
 
@@ -329,18 +339,6 @@ if CLIENT then
 					part:SetGravity(Vector(0, 0, 30)) -- Gravity of the particle
 					part:SetVelocity(Vector(1, 1, 1)) -- Initial velocity of the particle
 					part:SetColor(0, 0, 0)
-
-					hook.Add("Think", part, function()
-						if not IsValid(zombie) then
-							hook.Remove("Think", part)
-							return
-						end
-
-						local z_diff = part:GetPos().z - zombie:GetPos().z
-						local target_pos = zombie:GetPos() + offset
-						target_pos.z = zombie:GetPos().z + z_diff
-						part:SetPos(target_pos)
-					end)
 				end
 			end
 		end)
