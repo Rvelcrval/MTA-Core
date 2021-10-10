@@ -347,6 +347,7 @@ if CLIENT then
 	end
 
 	hook.Add("OnEntityCreated", TAG, function(ent)
+		if not is_halloween then return end
 		if MTA.IsOptedOut() then return end
 
 		timer.Simple(0.5, function()
