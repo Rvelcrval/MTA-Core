@@ -274,13 +274,13 @@ if SERVER then
 
 		local levels = {
 			default = {
-				title = "The Harrowing",
+				title = "Harrowing",
 				description = "Tracks how many lost souls you've purged"
 			}
 		}
 
 		MetaBadges.RegisterBadge("zombie_massacre", {
-			basetitle = "The Harrowing",
+			basetitle = "Harrowing",
 			levels = levels,
 			level_interpolation = MetaBadges.INTERPOLATION_FLOOR
 		})
