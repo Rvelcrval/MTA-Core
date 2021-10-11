@@ -14,8 +14,8 @@ local hook_name = ("%s_%s"):format(tag, id)
 hook.Add("PlayerDeath", hook_name, function(ply, inflictor, attacker)
 	if MetAchievements.HasAchievement(ply, id) then return end
 
-	if (inflictor:GetClass() == "grenade_helicopter" and inflictor:GetNWBool("MTABomb"))
-		or (attacker:GetClass() == "grenade_helicopter" and attacker:GetNWBool("MTABomb"))
+	if (IsValid(inflictor) and inflictor:GetClass() == "grenade_helicopter" and inflictor:GetNWBool("MTABomb"))
+		or (IsValid(attacker) and attacker:GetClass() == "grenade_helicopter" and attacker:GetNWBool("MTABomb"))
 	then
 		MetAchievements.UnlockAchievement(ply, id)
 	end
