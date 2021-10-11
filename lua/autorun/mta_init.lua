@@ -51,6 +51,8 @@ if SERVER then
 	resource.AddFile("materials/metabadges/criminal/s1/default.vmt")
 	resource.AddFile("materials/metabadges/daily_commitment/s1/default.vmt")
 	resource.AddFile("materials/metabadges/zombie_massacre/s1/default.vmt")
+
+	include("mta/gm_badges.lua")
 end
 
 hook.Add("PostGamemodeLoaded", "MTA", function()
@@ -62,7 +64,6 @@ hook.Add("PostGamemodeLoaded", "MTA", function()
 	end
 
 	include("skins/mta.lua")
-	include("mta/gm_badges.lua")
 	include("mta/core.lua")
 	include("mta/songs.lua")
 	include("mta/weapons.lua")
