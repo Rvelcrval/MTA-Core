@@ -318,7 +318,7 @@ if CLIENT then
 
 	local Vector = _G.Vector
 	local black = Material("models/alyx/alyxblack")
-
+	local ptcle_texture = Material("particle/smokestack_nofog"):IsError() and "particle/Particle_Glow_04" or "particle/smokestack_nofog"
 	local function make_shadow_zombie(zombie)
 		function zombie:RenderOverride()
 			render.MaterialOverride(black)
@@ -346,7 +346,7 @@ if CLIENT then
 
 			for i = 1, amount  do
 				local offset = Vector(math.random(-spread, spread), math.random(-spread, spread), 0) --math.random(0, zombie:OBBMaxs().z))
-				local part = emitter:Add("particle/smokestack_nofog", pos + offset) -- Create a new particle at pos
+				local part = emitter:Add(ptcle_texture, pos + offset) -- Create a new particle at pos
 				if part then
 					part:SetDieTime(2.5)
 
