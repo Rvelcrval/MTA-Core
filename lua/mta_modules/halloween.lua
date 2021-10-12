@@ -302,6 +302,8 @@ if SERVER then
 end
 
 if CLIENT then
+	local CVAR_SMOKE = CreateClientConVar("mta_halloween_shadows", "1", true, false)
+
 	hook.Add("MTADisplayJoinPanel", TAG, function()
 		if is_halloween then return false end
 	end)
@@ -325,6 +327,8 @@ if CLIENT then
 				self:DrawModel()
 			render.MaterialOverride()
 		end
+
+		if not CVAR_SMOKE:GetBool() then return end
 
 		-- dont do particles on headcrabs
 		if zombie:GetClass():match("headcrab") then return end
