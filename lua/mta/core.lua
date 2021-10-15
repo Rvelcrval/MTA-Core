@@ -19,6 +19,9 @@ local tag = "mta"
 local MTA = _G.MTA or {}
 _G.MTA = MTA
 
+-- events will set that value
+MTA.OnGoingEvent = false
+
 -- color scheme for most UI of MTA
 MTA.PrimaryColor = Color(244, 135, 2)
 MTA.BackgroundColor = Color(0, 0, 0, 200)

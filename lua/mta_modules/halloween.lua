@@ -65,14 +65,20 @@ local coefs = {
 
 local is_halloween = false
 local function check_halloween()
-	-- dont enable on MTA gamemode, we can make this infinitely better,
-	-- this is just a tiny easter egg thing
-	is_halloween = os.date("%m") == "10"
+	-- if there is an even and its now halloween dont do anything
+	if MTA.OnGoingEvent ~= false and MTA.OnGoingEvent ~= "halloween" then return end
+
+	is_halloween = os.date("%m") == "10" -- check for spooktober
 
 	if is_halloween then
 		MTA.Coeficients = coefs
+		MTA.OnGoingEvent = "halloween"
 	else
 		MTA.Coeficients = MTA_CONFIG.core.Coeficients
+
+		if MTA.OnGoingEvent == "halloween" then
+			MTA.OnGoingEvent = false
+		end
 	end
 
 	if CLIENT then
@@ -81,6 +87,7 @@ local function check_halloween()
 	end
 end
 
+check_halloween()
 timer.Create(TAG, 60, 0, check_halloween)
 
 if SERVER then
