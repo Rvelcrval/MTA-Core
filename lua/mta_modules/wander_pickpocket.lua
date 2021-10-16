@@ -53,9 +53,11 @@ if SERVER then
 
 			pickpockets[npc] = nil
 
-			net.Start(NET_REMOVE_PICKPOCKET)
-			net.WriteEntity(npc)
-			net.Send(atck)
+			if atck:IsPlayer() then
+				net.Start(NET_REMOVE_PICKPOCKET)
+				net.WriteEntity(npc)
+				net.Send(atck)
+			end
 		end
 	end)
 
