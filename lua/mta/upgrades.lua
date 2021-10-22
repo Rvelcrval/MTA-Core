@@ -594,6 +594,8 @@ if CLIENT then
 	end
 
 	hook.Add("HUDPaint", tag, function()
+		if IS_MTA_GM then return end -- the gamemode has its own thing
+
 		local npc = get_dealer_npc()
 		if not IsValid(npc) then return end
 
