@@ -394,8 +394,8 @@ if CLIENT then
 		if not IsValid(npc) then return end
 
 		timer.Simple(0.5, function()
-			if not IsValid(ent) then return end
-			if not ent:GetNWBool("MTACombine") then return end
+			if not IsValid(npc) then return end
+			if not npc:GetNWBool("MTACombine") then return end
 			make_shadow_zombie(npc)
 		end)
 	end)
