@@ -1,4 +1,5 @@
 local TAG = "MTAHalloween"
+local NET_SHADOW = "MTA_HALLOWEEN_SHADOW"
 
 local coefs = {
 	["player"] = {
@@ -91,6 +92,8 @@ check_halloween()
 timer.Create(TAG, 60, 0, check_halloween)
 
 if SERVER then
+	util.AddNetworkString(NET_SHADOW)
+
 	local function default_log(...)
 		Msg("[MTA] ")
 		print(...)
@@ -260,14 +263,7 @@ if SERVER then
 			ent:SetMaterial("models/alyx/alyxblack")
 
 			local target = MTA.BadPlayers[math.random(#MTA.BadPlayers)]
-			if IsValid(target) then
-				MTA.SetupCombine(ent, target, MTA.BadPlayers)
-			end
-
-			table.insert(MTA.Combines, ent)
-			ent:SetNWBool("MTACombine", true)
-			ent.ms_notouch = true
-			MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
+			MTA.EnrollNPC(ent, target)
 		end)
 	end)
 
@@ -305,6 +301,12 @@ if SERVER then
 		if is_wanted then return end
 		update_badge(ply, ply.MTAMassacreCount or 1)
 		ply.MTAMassacreCount = 0
+	end)
+
+	hook.Add("MTANPCEnrolled", TAG, function(npc)
+		net.Start(NET_SHADOW)
+		net.WriteEntity(npc)
+		net.Broadcast()
 	end)
 end
 
@@ -384,6 +386,17 @@ if CLIENT then
 			if not IsValid(ent) then return end
 			if not ent:GetNWBool("MTACombine") then return end
 			make_shadow_zombie(ent)
+		end)
+	end)
+
+	net.Receive(NET_SHADOW, function()
+		local npc = net.ReadEntity()
+		if not IsValid(npc) then return end
+
+		timer.Simple(0.5, function()
+			if not IsValid(ent) then return end
+			if not ent:GetNWBool("MTACombine") then return end
+			make_shadow_zombie(npc)
 		end)
 	end)
 end

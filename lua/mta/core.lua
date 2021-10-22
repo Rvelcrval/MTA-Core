@@ -742,6 +742,19 @@ if SERVER then
 		return true
 	end
 
+	function MTA.EnrollNPC(npc, target)
+		if IsValid(target) then
+			MTA.SetupCombine(npc, target, MTA.BadPlayers)
+		end
+
+		table.insert(MTA.Combines, npc)
+		npc:SetNWBool("MTACombine", true)
+		npc.ms_notouch = true
+		MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
+
+		hook.Run("MTANPCEnrolled", npc, target)
+	end
+
 	local whitelist = {}
 	for _, class_name in pairs(MTA_CONFIG.core.DamageWhitelist) do
 		whitelist[class_name] = true
@@ -934,14 +947,7 @@ if SERVER then
 			for _, nearby_ent in pairs(ents.FindInSphere(ent:GetPos(), 400)) do
 				if nearby_ent:GetNWBool("MTACombine") then
 					local target = nearby_ent:GetEnemy()
-					if IsValid(target) then
-						MTA.SetupCombine(ent, target, MTA.BadPlayers)
-					end
-
-					table.insert(MTA.Combines, ent)
-					ent:SetNWBool("MTACombine", true)
-					ent.ms_notouch = true
-					MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
+					MTA.EnrollNPC(ent, target)
 
 					break
 				end
