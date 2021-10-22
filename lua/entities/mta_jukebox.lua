@@ -133,6 +133,13 @@ if CLIENT then
 			end
 		end
 
+		function songs_combobox:Paint(w, h)
+			surface.SetDrawColor(
+				self:IsHovered() and MTA.TextColor or MTA.PrimaryColor
+			)
+			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
+		end
+
 		local songs_preview_btn = songs:Add("DButton")
 		songs_preview_btn:SetSize(60, 20)
 		songs_preview_btn:SetPos(330, 50)
@@ -174,6 +181,13 @@ if CLIENT then
 			self:SetText(text)
 		end
 
+		function songs_preview_btn:Paint(w, h)
+			surface.SetDrawColor(
+				self:IsHovered() and MTA.TextColor or MTA.PrimaryColor
+			)
+			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
+		end
+
 		local songs_remove_btn = songs:Add("DButton")
 		songs_remove_btn:SetSize(50, 20)
 		songs_remove_btn:SetPos(400, 50)
@@ -190,6 +204,13 @@ if CLIENT then
 			net.SendToServer()
 
 			notification.AddLegacy("Removed custom song", NOTIFY_UNDO, 5)
+		end
+
+		function songs_remove_btn:Paint(w,h)
+			surface.SetDrawColor(
+				self:IsHovered() and MTA.TextColor or MTA.PrimaryColor
+			)
+			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
 		end
 
 		local songs_customs_textentry = songs:Add("DTextEntry")
@@ -243,6 +264,13 @@ if CLIENT then
 
 			notification.AddLegacy("Added custom song", NOTIFY_GENERIC, 5)
 			songs_customs_textentry:SetText("")
+		end
+
+		function songs_customs_add_btn:Paint(w, h)
+			surface.SetDrawColor(
+				self:IsHovered() and MTA.TextColor or MTA.PrimaryColor
+			)
+			surface.DrawOutlinedRect(0, 0, w, h, 1.5)
 		end
 
 		function songs_customs_textentry:OnEnter()
