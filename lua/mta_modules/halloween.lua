@@ -304,6 +304,7 @@ if SERVER then
 	end)
 
 	hook.Add("MTANPCEnrolled", TAG, function(npc)
+		if not is_halloween then return end
 		net.Start(NET_SHADOW)
 		net.WriteEntity(npc)
 		net.Broadcast()
