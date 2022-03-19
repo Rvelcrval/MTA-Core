@@ -318,7 +318,7 @@ if CLIENT then
 		if is_halloween then return false end
 	end)
 
-	local base_url = "https://gitlab.com/metastruct/mta_projects/mta/-/raw/master/external/halloween/TRACK_%d.ogg"
+	local base_url = "https://gitlab.com/metastruct/mta_projects/mta/-/raw/master/external/songs/halloween/TRACK_%d.ogg"
 	hook.Add("MTAGetDefaultSong", TAG, function()
 		if not is_halloween then return end
 		local i = math.random(1, 2)

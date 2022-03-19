@@ -370,7 +370,7 @@ if CLIENT then
 		else
 			local index = get_rand_song_index(id, BASE_SONG_AMOUNT)
 			local file_name = ("song_%d.dat"):format(index)
-			local base_song_url = "https://gitlab.com/metastruct/mta_projects/mta/-/raw/master/external/TRACK_" .. index .. ".ogg"
+			local base_song_url = "https://gitlab.com/metastruct/mta_projects/mta/-/raw/master/external/songs/TRACK_" .. index .. ".ogg"
 			get_custom_content(base_song_url, file_name, function()
 				if not on_going_assault() then return end
 				start_assault(file_name)
