@@ -73,7 +73,10 @@ function MTA.Reset()
 	hook.Run("MTAReset")
 end
 
-function MTA.InLobby(ply)
+function MTA.InValidArea(ply)
+	local ret = hook.Run("MTAIsInValidArea", ply)
+	if ret ~= nil then return ret end
+
 	if IS_MTA_GM then return true end
 	if ply.InLobby then
 		return ply:InLobby()
@@ -713,7 +716,7 @@ if SERVER then
 		if ply.MTAIgnore then return false end
 		if not ply:IsPlayer() then return false end
 		if not skip_alive and not ply:Alive() then return false end
-		if not MTA.InLobby(ply) then return false end
+		if not MTA.InValidArea(ply) then return false end
 		if MTA.IsOptedOut(ply) then return false end
 
 		-- metastruct ban system
@@ -903,7 +906,7 @@ if SERVER then
 	hook.Add("PlayerLeftTrigger", tag, function(ply)
 		timer.Simple(1, function()
 			if not IsValid(ply) then return end
-			if not MTA.InLobby(ply) then
+			if not MTA.InValidArea(ply) then
 				MTA.ResetPlayerFactor(ply, true, false)
 			end
 		end)
@@ -983,7 +986,7 @@ if SERVER then
 		if should_sound_hack(ent) then
 			local plys = {}
 			for _, ply in ipairs(player.GetAll()) do
-				if MTA.InLobby(ply) and not MTA.IsOptedOut(ply) then
+				if MTA.InValidArea(ply) and not MTA.IsOptedOut(ply) then
 					table.insert(plys, ply)
 				end
 			end
@@ -1233,7 +1236,7 @@ if CLIENT then
 
 	hook.Add("EntityEmitSound", tag, function(data)
 		if not MTA.IsOptedOut() then return end
-		if not MTA.InLobby(LocalPlayer()) then return end
+		if not MTA.InValidArea(LocalPlayer()) then return end
 		if not IsValid(data.Entity) then return end
 
 		local ent = data.Entity
@@ -1306,7 +1309,7 @@ if CLIENT then
 	hook.Add("DeathNotice", tag, function(atck, inflictor, target)
 		if is_mta_ent(atck) or is_mta_ent(target) or is_mta_ent(inflictor) then
 			if MTA.IsOptedOut() then return false end
-			if not MTA.InLobby(LocalPlayer()) then return false end
+			if not MTA.InValidArea(LocalPlayer()) then return false end
 		end
 	end)
 end

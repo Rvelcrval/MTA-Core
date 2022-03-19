@@ -167,6 +167,11 @@ hook.Add("CanPlyGoto", tag, function(ply)
     timer.Simple(0, function()
         if not IsValid(ply) then return end
         if is_constrained(ply) then
+            if hook.Run("MTAIsInValidArea", ply) then
+                ply:SetPos(old_pos)
+                return
+            end
+
             if IS_MTA_GM then ply:SetPos(old_pos)
             elseif ply.InLobby and ply:InLobby() then ply:SetPos(old_pos) end
         end

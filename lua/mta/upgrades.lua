@@ -100,9 +100,11 @@ if SERVER then
 		local nw_value_name = ("MTAStat_%s"):format(stat_name)
 		local cur_value = ply:GetNWInt(nw_value_name, 0)
 		local new_value = cur_value + amount
-		ply:SetNWInt(nw_value_name, new_value)
 
-		hook.Run("MTAStatIncrease", ply, stat_name, cur_value, new_value)
+		local ret = hook.Run("MTAStatIncrease", ply, stat_name, cur_value, new_value)
+		if ret == false then return end
+
+		ply:SetNWInt(nw_value_name, new_value)
 
 		-- dont spam this
 		local account_id = ply:AccountID()
@@ -167,7 +169,7 @@ if SERVER then
 
 		local attacker = dmg_info:GetAttacker()
 		if not attacker:IsPlayer() then return end
-		if not MTA.InLobby(attacker) then return end
+		if not MTA.InValidArea(attacker) then return end
 
 		local multiplier = MTA.GetPlayerStat(attacker, "damage_multiplier")
 		dmg_info:ScaleDamage((1 + (0.01 * multiplier)) * 2) -- up to 4x the damage

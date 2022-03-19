@@ -15,7 +15,7 @@ if SERVER then
 	local function get_lobby_players()
 		local plys = {}
 		for _, ply in ipairs(player.GetAll()) do
-			if MTA.InLobby(ply) and not MTA.IsWanted(ply) and not MTA.IsOptedOut(ply) then
+			if MTA.InValidArea(ply) and not MTA.IsWanted(ply) and not MTA.IsOptedOut(ply) then
 				table.insert(plys, ply)
 			end
 		end
@@ -83,7 +83,7 @@ if SERVER then
 	local function announce_bounty_end(bounty, was_hunted, hunter, points_earned)
 		local filter = {}
 		for _, ply in ipairs(player.GetAll()) do
-			if (not was_hunted and MTA.InLobby(ply)) or (was_hunted and ply ~= hunter and MTA.InLobby(ply)) then
+			if (not was_hunted and MTA.InValidArea(ply)) or (was_hunted and ply ~= hunter and MTA.InValidArea(ply)) then
 				table.insert(filter, ply)
 			end
 		end
