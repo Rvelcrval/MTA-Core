@@ -318,14 +318,11 @@ if CLIENT then
 		if is_halloween then return false end
 	end)
 
-	local songs = {
-		"https://dl.dropboxusercontent.com/s/3yhyi3r516c452r/SIERRA%20TRAPPED.ogg",
-		"https://dl.dropboxusercontent.com/s/rd59wk27r3cjg3o/TARIK%20BOUISFI%20EVIL%20GATEWAY.ogg"
-	}
+	local base_url = "https://gitlab.com/metastruct/mta_projects/mta/-/raw/master/external/halloween/TRACK_%d.ogg"
 	hook.Add("MTAGetDefaultSong", TAG, function()
 		if not is_halloween then return end
-		local i = math.random(#songs)
-		return songs[i], ("halloween_%d.dat"):format(i)
+		local i = math.random(1, 2)
+		return base_url:format(i), ("halloween_%d.dat"):format(i)
 	end)
 
 	local Vector = _G.Vector
