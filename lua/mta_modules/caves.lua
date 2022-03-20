@@ -232,8 +232,12 @@ if SERVER then
 
 	hook.Add("MTARemoveNPC", TAG, function(ent)
 		if not npc_classes[ent:GetClass()] then return end
+		if ent.MTARemoving then return end
 
+		ent.MTARemoving = true
 		ent:Input("BurrowAway")
+
+		SafeRemoveEntityDelayed(ent, 1.5)
 		return false
 	end)
 
