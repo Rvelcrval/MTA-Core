@@ -1,4 +1,5 @@
 local NET_FAR_COMBINE_SPAWN_EFFECT = "FAR_COMBINE_SPAWN_EFFECT"
+local IsValid = _G.IsValid
 
 if CLIENT then
 	local CANNON_AMT = 50
@@ -53,8 +54,6 @@ end
 util.AddNetworkString(NET_FAR_COMBINE_SPAWN_EFFECT)
 
 local MAX_SPAWN_DISTANCE = 1024
-
-local IsValid = _G.IsValid
 
 local tag = "far_combine"
 local combines = {}
@@ -248,20 +247,20 @@ local function invisible_near(ply, node, collected)
 
 	return function()
 		for i = 1, 1500 * 10 do
-			local node = stack[1]
+			local found_node = stack[1]
 			table.remove(stack, 1)
-			if not node then
+			if not found_node then
 				return
 			end
-			if not collected[node] then
-				collected[node] = true
-				local nopvs = not ply:TestPVS(node.pos + Vector(0, 0, 4))
-				local far = is_far_behind(ply, node.pos)
+			if not collected[found_node] then
+				collected[found_node] = true
+				local nopvs = not ply:TestPVS(found_node.pos + Vector(0, 0, 4))
+				local far = is_far_behind(ply, found_node.pos)
 				if nopvs or far then
-					return node
+					return found_node
 				end
 
-				for k, node_candidate in next, node.neighbor do
+				for k, node_candidate in next, found_node.neighbor do
 					if not collected[node_candidate] then
 						stack[#stack + 1] = node_candidate
 					end
@@ -275,7 +274,7 @@ end
 
 local output = {}
 
-local t = {
+local BASE_TRACE_INFO = {
 	output = output,
 	mask = MASK_NPCSOLID,
 	mins = Vector(-17, -17, 0),
@@ -285,10 +284,10 @@ local t = {
 local function would_combine_stuck(pos)
 	if not util.IsInWorld(pos) then return true end
 
-	t.start = pos
-	t.endpos = pos
+	BASE_TRACE_INFO.start = pos
+	BASE_TRACE_INFO.endpos = pos
 
-	return util.TraceHull(t).StartSolid
+	return util.TraceHull(BASE_TRACE_INFO).StartSolid
 end
 
 local vecup_offset = Vector(0, 0, 33)
@@ -441,10 +440,9 @@ local function setup_combine(combine, target, players)
 
 			if n_new then
 				n = n_new
-				local nnode, newpos = find_cadidate_node(target, n)
+				local _, newpos = find_cadidate_node(target, n)
 				if newpos then
-					node, pos = nnode, newpos
-					combine:SetPos(pos)
+					combine:SetPos(newpos)
 					combine:SetEnemy(target, true)
 					combine:UpdateEnemyMemory(target, target:GetPos())
 				end
@@ -560,7 +558,12 @@ local function find_nearby_spot(node)
 
 	local new_pos = center_pos
 	while cur_retries < RETRIES do
-		new_pos = new_pos + Vector(math.random(-SCALE, SCALE), math.random(-SCALE, SCALE), 0)
+		new_pos = new_pos + Vector(
+			math.random() > 0.5 and math.random(SCALE, SCALE + SCALE) or math.random(-SCALE, -(SCALE + SCALE)),
+			math.random() > 0.5 and math.random(SCALE, SCALE + SCALE) or math.random(-SCALE, -(SCALE + SCALE)),
+			0
+		)
+
 		local tr = util.TraceHull({
 			start = new_pos,
 			endpos = new_pos,
@@ -583,7 +586,7 @@ local function find_node(target)
 	local nearest_node = get_nearest_node(target, MAX_SPAWN_DISTANCE)
 	if not nearest_node then return false, "could not get nearest node" end
 
-	local node, pos = find_cadidate_node(target, nearest_node)
+	local node, _ = find_cadidate_node(target, nearest_node)
 	if not node then return false, "could not find suitable node" end
 
 	local final_pos = node.pos
