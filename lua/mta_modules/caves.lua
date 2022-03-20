@@ -166,7 +166,7 @@ if SERVER then
 
 	local function unburrow(ent)
 		local spore = ents.Create("env_sporeexplosion")
-		spore:SetPos(there)
+		spore:SetPos(ent:WorldSpaceCenter())
 		spore:SetSaveValue("m_flSpawnRate", 128.0)
 		spore:Spawn()
 		spore:Fire("enable")
