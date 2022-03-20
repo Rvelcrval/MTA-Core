@@ -170,12 +170,10 @@ if SERVER then
 		spore:SetSaveValue("m_flSpawnRate", 64.0)
 		spore:Spawn()
 		spore:Fire("Enable")
+		SafeRemoveEntityDelayed(spore, 2)
 
 		ent:SetKeyValue("startburrowed", "1")
-
 		timer.Simple(0.1, function()
-			spore:Remove()
-
 			if not IsValid(ent) then return end
 			ent:Input("Unburrow")
 		end)
