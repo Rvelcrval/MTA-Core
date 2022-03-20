@@ -140,7 +140,7 @@ if SERVER then
 
 	local npcs = {}
 	for npc_class, npc_key in pairs(npc_classes) do
-		npcs[npc_key] = function() return ents.Create(npc_class), npc_class end
+		npcs[npc_key] = function() return ents.Create(npc_class) end
 	end
 
 	hook.Add("MTANPCSpawnProcess", TAG, function(ply, pos, wanted_lvl)
@@ -148,14 +148,14 @@ if SERVER then
 
 		add_coefs()
 
-		local spawn_function, npc_class = npcs.antlions
+		local spawn_function, npc_class = npcs.antlions, "npc_antlion"
 		if wanted_lvl > 10 then
 			if math.random(0, 100) < 25 then
-				spawn_function, npc_class = npcs.antlion_workers
+				spawn_function, npc_class = npcs.antlion_workers, "npc_antlion_worker"
 			end
 
 			if wanted_lvl > 20 and math.random(0, 100) < 5 then
-				spawn_function, npc_class = npcs.antlion_guards
+				spawn_function, npc_class = npcs.antlion_guards, "npc_antlionguard"
 			end
 		end
 

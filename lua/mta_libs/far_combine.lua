@@ -631,7 +631,7 @@ local function far_combine(target, players, spawn_function, callback, pos, npc_c
 		callback(combine)
 	end)
 
-	return true, npc_class
+	return true, nil, npc_class
 end
 
 return far_combine, setup_combine

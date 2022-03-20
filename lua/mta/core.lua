@@ -265,26 +265,26 @@ if SERVER then
 			npc:SetMaterial("models/mta/police_skins/metrocop_sheet_police")
 			npc:SetKeyValue("additionalequipment", math.random() > 0.5 and "weapon_pistol" or "weapon_stunstick")
 			npc:SetKeyValue("manhacks", tostring(math.random(0, 2)))
-			return npc, "npc_metropolice"
+			return npc
 		end,
 		soldiers = function() --  this includes shotgunners
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", math.random() < 0.25 and "weapon_shotgun" or "weapon_smg1")
 			npc:SetMaterial("models/mta/police_skins/combinesoldiersheet_police")
-			return npc, "npc_combine_s"
+			return npc
 		end,
 		elites = function()
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_ar2")
 			npc:SetModel("models/combine_super_soldier.mdl")
 			npc:SetMaterial("models/mta/police_skins/combine_elite_police")
-			return npc, "npc_combine_s"
+			return npc
 		end,
 		shotgunners = function()
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_shotgun")
 			npc:SetMaterial("models/mta/police_skins/combinesoldiersheet_police")
-			return npc, "npc_combine_s"
+			return npc
 		end,
 		hunters = function()
 			local npc = ents.Create("npc_hunter")
@@ -293,7 +293,7 @@ if SERVER then
 			return npc, "npc_hunter"
 		end,
 		manhacks = function()
-			return ents.Create("npc_manhack"), "npc_manhack"
+			return ents.Create("npc_manhack")
 		end,
 	}
 
@@ -309,22 +309,22 @@ if SERVER then
 			spawn_function, npc_class = provided_func, provided_npc_class
 		else
 			-- under 10 -> only metrocops
-			spawn_function, npc_class = combine_types.metrocops
+			spawn_function, npc_class = combine_types.metrocops, "npc_metropolice"
 
 			-- manhacks drop crucial parts, so they need to constantly spawn
 			if IS_MTA_GM and math.random(0, 100) <= 10 then
-				spawn_function, npc_class = combine_types.manhacks
+				spawn_function, npc_class = combine_types.manhacks, "npc_manhack"
 
 			-- 10 to 60 -> metrocops and soldiers that become more and more common
 			elseif wanted_lvl < 60 and wanted_lvl >= 10 then
-				spawn_function, npc_class = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
+				spawn_function, npc_class = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers, "npc_combine_s" or combine_types.metrocops, "npc_metropolice"
 
 			-- 60 - 80 -> only elites
 			elseif wanted_lvl >= 60 and wanted_lvl < 80 then
 				if IS_MTA_GM and math.random(0, 100) <= 7 then
-					spawn_function, npc_class = combine_types.hunters
+					spawn_function, npc_class = combine_types.hunters, "npc_hunter"
 				else
-					spawn_function, npc_class = combine_types.elites
+					spawn_function, npc_class = combine_types.elites, "npc_combine_s"
 				end
 
 			-- 80 - inf -> elites, shotgunners and an helicopter
@@ -342,9 +342,9 @@ if SERVER then
 				end
 
 				if IS_MTA_GM and math.random(0, 100) <= 7 then
-					spawn_function, npc_class = combine_types.hunters
+					spawn_function, npc_class = combine_types.hunters, "npc_hunter"
 				else
-					spawn_function, npc_class = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
+					spawn_function, npc_class = math.random(1, 5) == 1 and combine_types.shotgunners, "npc_combine_s" or combine_types.elites, "npc_combine_s"
 				end
 			end
 		end
