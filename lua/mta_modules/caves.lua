@@ -61,12 +61,18 @@ if SERVER then
 
 			local local_boss = ents.Create("npc_antlionguard")
 			local_boss:SetMaterial("Models/antlion_guard/antlionGuard2")
-			--local_boss:SetModelScale(2)
-			local_boss:SetHealth(5000)
+			local_boss:SetModelScale(1.25)
+			local_boss:SetHealth(20000)
 			local_boss:SetPos(prev_pos + Vector(0, 0, 100))
 			local_boss:Spawn()
 			local_boss:Activate()
 			local_boss:DropToFloor()
+			local_boss:SetKeyValue("startburrowed", "1")
+
+			timer.Simple(0.1, function()
+				if not IsValid(local_boss) then return end
+				local_boss:Input("Unburrow")
+			end)
 
 			MTA.EnrollNPC(local_boss, attacker)
 
@@ -157,15 +163,28 @@ if SERVER then
 		}
 	end
 
+	local function unburrow(ent)
+		ent:SetKeyValue("startburrowed", "1")
+
+		timer.Simple(0.1, function()
+			if not IsValid(ent) then return end
+			ent:Input("Unburrow")
+		end)
+	end
+
 	local npcs = {}
 	for npc_class, npc_key in pairs(npc_classes) do
-		npcs[npc_key] = function() return ents.Create(npc_class) end
+		npcs[npc_key] = function()
+			local ent = ents.Create(npc_class)
+			unburrow(ent)
+			return ent
+		end
 	end
 
 	npcs.antlion_guards = function()
 		local ent = ents.Create("npc_antlionguard")
 		ent.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
-
+		unburrow(ent)
 		return ent
 	end
 
