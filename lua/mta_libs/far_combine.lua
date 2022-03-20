@@ -160,7 +160,10 @@ local function create_combine(pos, spawn_function)
 	npc:Activate()
 	npc:SetCurrentWeaponProficiency(WEAPON_PROFICIENCY_PERFECT)
 	npc:Input("StartPatrolling")
-	npc:SetHealth(100)
+
+	if npc:Health() < 100 then
+		npc:SetHealth(100)
+	end
 
 	if not npc:IsFlagSet(FL_FLY) then
 		npc:DropToFloor()
