@@ -437,6 +437,9 @@ if SERVER then
 	end
 
 	function MTA.UpdatePlayerBadge(ply, factor)
+		local ret = hook.Run("MTACanUpdateBadge", ply, factor)
+		if ret == false then return end
+
 		local succ, err = pcall(function()
 			if MetaBadges and factor >= 1 then
 				local new_level = math.Clamp(math.ceil(factor / 10), 1, 2000)

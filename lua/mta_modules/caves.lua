@@ -162,13 +162,13 @@ if SERVER then
 		return spawn_function, npc_class
 	end)
 
-	hook.Add("MTAStatIncrease", TAG, function(ply)
+	local function DENY(ply)
 		if is_in_caves(ply) then return false end
-	end)
+	end
 
-	hook.Add("MTACanBeBounty", TAG, function(ply)
-		if is_in_caves(ply) then return false end
-	end)
+	hook.Add("MTAStatIncrease", TAG, DENY)
+	hook.Add("MTACanBeBounty", TAG, DENY)
+	hook.Add("MTACanUpdateBadge", TAG, DENY)
 
 	-- dont respawn npcs where they shouldnt be
 	hook.Add("MTADisplaceNPC", TAG, function(ply, npc_class)
