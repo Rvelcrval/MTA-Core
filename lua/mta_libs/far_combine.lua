@@ -434,6 +434,12 @@ local function setup_combine(combine, target, players)
 		local try_teleport = (curtime % 3 < 1) -- once every N seconds when N>1
 
 		if try_teleport and is_alive(target) and teleports < 3 and not target:TestPVS(combine:GetPos()) and not combine:IsUnreachable(target) then
+			local ret = hook.Run("MTADisplaceNPC", target, combine:GetClass())
+			if ret == false then
+				SafeRemoveEntityDelayed(combine, 0)
+				return
+			end
+
 			last_teleport = curtime
 			teleports = teleports + 1
 			--local oldpos = combine:GetPos()
