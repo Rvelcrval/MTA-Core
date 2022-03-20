@@ -57,6 +57,17 @@ if SERVER then
 			MTA.IncreasePlayerFactor(dmg_info:GetAttacker(), 100)
 			self:Remove()
 
+			util.RockImpact(attacker, prev_pos, Vector(0, 0, 1), 2, true)
+
+			local local_boss = ents.Create("npc_antlionguard")
+			local_boss:SetMaterial("Models/antlion_guard/antlionGuard2")
+			local_boss:SetModelScale(2)
+			local_boss:SetHealth(5000)
+			local_boss:SetPos(prev_pos)
+			local_boss:Spawn()
+
+			MTA.EnrollNPC(local_boss, attacker)
+
 			-- respawn after 10mins
 			timer.Simple(10 * 60, function()
 				local new_hive = ents.Create("mta_hive")
