@@ -63,9 +63,10 @@ if SERVER then
 			local_boss:SetMaterial("Models/antlion_guard/antlionGuard2")
 			--local_boss:SetModelScale(2)
 			local_boss:SetHealth(5000)
-			local_boss:SetPos(prev_pos)
+			local_boss:SetPos(prev_pos + Vector(0, 0, 100))
 			local_boss:Spawn()
 			local_boss:Activate()
+			local_boss:DropToFloor()
 
 			MTA.EnrollNPC(local_boss, attacker)
 
