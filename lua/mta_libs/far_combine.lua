@@ -413,7 +413,7 @@ local function setup_combine(combine, target, players)
 
 	combine:SetLagCompensated(true)
 	combine:AddFlags(FL_NPC + FL_OBJECT)
-	combine:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	combine:SetCollisionGroup(combine.MTAOverrideCollisionGroup or COLLISION_GROUP_PASSABLE_DOOR)
 	combine:SetEnemy(target, true)
 	combine:AddEntityRelationship(target, D_FR, 0)
 	combine:AddEntityRelationship(target, D_HT, 99)

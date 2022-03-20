@@ -143,6 +143,13 @@ if SERVER then
 		npcs[npc_key] = function() return ents.Create(npc_class) end
 	end
 
+	npcs.antlion_guards = function()
+		local ent = ents.Create("npc_antlionguard")
+		ent.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
+
+		return ent
+	end
+
 	hook.Add("MTANPCSpawnProcess", TAG, function(ply, pos, wanted_lvl)
 		if not is_in_caves(ply) then return end
 
