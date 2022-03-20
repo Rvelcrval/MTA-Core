@@ -1,6 +1,6 @@
 "UnlitGeneric"
 {
- "$basetexture"  "metabadges/daily_service/s1/default"
+ "$basetexture"  "metabadges/daily_commitment/s1/default"
  "$vertexcolor"   1
  "$vertexalpha"   1
  "$nolod"    1
