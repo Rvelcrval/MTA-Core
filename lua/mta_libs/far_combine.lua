@@ -4,6 +4,9 @@ if CLIENT then
 	local CANNON_AMT = 50
 	--local PARTICLES_AMT = 25
 	local function do_spawn_effect(pos)
+		local ret = hook.Run("MTASpawnEffect", pos)
+		if ret == false then return end
+
 		local spawn_pos_ent = ents.CreateClientProp("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
 		if not IsValid(spawn_pos_ent) then return end
 
@@ -549,6 +552,33 @@ local function setup_combine(combine, target, players)
 	end)
 end
 
+local SCALE = 20
+local RETRIES = 3
+local function find_nearby_spot(node)
+	local center_pos = node.pos
+	local cur_retries = 0
+
+	local new_pos = center_pos
+	while cur_retries < RETRIES do
+		new_pos = new_pos + Vector(math.random(-SCALE, SCALE), math.random(-SCALE, SCALE), 0)
+		local tr = util.TraceHull({
+			start = new_pos,
+			endpos = new_pos,
+			mins = Vector(-SCALE, -SCALE, 0),
+			maxs = Vector(SCALE, SCALE, 100),
+		})
+
+		if not IsValid(tr.Entity) then
+			return true, new_pos
+		end
+
+		cur_retries = cur_retries + 1
+	end
+
+	return false, "no available spot"
+end
+
+local cache = {}
 local function find_node(target)
 	local nearest_node = get_nearest_node(target, MAX_SPAWN_DISTANCE)
 	if not nearest_node then return false, "could not get nearest node" end
@@ -556,7 +586,18 @@ local function find_node(target)
 	local node, pos = find_cadidate_node(target, nearest_node)
 	if not node then return false, "could not find suitable node" end
 
-	return true, node.pos
+	local final_pos = node.pos
+	if cache[node] > CurTime() then
+		local success, new_pos = find_nearby_spot(node)
+		if not success then return false, new_pos end
+
+		final_pos = new_pos
+	else
+		cache[node] = CurTime() + 2 -- update cache
+		timer.Simple(2, function() cache[node] = nil end)
+	end
+
+	return true, final_pos
 end
 
 local function far_combine(target, players, spawn_function, callback, pos)
