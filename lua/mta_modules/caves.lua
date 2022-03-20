@@ -78,7 +78,7 @@ if SERVER then
 
 			pcall(function()
 				if not MetaBadges then return end
-				local cur_level = MetaBadges.GetBadgeLevel(attacker, "pest_control")
+				local cur_level = MetaBadges.GetBadgeLevel(attacker, "pest_control") or 0
 				MetaBadges.UpgradeBadge(attacker, "pest_control", cur_level + 1)
 			end)
 
@@ -230,6 +230,9 @@ if SERVER then
 
 	local function create_badge()
 		if not MetaBadges then return end
+
+		pcall(include, "autorun/translation.lua")
+		local L = translation and translation.L or function(s) return s end
 		local levels = {
 			default = {
 				title = L "Pest Control",
