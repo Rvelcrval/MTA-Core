@@ -225,4 +225,8 @@ if CLIENT then
 			return false -- ignore for now
 		end
 	end)
+
+	hook.Add("MTADisplayJoinPanel", TAG, function()
+		if is_in_caves(LocalPlayer()) then return false end
+	end)
 end
