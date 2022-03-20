@@ -255,11 +255,15 @@ end
 if CLIENT then
 	local prev_color, prev_text = MTA.PrimaryColor, MTA.WantedText
 
-	-- for reloads
-	if is_in_caves(LocalPlayer()) then
-		MTA.PrimaryColor = Color(0, 255, 0)
-		MTA.WantedText = "HIVE"
+	-- for reloads and respawns in the caves
+	local function check_cave()
+		if is_in_caves(LocalPlayer()) then
+			hook.Run("PlayerEnteredZone", LocalPlayer(), "cave")
+		end
 	end
+
+	check_cave()
+	hook.Add("InitPostEntity", TAG, check_cave)
 
 	hook.Add("PlayerEnteredZone", TAG, function(_, zone)
 		if zone ~= "cave" then return end

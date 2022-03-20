@@ -91,7 +91,7 @@ if SERVER then
 	end
 
 	local old_values = {}
-	function MTA.IncreasePlayerStat(ply, stat_name, amount, should_log)
+	function MTA.IncreasePlayerStat(ply, stat_name, amount, should_log, ignore_hook)
 		if not IsValid(ply) then return -1 end
 		if not can_db() then return -1 end
 		if not ply:IsPlayer() or ply:IsBot() then return -1 end
@@ -101,8 +101,10 @@ if SERVER then
 		local cur_value = ply:GetNWInt(nw_value_name, 0)
 		local new_value = cur_value + amount
 
-		local ret = hook.Run("MTAStatIncrease", ply, stat_name, cur_value, new_value)
-		if ret == false then return -1 end
+		if not ignore_hook then
+			local ret = hook.Run("MTAStatIncrease", ply, stat_name, cur_value, new_value)
+			if ret == false then return -1 end
+		end
 
 		ply:SetNWInt(nw_value_name, new_value)
 
@@ -221,11 +223,11 @@ if SERVER then
 			if not ret then
 				db.Query(("INSERT INTO mta_stats(id) VALUES(%d);"):format(account_id))
 				for stat_name, default_value in pairs(valid_stats) do
-					MTA.IncreasePlayerStat(ply, stat_name, default_value)
+					MTA.IncreasePlayerStat(ply, stat_name, default_value, false, true)
 				end
 			else
 				for stat_name, default_value in pairs(valid_stats) do
-					MTA.IncreasePlayerStat(ply, stat_name, ret[stat_name] or default_value)
+					MTA.IncreasePlayerStat(ply, stat_name, ret[stat_name] or default_value, false, true)
 				end
 			end
 
