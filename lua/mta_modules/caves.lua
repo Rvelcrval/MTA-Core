@@ -176,6 +176,7 @@ if SERVER then
 	hook.Add("MTAStatIncrease", TAG, DENY)
 	hook.Add("MTACanBeBounty", TAG, DENY)
 	hook.Add("MTACanUpdateBadge", TAG, DENY)
+	hook.Add("MTAShouldPayTax", TAG, DENY)
 
 	-- dont respawn npcs where they shouldnt be
 	hook.Add("MTADisplaceNPC", TAG, function(ply, npc_class)

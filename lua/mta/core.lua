@@ -467,6 +467,11 @@ if SERVER then
 		MTA.ReleasePlayer(ply)
 		MTA.Print(tostring(ply) .. " is now a normal citizen")
 
+		local ret = hook.Run("MTAShouldPayTax", ply, should_pay, is_death, old_factor)
+		if ret ~= nil then
+			should_pay = ret
+		end
+
 		if should_pay and old_factor > 0 then
 			local cur_coins = ply.GetCoins and ply:GetCoins() or 0
 			local wanted_lvl = math.ceil(old_factor / 10)
