@@ -193,7 +193,7 @@ if SERVER then
 
 	-- dont respawn npcs where they shouldnt be
 	hook.Add("MTADisplaceNPC", TAG, function(ply, npc_class)
-		if is_in_caves(ply) and npc_classes[npc_class] then return false end
+		if is_in_caves(ply) and not npc_classes[npc_class] then return false end
 		if not is_in_caves(ply) and npc_classes[npc_class] then return false end
 	end)
 

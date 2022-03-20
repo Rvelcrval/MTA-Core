@@ -143,11 +143,19 @@ if SERVER then
 
 		-- above level 10 progressively change to only fast zombies
 		elseif wanted_lvl < 60 and wanted_lvl >= 10 then
-			spawn_function, npc_class = math.random(0, 60) <= (wanted_lvl + 20) and enemy_types.fast_zombies, "npc_fastzombie" or enemy_types.zombies, "npc_zombie"
+			spawn_function, npc_class = unpack(
+				math.random(0, 60) <= (wanted_lvl + 20)
+				and { enemy_types.fast_zombies, "npc_fastzombie" }
+				or { enemy_types.zombies, "npc_zombie" }
+			)
 
 		-- above 60 we add zombines
 		elseif wanted_lvl >= 60 then
-			spawn_function, npc_class = math.random(0, 100) < 25 and enemy_types.zombines, "npc_zombine" or enemy_types.fast_zombies, "npc_fastzombie"
+			spawn_function, npc_class = unpack(
+				math.random(0, 100) < 25
+				and { enemy_types.zombines, "npc_zombine" }
+				or { enemy_types.fast_zombies, "npc_fastzombie" }
+		 	)
 		end
 
 		return spawn_function, npc_class

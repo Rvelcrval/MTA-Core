@@ -317,7 +317,11 @@ if SERVER then
 
 			-- 10 to 60 -> metrocops and soldiers that become more and more common
 			elseif wanted_lvl < 60 and wanted_lvl >= 10 then
-				spawn_function, npc_class = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers, "npc_combine_s" or combine_types.metrocops, "npc_metropolice"
+				spawn_function, npc_class = unpack(
+					math.random(0, 60) <= (wanted_lvl + 20)
+					and { combine_types.soldiers, "npc_combine_s" }
+					or { combine_types.metrocops, "npc_metropolice" }
+			 	)
 
 			-- 60 - 80 -> only elites
 			elseif wanted_lvl >= 60 and wanted_lvl < 80 then
@@ -344,7 +348,11 @@ if SERVER then
 				if IS_MTA_GM and math.random(0, 100) <= 7 then
 					spawn_function, npc_class = combine_types.hunters, "npc_hunter"
 				else
-					spawn_function, npc_class = math.random(1, 5) == 1 and combine_types.shotgunners, "npc_combine_s" or combine_types.elites, "npc_combine_s"
+					spawn_function, npc_class = unpack(
+						math.random(1, 5) == 1
+						and { combine_types.shotgunners, "npc_combine_s" }
+						or { combine_types.elites, "npc_combine_s" }
+					)
 				end
 			end
 		end
