@@ -166,10 +166,10 @@ if SERVER then
 
 	local function unburrow(ent)
 		local spore = ents.Create("env_sporeexplosion")
-		spore:SetPos(ent:GetPos())
-		spore:SetSaveValue("m_flSpawnRate", 64.0)
+		spore:SetPos(there)
+		spore:SetSaveValue("m_flSpawnRate", 128.0)
 		spore:Spawn()
-		spore:Fire("Enable")
+		spore:Fire("enable")
 		SafeRemoveEntityDelayed(spore, 2)
 
 		ent:SetKeyValue("startburrowed", "1")
