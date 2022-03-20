@@ -70,6 +70,12 @@ if SERVER then
 
 			MTA.EnrollNPC(local_boss, attacker)
 
+			pcall(function()
+				if not MetaBadges then return end
+				local cur_level = MetaBadges.GetBadgeLevel(attacker, "pest_control")
+				MetaBadges.UpgradeBadge(attacker, "pest_control", cur_level + 1)
+			end)
+
 			-- respawn after 10mins
 			timer.Simple(10 * 60, function()
 				local new_hive = ents.Create("mta_hive")
@@ -201,6 +207,26 @@ if SERVER then
 		if not is_in_caves(ply) then return end
 
 		return npc_classes[ent:GetClass()] ~= nil
+	end)
+
+	local function create_badge()
+		if not MetaBadges then return end
+		local levels = {
+			default = {
+				title = L "Pest Control",
+				description = L "Antlion hives destroyed"
+			}
+		}
+
+		MetaBadges.RegisterBadge("pest_control", {
+			basetitle = "Pest Control",
+			levels = levels,
+			level_interpolation = MetaBadges.INTERPOLATION_FLOOR
+		})
+	end
+
+	hook.Add("Initialize", TAG, function()
+		pcall(create_badge)
 	end)
 end
 

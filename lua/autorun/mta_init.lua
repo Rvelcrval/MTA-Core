@@ -51,6 +51,7 @@ if SERVER then
 	resource.AddFile("materials/metabadges/criminal/s1/default.vmt")
 	resource.AddFile("materials/metabadges/daily_commitment/s1/default.vmt")
 	resource.AddFile("materials/metabadges/zombie_massacre/s1/default.vmt")
+	resource.AddFile("materials/metabadges/pest_control/s1/default.vmt")
 
 	include("mta/gm_badges.lua")
 end
