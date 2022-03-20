@@ -29,6 +29,9 @@ if SERVER then
 	local function do_emp(ply)
 		if not IsValid(ply) then return end
 
+		local ret = hook.Run("MTACanMobileEMP", ply)
+		if ret == false then return end
+
 		local shockwave = ents.Create("mta_mobile_emp")
 		shockwave:SetPos(ply:WorldSpaceCenter())
 		shockwave:Spawn()
