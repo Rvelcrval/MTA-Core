@@ -68,6 +68,7 @@ if SERVER then
 			local_boss:Activate()
 			local_boss:DropToFloor()
 			local_boss:SetKeyValue("startburrowed", "1")
+			local_boss:SetKeyValue("allowbark", "1")
 
 			timer.Simple(0.1, function()
 				if not IsValid(local_boss) then return end
@@ -184,6 +185,7 @@ if SERVER then
 	npcs.antlion_guards = function()
 		local ent = ents.Create("npc_antlionguard")
 		ent.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
+		ent:SetKeyValue("allowbark", "1")
 		unburrow(ent)
 		return ent
 	end
