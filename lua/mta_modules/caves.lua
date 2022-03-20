@@ -21,6 +21,12 @@ local function is_in_caves(ply)
 	return true
 end
 
+local npc_classes = {
+	npc_antlion = "antlions",
+	npc_antlion_worker = "antlion_workers",
+	npc_antlionguard = "antlion_guards",
+}
+
 if SERVER then
 	function HIVE:Initialize()
 		self:SetSolid(SOLID_VPHYSICS)
@@ -132,12 +138,6 @@ if SERVER then
 		}
 	end
 
-	local npc_classes = {
-		npc_antlion = "antlions",
-		npc_antlion_worker = "antlion_workers",
-		npc_antlionguard = "antlion_guards",
-	}
-
 	local npcs = {}
 	for npc_class, npc_key in pairs(npc_classes) do
 		npcs[npc_key] = function() return ents.Create(npc_class) end
@@ -211,5 +211,11 @@ if CLIENT then
 		if not ply:IsInZone("cave") then return end
 
 		return song, "caves.dat"
+	end)
+
+	hook.Add("MTASpawnEffect", TAG, function(pos, npc_class)
+		if npc_classes[npc_class] then
+			return false -- ignore for now
+		end
 	end)
 end
