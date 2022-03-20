@@ -587,7 +587,7 @@ local function find_node(target)
 	if not node then return false, "could not find suitable node" end
 
 	local final_pos = node.pos
-	if cache[node] > CurTime() then
+	if cache[node] and cache[node] > CurTime() then
 		local success, new_pos = find_nearby_spot(node)
 		if not success then return false, new_pos end
 
