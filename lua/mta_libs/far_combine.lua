@@ -491,6 +491,9 @@ local function setup_combine(combine, target, players)
 
 		if not IsValid(target) then
 			if not combine.TargetIsVehicle and not combine.DontTouchMe then
+				local ret = hook.Run("MTARemoveNPC", combine)
+				if ret == false then continue end
+
 				combine:Remove()
 			end
 
@@ -552,6 +555,9 @@ local function setup_combine(combine, target, players)
 
 		-- purge ancient NPCs
 		if not combine.DontTouchMe and age > 60 and not target:TestPVS(combine:GetPos()) then
+			local ret = hook.Run("MTARemoveNPC", combine)
+			if ret == false then continue end
+
 			combine:Remove()
 		end
 	end)

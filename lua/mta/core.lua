@@ -217,6 +217,9 @@ if SERVER then
 		spawning = 0
 		MTA.ToSpawn = 0
 		for _, combine in ipairs(MTA.Combines) do
+			local ret = hook.Run("MTARemoveNPC", combine)
+			if ret == false then continue end
+
 			SafeRemoveEntity(combine)
 		end
 		MTA.Combines = {}

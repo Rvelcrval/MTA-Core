@@ -228,6 +228,13 @@ if SERVER then
 		return npc_classes[ent:GetClass()] ~= nil
 	end)
 
+	hook.Add("MTARemoveNPC", TAG, function(ent)
+		if not npc_classes[ent:GetClass()] then return end
+
+		ent:Input("BurrowAway")
+		return false
+	end)
+
 	local function create_badge()
 		if not MetaBadges then return end
 
