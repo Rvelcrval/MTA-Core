@@ -8,8 +8,18 @@ local HIVE = {
 	PrintName = "Hive",
 	Author = "Earu",
 	Spawnable = false,
-	AdminOnly = true
+	AdminOnly = true,
+	ms_notouch = true,
+	PhysgunDisabled = true,
+	dont_televate = true,
 }
+
+local function is_in_caves(ply)
+	if not ply.IsInZone then return false end
+	if not ply:IsInZone("cave") then return false end
+
+	return true
+end
 
 if SERVER then
 	function HIVE:Initialize()
@@ -63,6 +73,10 @@ if SERVER then
 		local cave_center = landmark.get("land_caves")
 		if not cave_center then return end
 
+		for _, hive in pairs(ents.FindByClass("mta_hive")) do
+			hive:Remove()
+		end
+
 		for _, spot in ipairs(hive_spots) do
 			local pos = cave_center + spot
 			local hive = ents.Create("mta_hive")
@@ -97,7 +111,7 @@ end
 scripted_ents.Register(HIVE, "mta_hive")
 
 hook.Add("MTAIsInValidArea", TAG, function(ply)
-	if ply.IsInZone and ply:IsInZone("cave") then return true end
+	if is_in_caves(ply) then return true end
 end)
 
 if SERVER then
@@ -120,42 +134,50 @@ if SERVER then
 
 	local npc_classes = {
 		npc_antlion = "antlions",
-		npc_antlion_worker = "antlions_workers",
-		npc_antlionguard = "antlions_guards",
+		npc_antlion_worker = "antlion_workers",
+		npc_antlionguard = "antlion_guards",
 	}
 
 	local npcs = {}
-	for npc_class, npc_key in ipairs(npc_classes) do
-		npcs[npc_key] = npc_class
+	for npc_class, npc_key in pairs(npc_classes) do
+		npcs[npc_key] = function() return ents.Create(npc_class), npc_class end
 	end
 
 	hook.Add("MTANPCSpawnProcess", TAG, function(ply, pos, wanted_lvl)
-		if not ply.IsInZone then return end
-		if not ply:IsInZone("cave") then return end
+		if not is_in_caves(ply) then return end
 
 		add_coefs()
 
-		local spawn_function = npcs.antlions
+		local spawn_function, npc_class = npcs.antlions
 		if wanted_lvl > 10 then
 			if math.random(0, 100) < 25 then
-				spawn_function = npcs.antlion_workers
+				spawn_function, npc_class = npcs.antlion_workers
 			end
 
 			if wanted_lvl > 20 and math.random(0, 100) < 5 then
-				spawn_function = npcs.antlion_guards
+				spawn_function, npc_class = npcs.antlion_guards
 			end
 		end
 
-		return spawn_function
+		return spawn_function, npc_class
 	end)
 
 	hook.Add("MTAStatIncrease", TAG, function(ply)
-		if ply.IsInZone and ply:IsInZone("cave") then return false end
+		if is_in_caves(ply) then return false end
+	end)
+
+	hook.Add("MTACanBeBounty", TAG, function(ply)
+		if is_in_caves(ply) then return false end
+	end)
+
+	-- dont respawn npcs where they shouldnt be
+	hook.Add("MTADisplaceNPC", TAG, function(ply, npc_class)
+		if is_in_caves(ply) and npc_classes[npc_class] then return false end
+		if not is_in_caves(ply) and npc_classes[npc_class] then return false end
 	end)
 
 	hook.Add("MTAShouldConsiderEntity", TAG, function(ent, ply)
-		if not ply or not ply.IsInZone then return end
-		if not ply:IsInZone("cave") then return end
+		if not is_in_caves(ply) then return end
 
 		return npc_classes[ent:GetClass()] ~= nil
 	end)

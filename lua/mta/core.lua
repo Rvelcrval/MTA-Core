@@ -265,35 +265,35 @@ if SERVER then
 			npc:SetMaterial("models/mta/police_skins/metrocop_sheet_police")
 			npc:SetKeyValue("additionalequipment", math.random() > 0.5 and "weapon_pistol" or "weapon_stunstick")
 			npc:SetKeyValue("manhacks", tostring(math.random(0, 2)))
-			return npc
+			return npc, "npc_metropolice"
 		end,
 		soldiers = function() --  this includes shotgunners
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", math.random() < 0.25 and "weapon_shotgun" or "weapon_smg1")
 			npc:SetMaterial("models/mta/police_skins/combinesoldiersheet_police")
-			return npc
+			return npc, "npc_combine_s"
 		end,
 		elites = function()
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_ar2")
 			npc:SetModel("models/combine_super_soldier.mdl")
 			npc:SetMaterial("models/mta/police_skins/combine_elite_police")
-			return npc
+			return npc, "npc_combine_s"
 		end,
 		shotgunners = function()
 			local npc = ents.Create("npc_combine_s")
 			npc:SetKeyValue("additionalequipment", "weapon_shotgun")
 			npc:SetMaterial("models/mta/police_skins/combinesoldiersheet_police")
-			return npc
+			return npc, "npc_combine_s"
 		end,
 		hunters = function()
 			local npc = ents.Create("npc_hunter")
 			npc:SetSubMaterial(0, "models/mta/police_skins/mini_skin_basecolor_police")
 			npc:SetSubMaterial(1, "models/mta/police_skins/mini_armor_basecolor_police")
-			return npc
+			return npc, "npc_hunter"
 		end,
 		manhacks = function()
-			return ents.Create("npc_manhack")
+			return ents.Create("npc_manhack"), "npc_manhack"
 		end,
 	}
 
@@ -301,30 +301,30 @@ if SERVER then
 		if not IsValid(target) then return false, "bad target" end
 		local wanted_lvl = math.ceil((MTA.Factors[target] or 0) / 10)
 
-		local res = hook.Run("MTANPCSpawnProcess", target, pos, wanted_lvl)
-		if res == false then return false, "spawn denied" end
+		local provided_func, provided_npc_class = hook.Run("MTANPCSpawnProcess", target, pos, wanted_lvl)
+		if provided_func == false then return false, "spawn denied" end
 
-		local spawn_function
-		if isfunction(res) then
-			spawn_function = res
+		local spawn_function, npc_class
+		if isfunction(provided_func) and isstring(provided_npc_class) then
+			spawn_function, npc_class = provided_func, provided_npc_class
 		else
 			-- under 10 -> only metrocops
-			spawn_function = combine_types.metrocops
+			spawn_function, npc_class = combine_types.metrocops
 
 			-- manhacks drop crucial parts, so they need to constantly spawn
 			if IS_MTA_GM and math.random(0, 100) <= 10 then
-				spawn_function = combine_types.manhacks
+				spawn_function, npc_class = combine_types.manhacks
 
 			-- 10 to 60 -> metrocops and soldiers that become more and more common
 			elseif wanted_lvl < 60 and wanted_lvl >= 10 then
-				spawn_function = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
+				spawn_function, npc_class = math.random(0, 60) <= (wanted_lvl + 20) and combine_types.soldiers or combine_types.metrocops
 
 			-- 60 - 80 -> only elites
 			elseif wanted_lvl >= 60 and wanted_lvl < 80 then
 				if IS_MTA_GM and math.random(0, 100) <= 7 then
-					spawn_function = combine_types.hunters
+					spawn_function, npc_class = combine_types.hunters
 				else
-					spawn_function = combine_types.elites
+					spawn_function, npc_class = combine_types.elites
 				end
 
 			-- 80 - inf -> elites, shotgunners and an helicopter
@@ -342,14 +342,14 @@ if SERVER then
 				end
 
 				if IS_MTA_GM and math.random(0, 100) <= 7 then
-					spawn_function = combine_types.hunters
+					spawn_function, npc_class = combine_types.hunters
 				else
-					spawn_function = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
+					spawn_function, npc_class = math.random(1, 5) == 1 and combine_types.shotgunners or combine_types.elites
 				end
 			end
 		end
 
-		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos)
+		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos, npc_class)
 	end
 
 	local spawn_fails = {}
@@ -360,7 +360,7 @@ if SERVER then
 		if (#MTA.Combines + spawning_wait_count) >= MTA.MAX_COMBINES then return end
 		if #MTA.BadPlayers == 0 then return end
 
-		local succ, ret = MTA.TrySpawnCombine(target, pos)
+		local succ, ret, npc_class = MTA.TrySpawnCombine(target, pos)
 		if succ then
 			spawning = spawning + 1
 		else
@@ -368,11 +368,11 @@ if SERVER then
 			spawn_fail_reps = spawn_fail_reps + 1
 			spawn_fails[reason] = true
 
-			hook.Run("MTASpawnFail", spawn_fail_reps, reason, target)
+			hook.Run("MTASpawnFail", spawn_fail_reps, reason, target, npc_class)
 
 			timer.Create("MTASpawnFails", 5, 1, function()
 				local fail_reason_display = table.concat(table.GetKeys(spawn_fails), " & ")
-				warn_log(("Failed to spawn combines %d times: %s"):format(spawn_fail_reps, fail_reason_display))
+				warn_log(("Failed to spawn npcs %d times: %s"):format(spawn_fail_reps, fail_reason_display))
 
 				spawn_fails = {}
 				spawn_fail_reps = 0

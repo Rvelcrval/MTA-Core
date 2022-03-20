@@ -73,6 +73,9 @@ if SERVER then
 		if wanted_level < (MINIMUM_LEVEL + (MTA.GetPlayerStat(ply, "prestige_level") * 10)) then return end
 		if bounties[ply] then return end
 
+		local ret = hook.Run("MTACanBeBounty", ply, wanted_level)
+		if ret == false then return end
+
 		MTA.ChatPrint(ply, "A bounty has been ", MTA.OldValueColor, "issued for you!")
 		bounties[ply] = true
 		net.Start(NET_MTA_BOUNTIES)

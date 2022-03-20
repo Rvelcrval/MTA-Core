@@ -4,8 +4,8 @@ local IsValid = _G.IsValid
 if CLIENT then
 	local CANNON_AMT = 50
 	--local PARTICLES_AMT = 25
-	local function do_spawn_effect(pos)
-		local ret = hook.Run("MTASpawnEffect", pos)
+	local function do_spawn_effect(pos, npc_class)
+		local ret = hook.Run("MTASpawnEffect", pos, npc_class)
 		if ret == false then return end
 
 		local spawn_pos_ent = ents.CreateClientProp("models/props_junk/PopCan01a.mdl", RENDERGROUP_OPAQUE)
@@ -44,8 +44,9 @@ if CLIENT then
 	end
 
 	net.Receive(NET_FAR_COMBINE_SPAWN_EFFECT, function()
+		local npc_class = net.ReadString()
 		local pos = net.ReadVector()
-		do_spawn_effect(pos)
+		do_spawn_effect(pos, npc_class)
 	end)
 
 	return function() end, function() end
@@ -603,17 +604,18 @@ local function find_node(target)
 	return true, final_pos
 end
 
-local function far_combine(target, players, spawn_function, callback, pos)
-	if not IsValid(target) then return false, "invalid target" end
-	if #players == 0 then return false, "no players to use" end
+local function far_combine(target, players, spawn_function, callback, pos, npc_class)
+	if not IsValid(target) then return false, "invalid target", npc_class end
+	if #players == 0 then return false, "no players to use", npc_class end
 
 	if not isvector(pos) then
 		local succ, ret = find_node(target)
-		if not succ then return false, ret end
+		if not succ then return false, ret, npc_class end
 		pos = ret
 	end
 
 	net.Start(NET_FAR_COMBINE_SPAWN_EFFECT, true)
+	net.WriteString(npc_class)
 	net.WriteVector(pos)
 	net.Broadcast()
 
@@ -629,7 +631,7 @@ local function far_combine(target, players, spawn_function, callback, pos)
 		callback(combine)
 	end)
 
-	return true
+	return true, npc_class
 end
 
 return far_combine, setup_combine

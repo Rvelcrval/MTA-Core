@@ -112,22 +112,22 @@ if SERVER then
 		zombies = function()
 			local z = ents.Create("npc_zombie")
 			z:SetMaterial("models/alyx/alyxblack")
-			return z
+			return z, "npc_zombie"
 		end,
 		poison_zombies = function()
 			local z = ents.Create("npc_poisonzombie")
 			z:SetMaterial("models/alyx/alyxblack")
-			return z
+			return z, "npc_poisonzombie"
 		end,
 		fast_zombies = function()
 			local z = ents.Create("npc_fastzombie")
 			z:SetMaterial("models/alyx/alyxblack")
-			return z
+			return z, "npc_fastzombie"
 		end,
 		zombines = function()
 			local z = ents.Create("npc_zombine")
 			z:SetMaterial("models/alyx/alyxblack")
-			return z
+			return z, "npc_zombine"
 		end,
 	}
 	hook.Add("MTANPCSpawnProcess", TAG, function(target, pos, wanted_lvl)
@@ -135,22 +135,22 @@ if SERVER then
 		if IS_MTA_GM then return end
 
 		-- below 10 is just zombies
-		local spawn_function = enemy_types.zombies
+		local spawn_function, npc_class = enemy_types.zombies
 
 		-- 10% chance of getting poison zombies here and there
 		if math.random(0, 100) <= 10 then
-			spawn_function = enemy_types.poison_zombies
+			spawn_function, npc_class = enemy_types.poison_zombies
 
 		-- above level 10 progressively change to only fast zombies
 		elseif wanted_lvl < 60 and wanted_lvl >= 10 then
-			spawn_function = math.random(0, 60) <= (wanted_lvl + 20) and enemy_types.fast_zombies or enemy_types.zombies
+			spawn_function, npc_class = math.random(0, 60) <= (wanted_lvl + 20) and enemy_types.fast_zombies or enemy_types.zombies
 
 		-- above 60 we add zombines
 		elseif wanted_lvl >= 60 then
-			spawn_function = math.random(0, 100) < 25 and enemy_types.zombines or enemy_types.fast_zombies
+			spawn_function, npc_class = math.random(0, 100) < 25 and enemy_types.zombines or enemy_types.fast_zombies
 		end
 
-		return spawn_function
+		return spawn_function, npc_class
 	end)
 
 	function update_badge(ply, count)
