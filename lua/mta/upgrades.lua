@@ -102,7 +102,7 @@ if SERVER then
 		local new_value = cur_value + amount
 
 		local ret = hook.Run("MTAStatIncrease", ply, stat_name, cur_value, new_value)
-		if ret == false then return end
+		if ret == false then return -1 end
 
 		ply:SetNWInt(nw_value_name, new_value)
 
