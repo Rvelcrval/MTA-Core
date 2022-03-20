@@ -728,9 +728,13 @@ if SERVER then
 		return true
 	end
 
-	function MTA.ShouldConsiderEntity(ent)
+	function MTA.ShouldConsiderEntity(ent, ply)
 		if not IsValid(ent) then return false end
 		if ent.MTAIgnore then return false end
+
+		local ret = hook.Run("MTAShouldConsiderEntity", ent, ply)
+		if ret ~= nil then return ret end
+
 		if not MTA.HasCoeficients(ent) then return false end
 
 		if ent:IsPlayer() then
@@ -779,8 +783,8 @@ if SERVER then
 		end
 
 		if ent == atck then return end
-		if not MTA.ShouldConsiderEntity(ent) then return end
 		if not MTA.ShouldIncreasePlayerFactor(atck) then return end
+		if not MTA.ShouldConsiderEntity(ent, atck) then return end
 
 		if Instances and not Instances.ShouldInteract(atck, ent) then
 			return true
