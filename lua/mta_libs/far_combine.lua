@@ -572,7 +572,7 @@ local function find_nearby_spot(node)
 			maxs = Vector(SCALE, SCALE, 100),
 		})
 
-		if not IsValid(tr.Entity) then
+		if not IsValid(tr.Entity) and util.IsInWorld(new_pos) then
 			return true, new_pos
 		end
 
