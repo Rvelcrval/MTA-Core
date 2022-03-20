@@ -185,6 +185,13 @@ end
 
 if CLIENT then
 	local prev_color, prev_text = MTA.PrimaryColor, MTA.WantedText
+
+	-- for reloads
+	if is_in_caves(LocalPlayer()) then
+		MTA.PrimaryColor = Color(0, 255, 0)
+		MTA.WantedText = "HIVE"
+	end
+
 	hook.Add("PlayerEnteredZone", TAG, function(_, zone)
 		if zone ~= "cave" then return end
 
