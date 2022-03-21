@@ -1,5 +1,5 @@
 AddCSLuaFile()
-AddCSLuaFile("mta_libs/far_combine.lua")
+AddCSLuaFile("mta_libs/far_npc.lua")
 AddCSLuaFile("mta_libs/shop_ui.lua")
 
 -- when is that going to get added ???
@@ -63,7 +63,7 @@ function MTA.Reset()
 	MTA.Print("state was reset")
 	if SERVER then
 		timer.Remove(tag)
-		MTA.RemoveCombines()
+		MTA.RemoveNPCs()
 		for _, ply in pairs(player.GetAll()) do
 			MTA.ResetPlayerFactor(ply, false)
 		end
@@ -180,18 +180,18 @@ if SERVER then
 		return ply:GetInfoNum("mta_opt_out", 0) ~= 0
 	end
 
-	MTA.MAX_COMBINES = MTA_CONFIG.core.MaxCombines
+	MTA.MAX_NPCS = MTA_CONFIG.core.MaxNPCs
 	MTA.MAX_HELIS = MTA_CONFIG.core.MaxHelis
 	MTA.ESCAPE_TIME = MTA_CONFIG.core.EscapeTime
 
-	MTA.FarCombine = MTA.FarCombine or function() return false, "did not load \'far_combine\'" end
-	MTA.SetupCombine = MTA.SetupCombine or function() return false, "did not load \'far_combine\'" end
+	MTA.FarNPC = MTA.FarNPC or function() return false, "did not load \'far_npc\'" end
+	MTA.SetupNPC = MTA.SetupNPC or function() return false, "did not load \'far_npc\'" end
 	MTA.ConstrainPlayer = MTA.ConstrainPlayer or function() return false, "did no load \'wanted_constraints\'" end
 	MTA.ReleasePlayer = MTA.ReleasePlayer or function() return false, "did no load \'wanted_constraints\'" end
 	MTA.SpawnHelicopter = MTA.SpawnHelicopter or function() return false, "did no load \'heli_attack\'" end
 
 	MTA.ToSpawn = 0
-	MTA.Combines = {}
+	MTA.NPCs = {}
 	MTA.HelicopterCount = 0
 	MTA.BadPlayers = {}
 	MTA.Factors = {}
@@ -213,31 +213,31 @@ if SERVER then
 	end
 
 	local spawning = 0
-	function MTA.RemoveCombines()
+	function MTA.RemoveNPCs()
 		spawning = 0
 		MTA.ToSpawn = 0
-		for _, combine in ipairs(MTA.Combines) do
-			local ret = hook.Run("MTARemoveNPC", combine)
+		for _, npc in ipairs(MTA.NPCs) do
+			local ret = hook.Run("MTARemoveNPC", npc)
 			if ret == false then continue end
 
-			SafeRemoveEntity(combine)
+			SafeRemoveEntity(npc)
 		end
-		MTA.Combines = {}
+		MTA.NPCs = {}
 		MTA.HelicopterCount = 0
 	end
 
-	local function dont_transmit_combine(combine)
-		local combine_ents = {}
-		table.insert(combine_ents, combine)
-		table.Add(combine_ents, combine:GetChildren())
+	local function dont_transmit_npc(npc)
+		local npc_ents = {}
+		table.insert(npc_ents, npc)
+		table.Add(npc_ents, npc:GetChildren())
 
-		local wep = combine:GetActiveWeapon()
+		local wep = npc:GetActiveWeapon()
 		if IsValid(wep) then
-			table.Add(combine_ents, wep)
+			table.Add(npc_ents, wep)
 		end
 
 		local plys = player.GetAll()
-		for _, ent in ipairs(combine_ents) do
+		for _, ent in ipairs(npc_ents) do
 			for _, ply in ipairs(plys) do
 				if MTA.IsOptedOut(ply) then
 					ent:SetPreventTransmit(ply, true)
@@ -246,17 +246,17 @@ if SERVER then
 		end
 	end
 
-	local function combine_spawn_callback(combine)
-		if not IsValid(combine) or #MTA.BadPlayers == 0 or not util.IsInWorld(combine:GetPos()) then
+	local function npc_spawn_callback(npc)
+		if not IsValid(npc) or #MTA.BadPlayers == 0 or not util.IsInWorld(npc:GetPos()) then
 			spawning = math.max(0, spawning - 1)
-			SafeRemoveEntity(combine)
+			SafeRemoveEntity(npc)
 			return
 		end
 
-		table.insert(MTA.Combines, combine)
-		combine:SetNWBool("MTACombine", true)
-		combine.ms_notouch = true
-		dont_transmit_combine(combine)
+		table.insert(MTA.NPCs, npc)
+		npc:SetNWBool("MTANPC", true)
+		npc.ms_notouch = true
+		dont_transmit_npc(npc)
 
 		MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
 		spawning = math.max(0, spawning - 1)
@@ -300,7 +300,7 @@ if SERVER then
 		end,
 	}
 
-	function MTA.TrySpawnCombine(target, pos)
+	function MTA.TrySpawnNPC(target, pos)
 		if not IsValid(target) then return false, "bad target" end
 		local wanted_lvl = math.ceil((MTA.Factors[target] or 0) / 10)
 
@@ -339,9 +339,9 @@ if SERVER then
 				if IS_MTA_GM and MTA.HelicopterCount < MTA.MAX_HELIS then
 					local succ, ret = MTA.SpawnHelicopter(target)
 					if succ then
-						combine_spawn_callback(ret)
+						npc_spawn_callback(ret)
 						MTA.HelicopterCount = MTA.HelicopterCount + 1
-						MTA.SetupCombine(ret, target, MTA.BadPlayers)
+						MTA.SetupNPC(ret, target, MTA.BadPlayers)
 						return true
 					else
 						warn_log(("helicopter could not spawn: %s"):format(ret))
@@ -360,18 +360,18 @@ if SERVER then
 			end
 		end
 
-		return MTA.FarCombine(target, MTA.BadPlayers, spawn_function, combine_spawn_callback, pos, npc_class)
+		return MTA.FarNPC(target, MTA.BadPlayers, spawn_function, npc_spawn_callback, pos, npc_class)
 	end
 
 	local spawn_fails = {}
 	local spawn_fail_reps = 0
-	function MTA.SpawnCombine(target, pos)
+	function MTA.SpawnNPC(target, pos)
 		local spawning_wait_count = math.max(spawning, 0)
 		if (MTA.ToSpawn - spawning_wait_count) < 1 then return end
-		if (#MTA.Combines + spawning_wait_count) >= MTA.MAX_COMBINES then return end
+		if (#MTA.NPCs + spawning_wait_count) >= MTA.MAX_NPCS then return end
 		if #MTA.BadPlayers == 0 then return end
 
-		local succ, ret, npc_class = MTA.TrySpawnCombine(target, pos)
+		local succ, ret, npc_class = MTA.TrySpawnNPC(target, pos)
 		if succ then
 			spawning = spawning + 1
 		else
@@ -415,14 +415,14 @@ if SERVER then
 			net.WriteBool(true)
 			net.Broadcast()
 
-			local timer_name = ("MTACombineSpawn_%d"):format(ply:EntIndex())
+			local timer_name = ("MTANPCSpawn_%d"):format(ply:EntIndex())
 			timer.Create(timer_name, 0.3, 0, function()
 				if not IsValid(ply) then
 					timer.Remove(timer_name)
 					return
 				end
 
-				MTA.SpawnCombine(ply)
+				MTA.SpawnNPC(ply)
 			end)
 			MTA.ConstrainPlayer(ply, "Wanted by MTA")
 			MTA.Print(tostring(ply) .. " is now a criminal")
@@ -434,8 +434,8 @@ if SERVER then
 			or math.max(1, math.floor(factor / 2))
 
 		local count = 0
-		for _, combine in ipairs(MTA.Combines) do
-			if IsValid(combine) and combine:GetEnemy() == ply then
+		for _, npc in ipairs(MTA.NPCs) do
+			if IsValid(npc) and npc:GetEnemy() == ply then
 				count = count + 1
 			end
 		end
@@ -507,7 +507,7 @@ if SERVER then
 		net.WriteBool(false)
 		net.Broadcast()
 
-		local timer_name = ("MTACombineSpawn_%d"):format(ply:EntIndex())
+		local timer_name = ("MTANPCSpawn_%d"):format(ply:EntIndex())
 		timer.Remove(timer_name)
 
 		ply.MTABad = nil
@@ -524,7 +524,7 @@ if SERVER then
 		end
 
 		if #MTA.BadPlayers == 0 then
-			MTA.RemoveCombines()
+			MTA.RemoveNPCs()
 		end
 
 		MTA.UpdatePlayerBadge(ply, old_factor)
@@ -670,14 +670,14 @@ if SERVER then
 
 	function MTA.Initialize()
 		-- this is done here, because only here will the proper nodegraph be available
-		local far_combine, setup_combine = include("mta_libs/far_combine.lua")
-		if not far_combine or not setup_combine then
-			warn_log("Could not include far_combine.lua")
+		local far_npc, setup_npc = include("mta_libs/far_npc.lua")
+		if not far_npc or not setup_npc then
+			warn_log("Could not include far_npc.lua")
 			return
 		end
 
-		MTA.FarCombine = far_combine
-		MTA.SetupCombine = setup_combine
+		MTA.FarNPC = far_npc
+		MTA.SetupNPC = setup_npc
 
 		local constrain_player, release_player = include("mta_libs/wanted_constraints.lua")
 		if not constrain_player or not release_player then
@@ -766,11 +766,11 @@ if SERVER then
 
 	function MTA.EnrollNPC(npc, target)
 		if IsValid(target) then
-			MTA.SetupCombine(npc, target, MTA.BadPlayers)
+			MTA.SetupNPC(npc, target, MTA.BadPlayers)
 		end
 
-		table.insert(MTA.Combines, npc)
-		npc:SetNWBool("MTACombine", true)
+		table.insert(MTA.NPCs, npc)
+		npc:SetNWBool("MTANPC", true)
 		npc.ms_notouch = true
 		MTA.ToSpawn = math.max(0, MTA.ToSpawn - 1)
 
@@ -787,9 +787,9 @@ if SERVER then
 
 		-- dont account damage by yourself
 		local atck = dmg_info:GetAttacker()
-		if ent:GetNWBool("MTACombine") then
+		if ent:GetNWBool("MTANPC") then
 			-- dont let combines hurt each others
-			if atck:GetNWBool("MTACombine") then return true end
+			if atck:GetNWBool("MTANPC") then return true end
 
 			-- dont let opted out players damage the npcs
 			if type(atck) == "Player" and MTA.IsOptedOut(atck) then
@@ -829,24 +829,24 @@ if SERVER then
 		MTA.IncreasePlayerFactor(atck, dmg_info:GetDamage() >= ent:Health() and coef_data.kill_coef or coef_data.damage_coef)
 	end)
 
-	local function ensure_combine_removal(npc)
-		if npc:GetClass() == "npc_helicopter" then
+	local function ensure_npc_removal(target_npc)
+		if target_npc:GetClass() == "npc_helicopter" then
 			MTA.HelicopterCount = math.max(MTA.HelicopterCount - 1, 0)
 		end
 
-		local removed = remove_ent_from_table(npc, MTA.Combines)
+		local removed = remove_ent_from_table(target_npc, MTA.NPCs)
 		if not removed then
 			timer.Simple(1, function()
-				for i, combine in pairs(MTA.Combines) do
-					if not IsValid(combine) then
-						table.remove(MTA.Combines, i)
+				for i, npc in pairs(MTA.NPCs) do
+					if not IsValid(npc) then
+						table.remove(MTA.NPCs, i)
 					end
 				end
 			end)
 		end
 	end
 
-	local function combine_drops(npc, attacker)
+	local function npc_drops(npc, attacker)
 		local ret = hook.Run("MTANPCDrops", npc, attacker)
 		if ret == true then return end
 
@@ -899,15 +899,15 @@ if SERVER then
 	end
 
 	hook.Add("OnNPCKilled", tag, function(npc, attacker)
-		if not npc:GetNWBool("MTACombine") then return end
+		if not npc:GetNWBool("MTANPC") then return end
 
-		combine_drops(npc, attacker)
-		ensure_combine_removal(npc)
+		npc_drops(npc, attacker)
+		ensure_npc_removal(npc)
 	end)
 
 	hook.Add("EntityRemoved", tag, function(ent) -- can be removed by other factors
-		if ent:IsNPC() and ent:GetNWBool("MTACombine") then
-			ensure_combine_removal(ent)
+		if ent:IsNPC() and ent:GetNWBool("MTANPC") then
+			ensure_npc_removal(ent)
 		end
 	end)
 
@@ -941,7 +941,7 @@ if SERVER then
 			return true
 		end
 
-		if atck:GetNWBool("MTACombine") then
+		if atck:GetNWBool("MTANPC") then
 			if not ply.MTABad then return false end
 
 			ply.MTALastFactorIncrease = CurTime()
@@ -967,7 +967,7 @@ if SERVER then
 			if ent.CPPIGetOwner and IsValid(ent:CPPIGetOwner()) then return end
 
 			for _, nearby_ent in pairs(ents.FindInSphere(ent:GetPos(), 400)) do
-				if nearby_ent:GetNWBool("MTACombine") then
+				if nearby_ent:GetNWBool("MTANPC") then
 					local target = nearby_ent:GetEnemy()
 					MTA.EnrollNPC(ent, target)
 
@@ -979,7 +979,7 @@ if SERVER then
 
 	local function should_sound_hack(ent)
 		if whitelist[ent:GetClass()] then return true end
-		if ent:GetNWBool("MTACombine") then return true end
+		if ent:GetNWBool("MTANPC") then return true end
 		if ent:GetClass() == "meta_core" and ent.IsThrownCore then return true end
 
 		if not ent:IsPlayer() then
@@ -992,7 +992,7 @@ if SERVER then
 			end
 		end
 
-		if ent:GetNWBool("MTACombine") then return true end -- check twice in-game of parent
+		if ent:GetNWBool("MTANPC") then return true end -- check twice in-game of parent
 		if ent:IsPlayer() and MTA.IsWanted(ent) then return true end
 
 		return false
@@ -1026,7 +1026,7 @@ if SERVER then
 end
 
 if CLIENT then
-	include("mta_libs/far_combine.lua")
+	include("mta_libs/far_npc.lua")
 	include("mta_libs/shop_ui.lua")
 
 	local MTA_OPT_OUT = CreateClientConVar("mta_opt_out", "0", true, true, "Disable criminal events in the lobby for yourself")
@@ -1264,7 +1264,7 @@ if CLIENT then
 		end
 
 		if ent:IsPlayer() and ent:GetNWInt("MTAFactor") >= 1 then return false end
-		if ent:GetNWBool("MTACombine") then return false end
+		if ent:GetNWBool("MTANPC") then return false end
 	end)
 
 	net.Receive(NET_WANTED_STATE, function()
@@ -1306,7 +1306,7 @@ if CLIENT then
 
 		timer.Simple(0.5, function()
 			if not IsValid(ent) then return end
-			if not ent:GetNWBool("MTACombine") then return end
+			if not ent:GetNWBool("MTANPC") then return end
 			dont_draw(ent)
 		end)
 	end)
@@ -1315,7 +1315,7 @@ if CLIENT then
 		if not isentity(ent) then return false end
 		if not IsValid(ent) then return false end
 
-		if ent:GetNWBool("MTACombine") then return true end
+		if ent:GetNWBool("MTANPC") then return true end
 		if ent:GetNWString("MTABountyHunter") ~= "" then return true end
 		if ent:GetNWInt("MTAFactor") > 0 then return true end
 		if ent:GetNWBool("MTABomb") then return true end

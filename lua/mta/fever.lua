@@ -22,7 +22,7 @@ if SERVER then
 	end
 
 	hook.Add("OnNPCKilled", tag, function(npc, atck)
-		if not npc:GetNWBool("MTACombine") then return end
+		if not npc:GetNWBool("MTANPC") then return end
 		if not atck:IsPlayer() then return end
 		if not MTA.IsWanted(atck) then return end
 		if atck.MTANextFever and atck.MTANextFever >= CurTime() then return end

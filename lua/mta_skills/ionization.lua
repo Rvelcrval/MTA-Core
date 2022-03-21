@@ -8,7 +8,7 @@ if SERVER then
 	end
 
 	hook.Add("EntityTakeDamage", "MTASkill_Ionization", function(target, dmg_info)
-		if not target:GetNWBool("MTACombine") then return end
+		if not target:GetNWBool("MTANPC") then return end
 
 		local atck = dmg_info:GetAttacker()
 		if IsValid(atck) and MTA.IsWanted(atck) and MTA.HasSkill(atck, "damage_multiplier", "ionization") then

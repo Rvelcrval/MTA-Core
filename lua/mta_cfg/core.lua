@@ -45,7 +45,7 @@ return {
 	["UseMapData"] = not IS_MTA_GM,
 	["DecreaseDivider"] = 250,
 	["EscapeTime"] = 20,
-	["MaxCombines"] = IS_MTA_GM and 75 or 25,
+	["MaxNPCs"] = IS_MTA_GM and 75 or 25,
 	["MaxHelis"] = 1,
 	["GMInfoAPI"] = "https://g2cf.metastruct.net/app/playerlist?server=",
 	["GMServerID"] = 3,

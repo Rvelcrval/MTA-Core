@@ -160,14 +160,14 @@ if SERVER then
 	end)
 
 	hook.Add("OnNPCKilled", tag, function(npc, attacker)
-		if not npc:GetNWBool("MTACombine") then return end
+		if not npc:GetNWBool("MTANPC") then return end
 		if not attacker:IsPlayer() then return end
 
 		MTA.IncreasePlayerStat(attacker, "killed_cops", 1)
 	end)
 
 	hook.Add("ScaleNPCDamage", tag, function(npc, _, dmg_info)
-		if not npc:GetNWBool("MTACombine") then return end
+		if not npc:GetNWBool("MTANPC") then return end
 
 		local attacker = dmg_info:GetAttacker()
 		if not attacker:IsPlayer() then return end
@@ -183,7 +183,7 @@ if SERVER then
 		if not ply.MTABad then return end
 
 		local attacker = dmg_info:GetAttacker()
-		if not attacker:GetNWBool("MTACombine") then return end
+		if not attacker:GetNWBool("MTANPC") then return end
 
 		local multiplier = MTA.GetPlayerStat(attacker, "defense_multiplier")
 

@@ -390,7 +390,7 @@ if CLIENT then
 
 		timer.Simple(0.5, function()
 			if not IsValid(ent) then return end
-			if not ent:GetNWBool("MTACombine") then return end
+			if not ent:GetNWBool("MTANPC") then return end
 			make_shadow_zombie(ent)
 		end)
 	end)
@@ -401,7 +401,7 @@ if CLIENT then
 
 		timer.Simple(0.5, function()
 			if not IsValid(npc) then return end
-			if not npc:GetNWBool("MTACombine") then return end
+			if not npc:GetNWBool("MTANPC") then return end
 			make_shadow_zombie(npc)
 		end)
 	end)

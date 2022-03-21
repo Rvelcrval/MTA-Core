@@ -51,7 +51,7 @@ if SERVER then
 				ent:TakeDamageInfo(dmg_info)
 			elseif ent:GetClass() == "npc_manhack" then
 				ent:TakeDamageInfo(dmg_info)
-			elseif ent:GetNWBool("MTACombine") then
+			elseif ent:GetNWBool("MTANPC") then
 				local wep = ent.GetActiveWeapon and ent:GetActiveWeapon()
 				if IsValid(wep) then
 					ent.MTAEMP = true
@@ -103,7 +103,7 @@ if SERVER then
 	end)
 
 	hook.Add("EntityFireBullets", "MTASkill_MobileEMP", function(ent)
-		if ent:GetNWBool("MTACombine") and ent.MTAEMP then return false end
+		if ent:GetNWBool("MTANPC") and ent.MTAEMP then return false end
 	end)
 end
 

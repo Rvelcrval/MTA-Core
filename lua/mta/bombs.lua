@@ -62,7 +62,7 @@ if SERVER then
 		local bomb = ents.Create("grenade_helicopter")
 		bomb:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 		bomb:Spawn()
-		bomb:SetNWBool("MTACombine", true)
+		bomb:SetNWBool("MTANPC", true)
 		bomb:SetNWBool("MTABomb", true)
 
 		local pos = find_space(ply, bomb)
@@ -137,15 +137,15 @@ if SERVER then
 		end
 	end)
 
-	local COMBINE_MAXS = Vector(13, 13, 72)
+	local NPC_MAXS = Vector(13, 13, 72)
 	hook.Add("MTASpawnFail", tag, function(failed_count, reason, target, npc_class)
 		if #MTA.BadPlayers < 1 then return end
 		if failed_count > 0 and failed_count % 5 == 0 then
 			local should_displace = hook.Run("MTADisplaceNPC", target, npc_class)
 			if should_displace == false then return end
 
-			local pos = find_space(target, COMBINE_MAXS)
-			MTA.TrySpawnCombine(target, pos)
+			local pos = find_space(target, NPC_MAXS)
+			MTA.TrySpawnNPC(target, pos)
 		end
 	end)
 
@@ -185,55 +185,6 @@ if SERVER then
 			end
 		end
 	end)
-
-	--[[local FAR_AWAY_DIST = 2048
-	local TOO_CLOSE_DIST = 75
-	local function find_space_ex(combine) -- thats an amazing joke I know... Don't hate me pls
-		local enemy = combine:GetEnemy()
-		local c_pos = combine:WorldSpaceCenter()
-		local e_pos = enemy:WorldSpaceCenter()
-		local dir = (c_pos - e_pos):GetNormalized()
-		local end_pos = e_pos + dir * (FAR_AWAY_DIST / 4)
-		local tr = util.TraceHull({
-			start = e_pos,
-	        endpos = end_pos,
-	        filter = function(ent)
-	        	if ent == enemy or ent:GetParent() == enemy then return false end
-	        end,
-	        mins = combine:OBBMins(),
-	        maxs = combine:OBBMaxs()
-		})
-
-		return tr.HitPos or end_pos
-	end
-
-	local function do_distance_checks(combine)
-		if combine.DontTouchMe then return end
-
-		local enemy = combine:GetEnemy()
-		if not IsValid(enemy) then return end
-
-		local enemy_pos = enemy:GetPos()
-		if combine:IsUnreachable(enemy) or enemy_pos:Distance(combine:GetPos()) >= FAR_AWAY_DIST then
-			local pos = find_space_ex(combine)
-			if pos:Distance(enemy_pos) <= TOO_CLOSE_DIST then
-				pos = find_space(enemy, combine, 150)
-			end
-
-			pos.z = enemy_pos.z
-
-			SafeRemoveEntity(combine)
-			MTA.ToSpawn = math.min(MTA.MAX_COMBINES, MTA.ToSpawn + 1)
-			MTA.SpawnCombine(enemy, pos)
-		end
-	end]]--
-
-	-- ok this is buggy
-	--[[timer.Create("mta_combine_fallback_tp", 4, 0, function()
-		for _, combine in ipairs(MTA.Combines) do
-			do_distance_checks(combine)
-		end
-	end)]]--
 end
 
 if CLIENT then

@@ -176,6 +176,7 @@ if SERVER then
 	for npc_class, npc_key in pairs(npc_classes) do
 		npcs[npc_key] = function()
 			local ent = ents.Create(npc_class)
+			ent.MTAOverrideSquad = "hive"
 			unburrow(ent)
 			return ent
 		end

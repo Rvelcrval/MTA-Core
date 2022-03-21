@@ -1,6 +1,6 @@
 if SERVER then
 	hook.Add("ScaleNPCDamage", "MTASkill_FieryBullets", function(npc, _, dmg_info)
-		if not npc:GetNWBool("MTACombine") then return end
+		if not npc:GetNWBool("MTANPC") then return end
 
 		local atck = dmg_info:GetAttacker()
 		if not atck:IsPlayer() then return end

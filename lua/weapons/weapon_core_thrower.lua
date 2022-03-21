@@ -30,7 +30,7 @@ end
 
 function SWEP:Obliterate(ent)
 	if not IsValid(ent) then return end
-	if not ent:GetNWBool("MTACombine") then return end
+	if not ent:GetNWBool("MTANPC") then return end
 
 	local dmg = DamageInfo()
 	dmg:SetDamage(2e9)

@@ -1,4 +1,4 @@
-local NET_FAR_COMBINE_SPAWN_EFFECT = "FAR_COMBINE_SPAWN_EFFECT"
+local NET_far_npc_SPAWN_EFFECT = "far_npc_SPAWN_EFFECT"
 local IsValid = _G.IsValid
 
 if CLIENT then
@@ -43,7 +43,7 @@ if CLIENT then
 		end
 	end
 
-	net.Receive(NET_FAR_COMBINE_SPAWN_EFFECT, function()
+	net.Receive(NET_far_npc_SPAWN_EFFECT, function()
 		local npc_class = net.ReadString()
 		local pos = net.ReadVector()
 		do_spawn_effect(pos, npc_class)
@@ -52,12 +52,12 @@ if CLIENT then
 	return function() end, function() end
 end
 
-util.AddNetworkString(NET_FAR_COMBINE_SPAWN_EFFECT)
+util.AddNetworkString(NET_far_npc_SPAWN_EFFECT)
 
 local MAX_SPAWN_DISTANCE = 1024
 
-local tag = "far_combine"
-local combines = {}
+local tag = "far_npc"
+local tracked_npcs = {}
 local lastonesec = 0
 
 local function think()
@@ -69,35 +69,35 @@ local function think()
 		onesec = true
 	end
 
-	for npc, v in next, combines do
+	for npc, v in next, tracked_npcs do
 		if npc:IsValid() then
 			v(npc, curtime, onesec)
 		else
-			combines[npc] = nil
+			tracked_npcs[npc] = nil
 		end
 	end
 
-	if not next(combines) then
+	if not next(tracked_npcs) then
 		hook.Remove("Think", tag)
 	end
 end
 
-local function try_get_combine(ply)
-	local min_dist, combine = math.huge
+local function try_get_npc(ply)
+	local min_dist, npc = math.huge
 	local pos = ply:GetPos()
 
-	for c, _ in next, combines do
+	for c, _ in next, tracked_npcs do
 		if IsValid(c) and c:GetEnemy() == ply then
 			local dist = pos:DistToSqr(c:GetPos())
 
 			if dist < min_dist then
 				min_dist = dist
-				combine = c
+				npc = c
 			end
 		end
 	end
 
-	return combine
+	return npc
 end
 
 local function is_combine_soldier(ent)
@@ -105,26 +105,26 @@ local function is_combine_soldier(ent)
 end
 
 hook.Add("DoPlayerDeath", tag, function(ply, _, _)
-	local combine = try_get_combine(ply)
-	if not combine then return end
-	if not is_combine_soldier(combine) then return end
-	combine:EmitSound("npc/metropolice/vo/chuckle.wav")
+	local npc = try_get_npc(ply)
+	if not npc then return end
+	if not is_combine_soldier(npc) then return end
+	npc:EmitSound("npc/metropolice/vo/chuckle.wav")
 end)
 
-hook.Add("OnNPCKilled", tag, function(npc, ply, _)
-	if not combines[npc] then return end
-	local combine = try_get_combine(ply)
-	if not combine then return end
-	if not is_combine_soldier(combine) then return end
-	combine:EmitSound("npc/metropolice/vo/lookout.wav")
+hook.Add("OnNPCKilled", tag, function(killed_npc, ply, _)
+	if not tracked_npcs[killed_npc] then return end
+	local npc = try_get_npc(ply)
+	if not npc then return end
+	if not is_combine_soldier(npc) then return end
+	npc:EmitSound("npc/metropolice/vo/lookout.wav")
 end)
 
-local function keep_sane(combine, callback)
-	if not next(combines) then
+local function keep_sane(npc, callback)
+	if not next(tracked_npcs) then
 		hook.Add("Think", tag, think)
 	end
 
-	combines[combine] = callback or nil
+	tracked_npcs[npc] = callback or nil
 end
 
 local function is_far_behind(ent, pos, fard)
@@ -142,7 +142,7 @@ local function is_far_behind(ent, pos, fard)
 	return dot > 0
 end
 
-local function create_combine(pos, spawn_function)
+local function create_npc(pos, spawn_function)
 	local npc = spawn_function()
 	if not IsValid(npc) then return nil end
 
@@ -152,7 +152,7 @@ local function create_combine(pos, spawn_function)
 	npc:SetKeyValue("NumGrenades", "10")
 	npc:SetKeyValue("tacticalvariant", "pressure")
 	npc:SetKeyValue("spawnflags", tostring(bit.bor(SF_NPC_LONG_RANGE, SF_NPC_NO_WEAPON_DROP, SF_NPC_NO_PLAYER_PUSHAWAY)))
-	npc:SetKeyValue("squadname", "combine")
+	npc:SetKeyValue("squadname", npc.MTAOverrideSquad or "npc")
 
 	npc:AddRelationship("player D_LI 99")
 
@@ -285,7 +285,7 @@ local BASE_TRACE_INFO = {
 	maxs = Vector(17, 17, 72)
 }
 
-local function would_combine_stuck(pos)
+local function would_npc_stuck(pos)
 	if not util.IsInWorld(pos) then return true end
 
 	BASE_TRACE_INFO.start = pos
@@ -300,7 +300,7 @@ local function find_cadidate_node(ply, n, t)
 	local node, pos
 
 	for node_candidate in invisible_near(ply, n, t) do
-		if not would_combine_stuck(node_candidate.pos) then
+		if not would_npc_stuck(node_candidate.pos) then
 			-- find from between nodes
 			node = node_candidate
 			pos = node_candidate.pos
@@ -312,7 +312,7 @@ local function find_cadidate_node(ply, n, t)
 				--local a = v.pos
 				local b = v.pos * 0.5 + half
 
-				if not would_combine_stuck(b) then
+				if not would_npc_stuck(b) then
 					node = node_candidate
 					pos = b
 					break
@@ -320,7 +320,7 @@ local function find_cadidate_node(ply, n, t)
 
 				b:Add(vecup_offset)
 
-				if not would_combine_stuck(b) then
+				if not would_npc_stuck(b) then
 					node = node_candidate
 					pos = b
 					break
@@ -336,11 +336,11 @@ local function find_cadidate_node(ply, n, t)
 	return node, pos
 end
 
-local function get_closest_player(combine, players)
+local function get_closest_player(npc, players)
 	local min_dist, ret = math.huge
 	for _,ply in ipairs(players) do
 		if IsValid(ply) then
-			local dist = ply:GetPos():Distance(combine:GetPos())
+			local dist = ply:GetPos():Distance(npc:GetPos())
 			if dist < min_dist then
 				min_dist = dist
 				ret = ply
@@ -375,15 +375,15 @@ local function is_explodable_car(car)
 	return car:GetClass() == "gmod_sent_vehicle_fphysics_base" and car:IsVehicle() and car.ExplodeVehicle
 end
 
-local function handle_entity_block(combine)
+local function handle_entity_block(npc)
 	-- dont bother if that function doesnt exist
 	if not FindMetaTable("Entity").PropDoorRotatingExplode then return end
 
-	local aim_vector = combine:GetAimVector()
-	local pos = combine:GetPos()
+	local aim_vector = npc:GetAimVector()
+	local pos = npc:GetPos()
 
 	local time = 0
-	local last_stuck_state = combine.LastStuckState
+	local last_stuck_state = npc.LastStuckState
 	if last_stuck_state and last_stuck_state.NPCPos:Distance(pos) <= 100 then
 		if last_stuck_state.Time > 6 then
 			for _, ent in pairs(ents.FindInSphere(pos, 150)) do
@@ -398,7 +398,7 @@ local function handle_entity_block(combine)
 		end
 	end
 
-	combine.LastStuckState = {
+	npc.LastStuckState = {
 		NPCPos = pos,
 		Time = time
 	}
@@ -409,159 +409,159 @@ local function is_alive(ent)
 	return ent:Health() > 0
 end
 
-local function setup_combine(combine, target, players)
+local function setup_npc(npc, target, players)
 	if not IsValid(target) then return end
 
-	SafeRemoveEntityDelayed(combine, 120)
+	SafeRemoveEntityDelayed(npc, 120)
 
-	combine:SetLagCompensated(true)
-	combine:AddFlags(FL_NPC + FL_OBJECT)
-	combine:SetCollisionGroup(combine.MTAOverrideCollisionGroup or COLLISION_GROUP_PASSABLE_DOOR)
-	combine:SetEnemy(target, true)
-	combine:AddEntityRelationship(target, D_FR, 0)
-	combine:AddEntityRelationship(target, D_HT, 99)
-	combine:UpdateEnemyMemory(target, target:GetPos())
-	combine.Enemy = target
+	npc:SetLagCompensated(true)
+	npc:AddFlags(FL_NPC + FL_OBJECT)
+	npc:SetCollisionGroup(npc.MTAOverrideCollisionGroup or COLLISION_GROUP_PASSABLE_DOOR)
+	npc:SetEnemy(target, true)
+	npc:AddEntityRelationship(target, D_FR, 0)
+	npc:AddEntityRelationship(target, D_HT, 99)
+	npc:UpdateEnemyMemory(target, target:GetPos())
+	npc.Enemy = target
 
 	timer.Simple(math.random() * 1.5, function()
-		if not combine:IsValid() then return end
-		if not is_combine_soldier(combine) then return end
-		combine:EmitSound("npc/metropolice/vo/sweepingforsuspect.wav")
+		if not npc:IsValid() then return end
+		if not is_combine_soldier(npc) then return end
+		npc:EmitSound("npc/metropolice/vo/sweepingforsuspect.wav")
 	end)
 
 	-- teleport NPC if too far
 	local teleports = 0
 	local last_teleport = 0
-	local function check_teleport(combine, target, onesec, curtime)
+	local function check_teleport(local_npc, local_target, onesec, curtime)
 		if curtime - last_teleport < 5 then return end
 		local try_teleport = (curtime % 3 < 1) -- once every N seconds when N>1
 
-		if try_teleport and is_alive(target) and teleports < 3 and not target:TestPVS(combine:GetPos()) and not combine:IsUnreachable(target) then
-			local ret = hook.Run("MTADisplaceNPC", target, combine:GetClass())
+		if try_teleport and is_alive(local_target) and teleports < 3 and not local_target:TestPVS(local_npc:GetPos()) and not local_npc:IsUnreachable(target) then
+			local ret = hook.Run("MTADisplaceNPC", local_target, local_npc:GetClass())
 			if ret == false then
-				SafeRemoveEntityDelayed(combine, 0)
+				SafeRemoveEntityDelayed(local_npc, 0)
 				return
 			end
 
 			last_teleport = curtime
 			teleports = teleports + 1
-			--local oldpos = combine:GetPos()
-			local n_new = get_nearest_node(target, MAX_SPAWN_DISTANCE)
+			--local oldpos = local_npc:GetPos()
+			local n_new = get_nearest_node(local_target, MAX_SPAWN_DISTANCE)
 
 			if n_new then
 				n = n_new
-				local _, newpos = find_cadidate_node(target, n)
+				local _, newpos = find_cadidate_node(local_target, n)
 				if newpos then
-					combine:SetPos(newpos)
-					combine:SetEnemy(target, true)
-					combine:UpdateEnemyMemory(target, target:GetPos())
+					local_npc:SetPos(newpos)
+					local_npc:SetEnemy(local_target, true)
+					local_npc:UpdateEnemyMemory(local_target, local_target:GetPos())
 				end
 			end
 		end
 	end
 
-	local creation_time = combine:GetCreationTime()
+	local creation_time = npc:GetCreationTime()
 	-- local first = true
 	-- for sound emissions
 	local converged, sighted
 
 	-- "Think" hook
 	local next_update = CurTime() + 1
-	keep_sane(combine, function(_, curtime, onesec)
-		if not IsValid(combine) then return end
+	keep_sane(npc, function(_, curtime, onesec)
+		if not IsValid(npc) then return end
 
-		combine.Targets = players
+		npc.Targets = players
 
 		local old_target = target
 		if CurTime() > next_update then
-			local new_ply = get_closest_player(combine, players)
+			local new_ply = get_closest_player(npc, players)
 
 			-- if the target is in a vehicle, try to target the vehicle
-			combine.TargetIsVehicle = false
+			npc.TargetIsVehicle = false
 			--if IsValid(new_ply) and new_ply:InVehicle() then
 				--new_ply = new_ply:GetVehicle()
-				--combine.TargetIsVehicle = true
+				--npc.TargetIsVehicle = true
 			--end
 
 			if IsValid(target) and target ~= new_ply and not table.HasValue(players, target) then
-				combine:AddEntityRelationship(target, D_LI, 99)
+				npc:AddEntityRelationship(target, D_LI, 99)
 			end
 
-			handle_entity_block(combine)
+			handle_entity_block(npc)
 			target = new_ply
 			next_update = CurTime() + 1
 		end
 
 		if not IsValid(target) then
-			if not combine.TargetIsVehicle and not combine.DontTouchMe then
-				local ret = hook.Run("MTARemoveNPC", combine)
+			if not npc.TargetIsVehicle and not npc.DontTouchMe then
+				local ret = hook.Run("MTARemoveNPC", npc)
 				if ret == false then return end
 
-				combine:Remove()
+				npc:Remove()
 			end
 
 			return
 		end
 
-		combine:AddEntityRelationship(target, D_HT, 99)
-		combine:SetEnemy(target, old_target ~= target)
+		npc:AddEntityRelationship(target, D_HT, 99)
+		npc:SetEnemy(target, old_target ~= target)
 
 		local age = curtime - creation_time
-		local enemy = combine:GetEnemy()
+		local enemy = npc:GetEnemy()
 		if enemy ~= target then
 			if not IsValid(enemy) then enemy = nil end
 
 			-- teleportation possibility in case of no enemy
 			-- fix hating other things
 			if enemy then
-				combine:AddEntityRelationship(enemy, D_LI, 99)
-				combine:MarkEnemyAsEluded()
+				npc:AddEntityRelationship(enemy, D_LI, 99)
+				npc:MarkEnemyAsEluded()
 			end
 
 			-- let's make you the enemy of the player again
 			--if is_alive(target) then
-			--	combine:SetEnemy(target)
+			--	npc:SetEnemy(target)
 			--end
 		end
 
 		if not onesec then return end
 
 		-- first contact
-		if is_combine_soldier(combine) and not sighted and combine:VisibleVec(target:EyePos()) then
+		if is_combine_soldier(npc) and not sighted and npc:VisibleVec(target:EyePos()) then
 			sighted = true
 
 			if math.random() < 1 then
-				combine:EmitSound("npc/metropolice/vo/hesupthere.wav")
+				npc:EmitSound("npc/metropolice/vo/hesupthere.wav")
 			end
 		end
 
 		-- getting closer
-		if is_combine_soldier(combine) and not converged and target:TestPVS(combine:GetPos()) then
+		if is_combine_soldier(npc) and not converged and target:TestPVS(npc:GetPos()) then
 			converged = true
 
 			if math.random() > 0.7 then
 				timer.Simple(2, function()
-					if not IsValid(combine) then return end
-					combine:EmitSound("npc/metropolice/vo/converging.wav")
+					if not IsValid(npc) then return end
+					npc:EmitSound("npc/metropolice/vo/converging.wav")
 				end)
 			end
 		end
 
 		-- tell enemy where you exist
 		if is_alive(target) then
-			combine:UpdateEnemyMemory(target, target:GetPos())
+			npc:UpdateEnemyMemory(target, target:GetPos())
 		end
 
-		if not combine.DontTouchMe and age > 10 then
-			check_teleport(combine, target, onesec, curtime)
+		if not npc.DontTouchMe and age > 10 then
+			check_teleport(npc, target, onesec, curtime)
 		end
 
 		-- purge ancient NPCs
-		if not combine.DontTouchMe and age > 60 and not target:TestPVS(combine:GetPos()) then
-			local ret = hook.Run("MTARemoveNPC", combine)
+		if not npc.DontTouchMe and age > 60 and not target:TestPVS(npc:GetPos()) then
+			local ret = hook.Run("MTARemoveNPC", npc)
 			if ret == false then return end
 
-			combine:Remove()
+			npc:Remove()
 		end
 	end)
 end
@@ -619,7 +619,7 @@ local function find_node(target)
 	return true, final_pos
 end
 
-local function far_combine(target, players, spawn_function, callback, pos, npc_class)
+local function far_npc(target, players, spawn_function, callback, pos, npc_class)
 	if not IsValid(target) then return false, "invalid target", npc_class end
 	if #players == 0 then return false, "no players to use", npc_class end
 
@@ -629,24 +629,24 @@ local function far_combine(target, players, spawn_function, callback, pos, npc_c
 		pos = ret
 	end
 
-	net.Start(NET_FAR_COMBINE_SPAWN_EFFECT, true)
+	net.Start(NET_far_npc_SPAWN_EFFECT, true)
 	net.WriteString(npc_class)
 	net.WriteVector(pos)
 	net.Broadcast()
 
 	timer.Simple(1, function()
-		local combine = create_combine(pos, spawn_function)
-		if not IsValid(combine) then
+		local npc = create_npc(pos, spawn_function)
+		if not IsValid(npc) then
 			callback()
 			return
 		end
 
-		setup_combine(combine, target, players)
-		combine:EmitSound("ambient/machines/teleport1.wav", 40)
-		callback(combine)
+		setup_npc(npc, target, players)
+		npc:EmitSound("ambient/machines/teleport1.wav", 40)
+		callback(npc)
 	end)
 
 	return true, nil, npc_class
 end
 
-return far_combine, setup_combine
+return far_npc, setup_npc

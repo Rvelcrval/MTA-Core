@@ -160,7 +160,7 @@ if SERVER then
 
 	hook.Add("EntityTakeDamage", tag, function(ent, dmg_info)
 		local atck = dmg_info:GetAttacker()
-		if hunters[atck] and ent:GetNWBool("MTACombine") then return true end
+		if hunters[atck] and ent:GetNWBool("MTANPC") then return true end
 	end)
 
 	hook.Add("PlayerShouldTakeDamage", tag, function(ply, atck)
