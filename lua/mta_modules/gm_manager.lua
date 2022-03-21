@@ -174,8 +174,17 @@ end
 
 vgui.Register("mta_join", PANEL, "DFrame")
 
+local loading_in = true
+hook.Add("InitPostEntity", tag, function()
+	timer.Simple(10, function()
+		loading_in = false
+	end)
+
+	hook.Remove("InitPostEntity", tag)
+end)
+
 hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
-	if is_wanted then return end
+	if is_wanted or loading_in then return end
 	if ply ~= LocalPlayer() then return end
 	if waiting_server then return end
 	if gm_request and gm_request:IsHostServer() then return end
