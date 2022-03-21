@@ -28,7 +28,19 @@ local npc_classes = {
 }
 
 if SERVER then
+	local hive_spots = {
+		Vector (-78, -2591, -69),
+		Vector (-1616, -2533, -100),
+		Vector (1189, 1725, -217),
+	}
+
 	function HIVE:Initialize()
+		local cur_hive_count = #ents.FindByClass("mta_hive")
+		if cur_hive_count >= #hive_spots then
+			SafeRemoveEntityDelayed(self, 0)
+			return
+		end
+
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetModel("models/props_wasteland/antlionhill.mdl")
 		self:SetModelScale(1 / 3)
@@ -42,7 +54,19 @@ if SERVER then
 		end
 	end
 
+	function HIVE:IsOKSpot()
+		return not IsValid(util.TraceHull({
+			start = self:GetPos(),
+			endpos = self:GetPos() + Vector(0, 0, self:OBBMaxs().z),
+			mins = self:OBBMins(),
+			maxs = self:OBBMaxs(),
+			filter = self,
+		}).Entity)
+	end
+
 	function HIVE:OnTakeDamage(dmg_info)
+		if self:Health() <= 0 then return end
+
 		local attacker = dmg_info:GetAttacker()
 		if not IsValid(attacker) then return end
 		if not attacker:IsPlayer() then return end
@@ -52,8 +76,9 @@ if SERVER then
 		local new_health = cur_health - dmg
 		self:SetHealth(new_health)
 
-		if new_health <= 0 then
+		if new_health <= 0 and self:IsOKSpot() then
 			local prev_pos = self:GetPos()
+
 			MTA.IncreasePlayerFactor(dmg_info:GetAttacker(), 100)
 			self:Remove()
 
@@ -96,11 +121,6 @@ if SERVER then
 		end
 	end
 
-	local hive_spots = {
-		Vector (-78, -2591, -69),
-		Vector (-1616, -2533, -100),
-		Vector (1189, 1725, -217),
-	}
 	local function spawn_hives()
 		if not landmark then return end
 
