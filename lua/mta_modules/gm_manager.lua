@@ -82,13 +82,14 @@ function PANEL:Init()
 
 	self.lblTitle:SetFont("Trebuchet24")
 
+	local area = (LocalPlayer().InLobby and LocalPlayer():InLobby()) and "lobby" or "caves"
 	local header = self:Add("DLabel")
 	header:Dock(TOP)
 	header:SetWrap(true)
 	header:SetFont("Trebuchet24")
 	header:SetTall(100)
 	header:SetColor(MTA.NewValueColor)
-	header:SetText("Looks like you're causing chaos in the lobby. "
+	header:SetText(("Looks like you're causing chaos in the %s. "):format(area)
 		.. "Our forces tried to/stopped you. Would you like to join the server where you have an actual chance to fight back?")
 
 	local gains_header = self:Add("DLabel")
