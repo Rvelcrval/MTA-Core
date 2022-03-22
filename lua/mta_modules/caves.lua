@@ -35,11 +35,14 @@ if SERVER then
 	}
 
 	function HIVE:Initialize()
-		local cur_hive_count = #ents.FindByClass("mta_hive")
-		if cur_hive_count >= #hive_spots then
-			SafeRemoveEntityDelayed(self, 0)
-			return
-		end
+		timer.Simple(0, function()
+			if not IsValid(self) then return end
+			local cur_hive_count = #ents.FindByClass("mta_hive")
+			if cur_hive_count > #hive_spots then
+				SafeRemoveEntity(self)
+				return
+			end
+		end)
 
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetModel("models/props_wasteland/antlionhill.mdl")
@@ -54,16 +57,6 @@ if SERVER then
 		end
 	end
 
-	function HIVE:IsOKSpot()
-		return not IsValid(util.TraceHull({
-			start = self:GetPos(),
-			endpos = self:GetPos() + Vector(0, 0, self:OBBMaxs().z),
-			mins = self:OBBMins(),
-			maxs = self:OBBMaxs(),
-			filter = self,
-		}).Entity)
-	end
-
 	function HIVE:OnTakeDamage(dmg_info)
 		if self:Health() <= 0 then return end
 
@@ -76,7 +69,7 @@ if SERVER then
 		local new_health = cur_health - dmg
 		self:SetHealth(new_health)
 
-		if new_health <= 0 and self:IsOKSpot() then
+		if new_health <= 0 then
 			local prev_pos = self:GetPos()
 
 			MTA.IncreasePlayerFactor(dmg_info:GetAttacker(), 100)
