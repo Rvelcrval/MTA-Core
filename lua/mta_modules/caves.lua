@@ -35,15 +35,6 @@ if SERVER then
 	}
 
 	function HIVE:Initialize()
-		timer.Simple(0, function()
-			if not IsValid(self) then return end
-			local cur_hive_count = #ents.FindByClass("mta_hive")
-			if cur_hive_count > #hive_spots then
-				SafeRemoveEntity(self)
-				return
-			end
-		end)
-
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetModel("models/props_wasteland/antlionhill.mdl")
 		self:SetModelScale(1 / 3)
@@ -57,9 +48,19 @@ if SERVER then
 		end
 	end
 
-	function HIVE:OnTakeDamage(dmg_info)
-		if self:Health() <= 0 then return end
+	function HIVE:IsDuplicateHive()
+		local tr = util.TraceHull({
+			start = self:GetPos(),
+			endpos = self:GetPos() + Vector(0, 0, 100),
+			mins = self:OBBMins(),
+			maxs = self:OBBMaxs(),
+			filter = self,
+		})
 
+		return IsValid(tr.Entity) and tr.Entity:GetClass() == "mta_hive"
+	end
+
+	function HIVE:OnTakeDamage(dmg_info)
 		local attacker = dmg_info:GetAttacker()
 		if not IsValid(attacker) then return end
 		if not attacker:IsPlayer() then return end
@@ -108,6 +109,10 @@ if SERVER then
 				local new_hive = ents.Create("mta_hive")
 				new_hive:SetPos(prev_pos)
 				new_hive:Spawn()
+
+				if new_hive:IsDuplicateHive() then
+					new_hive:Remove()
+				end
 			end)
 		else
 			MTA.IncreasePlayerFactor(dmg_info:GetAttacker(), math.ceil(1 * (dmg / 10)))
@@ -129,6 +134,10 @@ if SERVER then
 			local hive = ents.Create("mta_hive")
 			hive:SetPos(pos)
 			hive:Spawn()
+
+			if hive:IsDuplicateHive() then
+				hive:Remove()
+			end
 		end
 	end
 
