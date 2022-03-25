@@ -67,7 +67,7 @@ if SERVER then
 		if not attacker:IsPlayer() then return end
 		if MTA.IsOptedOut(attacker) then return end
 		if self.Destroying then return end
-		if not util.IsInWorld(attacker) then return end
+		if not attacker:IsInWorld() then return end
 		if attacker:GetPos():DistToSqr(self:GetPos()) >= MIN_ATCK_DIST then return end
 
 		local cur_health = self:Health()
