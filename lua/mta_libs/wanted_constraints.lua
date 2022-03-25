@@ -122,6 +122,7 @@ hook.Add("CanPlayerTimescale", tag, deny)
 hook.Add("CanPlayerHax", tag, deny)
 hook.Add("CanPlyRespawn", tag, deny)
 hook.Add("CanPlayerRagdoll", tag, deny)
+hook.Add("CanTool", tag, deny)
 
 hook.Add("CanPlyCursedBullet", tag, function(ply, atck)
     if is_constrained(ply) or is_constrained(atck) then return false end

@@ -60,20 +60,26 @@ if SERVER then
 		return IsValid(tr.Entity) and tr.Entity:GetClass() == "mta_hive"
 	end
 
+	local MIN_ATCK_DIST = 200 * 200
 	function HIVE:OnTakeDamage(dmg_info)
 		local attacker = dmg_info:GetAttacker()
 		if not IsValid(attacker) then return end
 		if not attacker:IsPlayer() then return end
+		if MTA.IsOptedOut(attacker) then return end
+		if self.Destroying then return end
+		if not util.IsInWorld(attacker) then return end
+		if attacker:GetPos():DistToSqr(self:GetPos()) >= MIN_ATCK_DIST then return end
 
 		local cur_health = self:Health()
 		local dmg = dmg_info:GetDamage()
-		local new_health = cur_health - dmg
+		local new_health = math.max(0, cur_health - dmg)
 		self:SetHealth(new_health)
 
-		if new_health <= 0 then
-			local prev_pos = self:GetPos()
+		if new_health <= 1 then
+			self.Destroying = true
 
-			MTA.IncreasePlayerFactor(dmg_info:GetAttacker(), 100)
+			local prev_pos = self:GetPos()
+			MTA.IncreasePlayerFactor(attacker, 100)
 			self:Remove()
 
 			util.RockImpact(attacker, prev_pos, Vector(0, 0, 1), 2, true)
@@ -115,7 +121,7 @@ if SERVER then
 				end
 			end)
 		else
-			MTA.IncreasePlayerFactor(dmg_info:GetAttacker(), math.ceil(1 * (dmg / 10)))
+			MTA.IncreasePlayerFactor(attacker, math.max(1, math.ceil(1 * (dmg / 10))))
 		end
 	end
 
@@ -201,6 +207,7 @@ if SERVER then
 		npcs[npc_key] = function()
 			local ent = ents.Create(npc_class)
 			ent.MTAOverrideSquad = "hive"
+			ent.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
 			unburrow(ent)
 			return ent
 		end
