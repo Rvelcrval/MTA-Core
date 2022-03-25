@@ -251,6 +251,17 @@ if SERVER then
 	hook.Add("MTAShouldPayTax", TAG, DENY)
 	hook.Add("MTACanMobileEMP", TAG, DENY)
 
+	hook.Add("PlayerExitedZone", TAG, function(ply, zone)
+		if zone ~= "cave" then return end
+		if not MTA.IsWanted(ply) then return end
+
+		local cave_center = landmark and landmark.get("land_caves")
+		if not cave_center then return end
+
+		ply:SetPos(cave_center)
+		MTA.ChatPrint(ply, "You cannot leave this area while fighting the hive!")
+	end)
+
 	-- dont respawn npcs where they shouldnt be
 	hook.Add("MTADisplaceNPC", TAG, function(ply, npc_class)
 		if is_in_caves(ply) and not npc_classes[npc_class] then return false end
