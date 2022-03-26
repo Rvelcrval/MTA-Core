@@ -15,9 +15,8 @@ AddCSLuaFile("mta/weapons.lua")
 AddCSLuaFile("mta/upgrades.lua")
 AddCSLuaFile("mta/skill_tree.lua")
 AddCSLuaFile("mta/bounties.lua")
-AddCSLuaFile("mta/bombs.lua")
+AddCSLuaFile("mta/balancing.lua")
 AddCSLuaFile("mta/fever.lua")
-AddCSLuaFile("mta/riot_shield_texture_manager.lua")
 
 -- better combine tracers
 do
@@ -71,9 +70,8 @@ hook.Add("PostGamemodeLoaded", "MTA", function()
 	include("mta/upgrades.lua")
 	include("mta/skill_tree.lua")
 	include("mta/bounties.lua")
-	include("mta/bombs.lua")
+	include("mta/balancing.lua")
 	include("mta/fever.lua")
-	include("mta/riot_shield_texture_manager.lua")
 
 	hook.Run("MTAInitialized")
 end)

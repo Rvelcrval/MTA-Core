@@ -214,7 +214,7 @@ if SERVER then
 
 	function MTA.RemoveNPC(npc)
 		local ret = hook.Run("MTARemoveNPC", npc)
-		if ret == false then continue end
+		if ret == false then return end
 
 		SafeRemoveEntity(npc)
 	end
