@@ -202,7 +202,7 @@ if SERVER then
 
 			-- avg_perf should be a score between 1 and about 30
 			local tickrate = 1 / engine.TickInterval()
-			MTA.MAX_NPCS = math.ceil(math.max(10, MTA_CONFIG.core.MAX_NPCS / tickrate * avg_perf))
+			MTA.MAX_NPCS = math.ceil(math.max(10, MTA_CONFIG.core.MaxNPCs / tickrate * avg_perf))
 
 			for i = 1, #MTA.NPCs do
 				if i >= MTA.MAX_NPCS then
