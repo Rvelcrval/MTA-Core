@@ -190,7 +190,7 @@ if SERVER then
 	local perf_cache_count = 0
 	local next_perf_check = 0
 	hook.Add("Think", TAG, function()
-		perf_cache = perf_cache + (1 / RealFrameTime())
+		perf_cache = perf_cache + (1 / RealFrameTime and RealFrameTime() or FrameTime())
 		perf_cache_count = perf_cache_count + 1
 
 		if CurTime() >= next_perf_check then
