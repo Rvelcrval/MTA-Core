@@ -1,4 +1,4 @@
-local tag = "mta_bombs"
+local TAG = "mta_balancing"
 
 if SERVER then
 	local function is_free_space(ply, vec, ent)
@@ -91,7 +91,7 @@ if SERVER then
 	end
 
 	local blocking_classes = {}
-	for _, class_name in pairs(MTA_CONFIG.bombs.BlockingClasses) do
+	for _, class_name in pairs(MTA_CONFIG.balancing.BlockingClasses) do
 		blocking_classes[class_name] = true
 	end
 
@@ -114,7 +114,7 @@ if SERVER then
 		return car:GetClass() == "gmod_sent_vehicle_fphysics_base" and car:IsVehicle() and car.ExplodeVehicle
 	end
 
-	hook.Add("EntityRemoved", tag, function(grenade)
+	hook.Add("EntityRemoved", TAG, function(grenade)
 		if grenade:GetClass() == "grenade_helicopter" and grenade:GetNWBool("MTABomb") then
 			local pos = grenade:WorldSpaceCenter()
 			local dmg_info = DamageInfo()
@@ -138,7 +138,7 @@ if SERVER then
 	end)
 
 	local NPC_MAXS = Vector(13, 13, 72)
-	hook.Add("MTASpawnFail", tag, function(failed_count, reason, target, npc_class)
+	hook.Add("MTASpawnFail", TAG, function(failed_count, reason, target, npc_class)
 		if #MTA.BadPlayers < 1 then return end
 		if failed_count > 0 and failed_count % 5 == 0 then
 			local should_displace = hook.Run("MTADisplaceNPC", target, npc_class)
@@ -149,12 +149,12 @@ if SERVER then
 		end
 	end)
 
-	local CAMPING_DIST = MTA_CONFIG.bombs.CampingDistance
-	local START_CAMPING_DURATION = MTA_CONFIG.bombs.CampingInterval
+	local CAMPING_DIST = MTA_CONFIG.balancing.CampingDistance
+	local START_CAMPING_DURATION = MTA_CONFIG.balancing.CampingInterval
 	local WARNING_DURATION = 20
 
 	local campers = {}
-	timer.Create(tag, 1, 0, function()
+	timer.Create(TAG, 1, 0, function()
 		for _, ply in ipairs(MTA.BadPlayers) do
 			if ply:IsValid() then
 				local pos = ply:GetPos()
@@ -185,10 +185,36 @@ if SERVER then
 			end
 		end
 	end)
+
+	local perf_cache = 0
+	local perf_cache_count = 0
+	local next_perf_check = 0
+	hook.Add("Think", TAG, function()
+		perf_cache = perf_cache + (1 / FrameTime())
+		perf_cache_count = perf_cache_count + 1
+
+		if CurTime() >= next_perf_check then
+			next_perf_check = CurTime() + 5
+
+			local avg_perf = perf_cache / perf_cache_count
+			perf_cache = 0
+			perf_cache_count = 0
+
+			-- avg_perf should be a score between 1 and about 30
+			local tickrate = 1 / engine.TickInterval()
+			MTA.MAX_NPCS = math.max(10, MTA_CONFIG.core.MAX_NPCS / tickrate * avg_perf)
+
+			for i = 1, #MTA.NPCs do
+				if i >= MTA.MAX_NPCS then
+					MTA.RemoveNPC(MTA.NPCs[i])
+				end
+			end
+		end
+	end)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", tag, function()
+	hook.Add("HUDPaint", TAG, function()
 		if not MTA.IsWanted() then return end
 		for _, bomb in ipairs(ents.FindByClass("grenade_helicopter")) do
 			if bomb:GetNWBool("MTABomb") then

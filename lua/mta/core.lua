@@ -212,15 +212,19 @@ if SERVER then
 		return ply.MTABad or false
 	end
 
+	function MTA.RemoveNPC(npc)
+		local ret = hook.Run("MTARemoveNPC", npc)
+		if ret == false then continue end
+
+		SafeRemoveEntity(npc)
+	end
+
 	local spawning = 0
 	function MTA.RemoveNPCs()
 		spawning = 0
 		MTA.ToSpawn = 0
 		for _, npc in ipairs(MTA.NPCs) do
-			local ret = hook.Run("MTARemoveNPC", npc)
-			if ret == false then continue end
-
-			SafeRemoveEntity(npc)
+			MTA.RemoveNPC(npc)
 		end
 		MTA.NPCs = {}
 		MTA.HelicopterCount = 0

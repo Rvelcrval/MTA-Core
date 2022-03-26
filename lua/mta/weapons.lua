@@ -104,8 +104,13 @@ if SERVER then
 
 	if IS_MTA_GM then
 		hook.Add("PlayerLoadout", tag, function(ply)
+			local cur_wep = ply:GetActiveWeapon()
 			for _, weapon_class in pairs(MTA.Weapons.Get(ply)) do
 				give_weapon(ply, weapon_class)
+			end
+
+			if IsValid(cur_wep) then
+				ply:SetActiveWeapon(cur_wep)
 			end
 		end)
 	else
