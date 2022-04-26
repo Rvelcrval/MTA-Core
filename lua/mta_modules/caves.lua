@@ -41,6 +41,17 @@ if SERVER then
 		self:SetHealth(1000)
 		self:Activate()
 
+		local trigger = ents.Create("base_brush")
+		trigger:SetPos(self:GetPos())
+		trigger:SetAngles(self:GetAngles())
+		trigger:SetParent(self)
+		trigger:SetTrigger(true)
+		trigger:SetSolid(SOLID_BBOX)
+		trigger:SetNotSolid(true)
+		trigger:SetCollisionBounds(self:OBBMins() / 2, Vector(200, 200, 200))
+		trigger.StartTouch = function(_, ent) self:StartTouch(ent) end
+		trigger.EndTouch = function(_, ent) self:EndTouch(ent) end
+
 		local phys = self:GetPhysicsObject()
 		if IsValid(phys) then
 			phys:EnableMotion(false)
@@ -60,7 +71,29 @@ if SERVER then
 		return IsValid(tr.Entity) and tr.Entity:GetClass() == "mta_hive"
 	end
 
+	local tracked_ply = nil
+    local taunt_sound = "npc/antlion_guard/growl_idle.wav"
+
+	function HIVE:StartTouch(ent)
+		if IsValid(ent) and ent:IsPlayer() and not tracked_ply then
+			tracked_ply = ent
+			self:EmitSound(taunt_sound, 75, 100, 1, CHAN_AUTO, 32, 114)
+		end
+	end
+
+	function HIVE:EndTouch(ent)
+		if IsValid(ent) and ent:IsPlayer() and tracked_ply and tracked_ply == ent then
+			self:StopSound(taunt_sound)
+            tracked_ply = nil
+		end
+	end
+
 	local MIN_ATCK_DIST = 200 * 200
+	local hurt_sounds = {
+		"npc/antlion_guard/frustrated_growl1.wav",
+		"npc/antlion_guard/frustrated_growl2.wav",
+		"npc/antlion_guard/frustrated_growl3.wav"
+	}
 	function HIVE:OnTakeDamage(dmg_info)
 		local attacker = dmg_info:GetAttacker()
 		if not IsValid(attacker) then return end
@@ -74,12 +107,14 @@ if SERVER then
 		local dmg = dmg_info:GetDamage()
 		local new_health = math.max(0, cur_health - dmg)
 		self:SetHealth(new_health)
+		self:EmitSound(hurt_sounds[math.random(#hurt_sounds)], 75, 100, 1, CHAN_AUTO, 0, 114)
 
 		if new_health <= 1 then
 			self.Destroying = true
 
 			local prev_pos = self:GetPos()
 			MTA.IncreasePlayerFactor(attacker, 100)
+			self:StopSound(taunt_sound)
 			self:Remove()
 
 			util.RockImpact(attacker, prev_pos, Vector(0, 0, 1), 2, true)
