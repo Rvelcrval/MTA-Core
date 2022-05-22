@@ -160,6 +160,8 @@ if SERVER then
 	end
 
 	function MTA.IsEnabled()
+		if IS_MTA_GM then return true end
+
 		local lobby_party = GetConVar("ms_lobby_party")
 		if lobby_party and lobby_party:GetBool() then return false end
 
