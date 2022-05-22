@@ -135,8 +135,9 @@ function PANEL:Init()
 		end
 	end
 
-	function btn_join:DoClick()
+	btn_join.DoClick = function()
 		on_join()
+		self:Close()
 	end
 
 	local btn_remain = self:Add("DButton")
@@ -155,7 +156,9 @@ function PANEL:Init()
 		end
 	end
 
-	btn_remain.DoClick = function() self:Close() end
+	btn_remain.DoClick = function()
+		self:Close()
+	end
 end
 
 function PANEL:SetData(player_count, max_players, map_name)
