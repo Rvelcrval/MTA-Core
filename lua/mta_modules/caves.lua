@@ -37,7 +37,8 @@ if SERVER then
 	function HIVE:Initialize()
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetModel("models/props_wasteland/antlionhill.mdl")
-		self:SetModelScale(1 / 3)
+		self:SetModelScale(1 / 4)
+		self:ManipulateBoneScale(0, Vector(1.33, 1.33, 1.33))
 		self:SetHealth(1000)
 		self:Activate()
 
