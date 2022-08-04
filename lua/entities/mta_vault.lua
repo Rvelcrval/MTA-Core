@@ -254,7 +254,7 @@ if CLIENT then
 					end
 				else
 					local driller = vault:GetNWEntity("DrillingPlayer", NULL)
-					local driller_nick = IsValid(driller) and UndecorateNick(driller:Nick()) or "???"
+					local driller_nick = IsValid(driller) and driller:Nick() or "???"
 					local text = ("/// %s's %s: %d%% ///"):format(driller_nick, verb, vault:GetNWInt("DrillingProgress", 0))
 					MTA.HighlightEntity(vault, text, MTA.PrimaryColor)
 				end

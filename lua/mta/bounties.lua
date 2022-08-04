@@ -273,7 +273,7 @@ if CLIENT then
 			frame.btnMaxim:Hide()
 
 			local label_name = frame:Add("DLabel")
-			label_name:SetText("Target: " .. (UndecorateNick and UndecorateNick(bounty:Nick()) or bounty:Nick()))
+			label_name:SetText("Target: " .. bounty:Nick())
 			label_name:Dock(TOP)
 			label_name:DockMargin(5, 5, 5, 5)
 

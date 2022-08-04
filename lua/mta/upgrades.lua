@@ -250,7 +250,7 @@ if SERVER then
 				if not IsValid(target) then return false, "invalid target" end
 				if not target:IsPlayer() then return false, "not a player" end
 
-				local target_nick = UndecorateNick(target:Nick())
+				local target_nick = target:Nick()
 				local msg = ("Stats for %s:\n"):format(target_nick)
 				for stat_name, _ in pairs(valid_stats) do
 					msg = msg .. ("- %s: %d\n"):format(stat_name, MTA.GetPlayerStat(target, stat_name))
