@@ -490,7 +490,7 @@ if SERVER then
 
 			local ret = hook.Run("MTAShouldPayTax", ply, should_pay, is_death, old_factor)
 			if not IS_MTA_GM and ret ~= false then -- dont tax players in the gamemode
-				local to_pay = cur_coins > 1000000 and math.ceil((cur_coins / 10000) * wanted_lvl) or wanted_lvl * 1000
+				local to_pay = cur_coins > 1000000 and math.ceil((cur_coins / 1000) * wanted_lvl) or wanted_lvl * 100
 				if ply.PayCoins and not ply:PayCoins(to_pay, "MTA Criminal Fee") then
 					if cur_coins > 0 then
 						ply:PayCoins(cur_coins, "MTA Criminal Fee")
