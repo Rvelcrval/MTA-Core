@@ -258,13 +258,45 @@ if SERVER then
 		return ent
 	end
 
-	npcs.rocklions = function()
-		local cave_pos = (landmark and landmark.get("land_caves") or Vector(0, 0, 0)) + Vector(150)
-		local npc = ms.Ores.SpawnRockyAntlion(cave_pos, math.random(1, 2))
+	local SCALE = 20
+	local RETRIES = 5
+	local function find_nearby_spot(center_pos)
+		local cur_retries = 0
+
+		local new_pos = center_pos
+		while cur_retries < RETRIES do
+			new_pos = new_pos + Vector(
+				math.random() > 0.5 and math.random(SCALE, SCALE + SCALE) or math.random(-SCALE, -(SCALE + SCALE)),
+				math.random() > 0.5 and math.random(SCALE, SCALE + SCALE) or math.random(-SCALE, -(SCALE + SCALE)),
+				0
+			)
+
+			local tr = util.TraceHull({
+				start = new_pos,
+				endpos = new_pos,
+				mins = Vector(-SCALE, -SCALE, 0),
+				maxs = Vector(SCALE, SCALE, 100),
+			})
+
+			if not IsValid(tr.Entity) and util.IsInWorld(new_pos) then
+				return true, new_pos
+			end
+
+			cur_retries = cur_retries + 1
+		end
+
+		return false, "no available spot"
+	end
+
+	local function spawn_rocklion(ply)
+		local succ, pos = find_nearby_spot(ply:GetPos())
+		if not succ then return end
+
+		local npc = ms.Ores.SpawnRockyAntlion(pos, ms.Ores.SelectRarityFromSpawntable())
 		npc.MTAOverrideSquad = "hive"
 		npc.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
 
-		return npc
+		MTA.EnrollNPC(npc, ply)
 	end
 
 	hook.Add("MTANPCSpawnProcess", TAG, function(ply, pos, wanted_lvl)
@@ -283,8 +315,8 @@ if SERVER then
 			end
 		end
 
-		if math.random(0, 100) <= 20 and ms and ms.Ores and ms.Ores.SpawnRockyAntlion then
-			spawn_function = npcs.rocklions, "npc_antlion"
+		if math.random(0, 100) <= 15 and ms and ms.Ores and ms.Ores.SpawnRockyAntlion then
+			spawn_rocklion(ply)
 		end
 
 		return spawn_function, npc_class
