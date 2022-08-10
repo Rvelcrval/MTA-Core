@@ -241,14 +241,6 @@ if SERVER then
 	local npcs = {}
 	for npc_class, npc_key in pairs(npc_classes) do
 		npcs[npc_key] = function()
-			if npc_class == "npc_antlion" and math.random(0, 100) <= 5 and (ms and ms.Ores and ms.Ores.SpawnRockyAntlion) then
-				local npc = ms.Ores.SpawnRockyAntlion(Vector(0,0,0), math.random(0, 2))
-				npc.MTAOverrideSquad = "hive"
-				npc.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
-
-				return npc
-			end
-
 			local ent = ents.Create(npc_class)
 			ent.MTAOverrideSquad = "hive"
 			ent.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
@@ -266,6 +258,14 @@ if SERVER then
 		return ent
 	end
 
+	npcs.rocklions = function()
+		local npc = ms.Ores.SpawnRockyAntlion(Vector(0,0,0), math.random(0, 2))
+		npc.MTAOverrideSquad = "hive"
+		npc.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
+
+		return npc
+	end
+
 	hook.Add("MTANPCSpawnProcess", TAG, function(ply, pos, wanted_lvl)
 		if not is_in_caves(ply) then return end
 
@@ -280,6 +280,10 @@ if SERVER then
 			if wanted_lvl > 20 and math.random(0, 100) < 5 then
 				spawn_function, npc_class = npcs.antlion_guards, "npc_antlionguard"
 			end
+		end
+
+		if math.random(0, 100) <= 10 and ms and ms.Ores and ms.Ores.SpawnRockyAntlion then
+			spawn_function = npcs.rocklions, "npc_antlion"
 		end
 
 		return spawn_function, npc_class
