@@ -283,7 +283,7 @@ if SERVER then
 			end
 		end
 
-		if math.random(0, 100) <= 10 and ms and ms.Ores and ms.Ores.SpawnRockyAntlion then
+		if math.random(0, 100) <= 20 and ms and ms.Ores and ms.Ores.SpawnRockyAntlion then
 			spawn_function = npcs.rocklions, "npc_antlion"
 		end
 
