@@ -259,7 +259,8 @@ if SERVER then
 	end
 
 	npcs.rocklions = function()
-		local npc = ms.Ores.SpawnRockyAntlion(Vector(0,0,0), math.random(0, 2))
+		local cave_pos = (landmark and landmark.get("land_caves") or Vector(0, 0, 0)) + Vector(150)
+		local npc = ms.Ores.SpawnRockyAntlion(cave_pos, math.random(1, 2))
 		npc.MTAOverrideSquad = "hive"
 		npc.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
 
