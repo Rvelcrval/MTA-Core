@@ -73,7 +73,7 @@ if SERVER then
 	end
 
 	local tracked_ply = nil
-    local taunt_sound = "npc/antlion_guard/growl_idle.wav"
+	local taunt_sound = "npc/antlion_guard/growl_idle.wav"
 
 	function HIVE:StartTouch(ent)
 		if IsValid(ent) and ent:IsPlayer() and not tracked_ply then
@@ -85,7 +85,7 @@ if SERVER then
 	function HIVE:EndTouch(ent)
 		if IsValid(ent) and ent:IsPlayer() and tracked_ply and tracked_ply == ent then
 			self:StopSound(taunt_sound)
-            tracked_ply = nil
+			tracked_ply = nil
 		end
 	end
 
@@ -241,6 +241,14 @@ if SERVER then
 	local npcs = {}
 	for npc_class, npc_key in pairs(npc_classes) do
 		npcs[npc_key] = function()
+			if npc_class == "npc_antlion" and math.random(0, 100) <= 5 and (ms and ms.Ores and ms.Ores.SpawnRockyAntlion) then
+				local npc = ms.Ores.SpawnRockyAntlion(Vector(0,0,0), math.random(0, 2))
+				npc.MTAOverrideSquad = "hive"
+				npc.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
+
+				return npc
+			end
+
 			local ent = ents.Create(npc_class)
 			ent.MTAOverrideSquad = "hive"
 			ent.MTAOverrideCollisionGroup = COLLISION_GROUP_NPC
