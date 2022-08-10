@@ -832,6 +832,12 @@ if SERVER then
 		end]]--
 
 		local coef_data = MTA.Coeficients[ent:GetClass()]
+		 -- this is somehow possible??
+		if not coef_data then
+			warn_log(ent, "Passed checks when it shouldnt have!!!!???", inflictor, atck)
+			return
+		end
+
 		MTA.IncreasePlayerFactor(atck, dmg_info:GetDamage() >= ent:Health() and coef_data.kill_coef or coef_data.damage_coef)
 	end)
 
