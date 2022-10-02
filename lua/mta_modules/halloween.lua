@@ -133,6 +133,7 @@ if SERVER then
 	hook.Add("MTANPCSpawnProcess", TAG, function(target, pos, wanted_lvl)
 		if not is_halloween then return end
 		if IS_MTA_GM then return end
+		if target.MTALocalEvent then return end
 
 		-- below 10 is just zombies
 		local spawn_function, npc_class = enemy_types.zombies, "npc_zombie"

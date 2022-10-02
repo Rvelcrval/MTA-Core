@@ -27,6 +27,18 @@ local npc_classes = {
 	npc_antlionguard = "antlion_guards",
 }
 
+hook.Add("PlayerEnteredZone", "MTAHiveLocalEvent", function(ply, zone)
+	if zone == "cave" then
+		ply.MTALocalEvent = true
+	end
+end)
+
+hook.Add("PlayerExitedZone", "MTAHiveLocalEvent", function(ply, zone)
+	if zone == "cave" then
+		ply.MTALocalEvent = false
+	end
+end)
+
 if SERVER then
 	local hive_spots = {
 		Vector (-78, -2591, -69),
@@ -408,7 +420,7 @@ if CLIENT then
 	check_cave()
 	hook.Add("InitPostEntity", TAG, check_cave)
 
-	hook.Add("PlayerEnteredZone", TAG, function(_, zone)
+	hook.Add("PlayerEnteredZone", TAG, function(ply, zone)
 		if zone ~= "cave" then return end
 
 		MTA.OnGoingEvent = "mines"
@@ -418,7 +430,7 @@ if CLIENT then
 		MTA.WantedText = "HIVE"
 	end)
 
-	hook.Add("PlayerExitedZone", TAG, function(_, zone)
+	hook.Add("PlayerExitedZone", TAG, function(ply, zone)
 		if zone ~= "cave" then return end
 
 		MTA.OnGoingEvent = false
