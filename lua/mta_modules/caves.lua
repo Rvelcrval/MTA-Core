@@ -383,6 +383,19 @@ if SERVER then
 		return false
 	end)
 
+	local CAVE_TRIGGERS = { "cave1", "cave2" }
+	hook.Add("MTAShouldExplodeBlockingEntity", TAG, function(ent)
+		if not ms then return end
+		if not ms.GetTrigger then return end
+
+		for _, trigger_name in ipairs(CAVE_TRIGGERS) do
+			local trigger = ms.GetTrigger(trigger_name)
+			if not IsValid(trigger) then continue end
+
+			if trigger:GetEntities()[ent] then return false end
+		end
+	end)
+
 	local function create_badge()
 		if not MetaBadges then return end
 
