@@ -359,7 +359,7 @@ local blocking_classes = {
 local function is_blocking_entity(ent)
 	if not IsValid(ent) then return false end
 
-	local ret = hook.Run("MTAShouldExplodeBlockingEntity")
+	local ret = hook.Run("MTAShouldExplodeBlockingEntity", ent)
 	if ret ~= nil then return ret end
 
 	local class = ent:GetClass()
