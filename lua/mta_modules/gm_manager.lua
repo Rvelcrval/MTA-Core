@@ -206,10 +206,15 @@ hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 
 	http.Fetch(MTA_CONFIG.core.GMInfoAPI .. MTA_CONFIG.core.GMServerID, function(body)
 		local data = util.JSONToTable(body)
+		local cannot_votegamemode = false
 		local player_count = 0
 		for k,v in pairs(data and data.players or {}) do
 			if not v.IsBanned and not v.IsBot then
 				player_count = player_count + 1
+				if not v.AFK or v.IsAdmin then
+					-- afk players are not counted except for admins (TODO: check afk length)
+					cannot_votegamemode = true
+				end
 			end
 		end
 		local max_player_count = data and data.serverinfo and data.serverinfo.maxplayers or 123
@@ -217,7 +222,7 @@ hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 		local gamemode = data and data.serverinfo and data.serverinfo.gm or "mta"
 		local is_mta = (gm_request and gm_request.IsServerGamemode and gm_request:IsServerGamemode(MTA_CONFIG.core.GMServerID, "MTA")) or gamemode:lower()=='mta'
 		
-		if not is_mta and player_count ~= 0 then
+		if not is_mta and cannot_votegamemode then
 			return -- server already occupied
 		end
 
