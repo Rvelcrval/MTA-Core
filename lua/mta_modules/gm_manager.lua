@@ -5,10 +5,14 @@ local tag = "mta_wait"
 local waiting_server = false
 local waiting_error = ""
 local function on_join()
+	
+	
+
 	if not gm_request then return end
 
 	local serverid = "#" .. MTA_CONFIG.core.GMServerID
 	if gm_request:IsServerGamemode(MTA_CONFIG.core.GMServerID, "MTA") then
+		RunConsoleCommand("say","/advert JOIN THE MTA GAME WITH ME. Type !goto #3")
 		RunConsoleCommand("aowl", "goto", serverid)
 		return
 	end
@@ -27,6 +31,7 @@ local function on_join()
 		end
 
 		waiting_server = false
+		RunConsoleCommand("say","/advert JOIN THE MTA GAME WITH ME. Type !goto #3")
 		RunConsoleCommand("aowl", "goto", serverid)
 	end)
 
@@ -136,6 +141,7 @@ function PANEL:Init()
 	end
 
 	btn_join.DoClick = function()
+
 		on_join()
 		self:Close()
 	end
@@ -179,7 +185,7 @@ vgui.Register("mta_join", PANEL, "DFrame")
 
 local loading_in = true
 hook.Add("InitPostEntity", tag, function()
-	timer.Simple(10, function()
+	timer.Simple(23, function()
 		loading_in = false
 	end)
 
@@ -200,20 +206,27 @@ hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 
 	http.Fetch(MTA_CONFIG.core.GMInfoAPI .. MTA_CONFIG.core.GMServerID, function(body)
 		local data = util.JSONToTable(body)
-		local player_count = data and #data.players or 1
+		local player_count = 0
+		for k,v in pairs(data and data.players or {}) do
+			if not v.IsBanned and not v.IsBot then
+				player_count = player_count + 1
+			end
+		end
 		local max_player_count = data and data.serverinfo and data.serverinfo.maxplayers or 123
 		local map_name = data and data.serverinfo and data.serverinfo.map or "unknown"
+		local gamemode = data and data.serverinfo and data.serverinfo.gm or "mta"
+		local is_mta = (gm_request and gm_request.IsServerGamemode and gm_request:IsServerGamemode(MTA_CONFIG.core.GMServerID, "MTA")) or gamemode:lower()=='mta'
+		
+		if not is_mta and player_count ~= 0 then
+			return -- server already occupied
+		end
 
 		local panel = vgui.Create("mta_join")
 		panel:Center()
 		panel:MakePopup()
 		panel:SetData(player_count, max_player_count, map_name)
 	end, function()
-		-- errored, but still display the prompt
-		local panel = vgui.Create("mta_join")
-		panel:Center()
-		panel:MakePopup()
-		panel:SetData(1, 123, "unknown")
+		--error, can't do anything as we don't know if the server even exists and client can't query that
 	end)
 
 end)
