@@ -5,9 +5,6 @@ local tag = "mta_wait"
 local waiting_server = false
 local waiting_error = ""
 local function on_join()
-	
-	
-
 	if not gm_request then return end
 
 	local serverid = "#" .. MTA_CONFIG.core.GMServerID
@@ -220,8 +217,8 @@ hook.Add("MTAWantedStateUpdate", tag, function(ply, is_wanted)
 		local max_player_count = data and data.serverinfo and data.serverinfo.maxplayers or 123
 		local map_name = data and data.serverinfo and data.serverinfo.map or "unknown"
 		local gamemode = data and data.serverinfo and data.serverinfo.gm or "mta"
-		local is_mta = (gm_request and gm_request.IsServerGamemode and gm_request:IsServerGamemode(MTA_CONFIG.core.GMServerID, "MTA")) or gamemode:lower()=='mta'
-		
+		local is_mta = (gm_request and gm_request.IsServerGamemode and gm_request:IsServerGamemode(MTA_CONFIG.core.GMServerID, "MTA")) or gamemode:lower() == "mta"
+
 		if not is_mta and cannot_votegamemode then
 			return -- server already occupied
 		end
