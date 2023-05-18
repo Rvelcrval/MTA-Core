@@ -28,7 +28,7 @@ local function on_join()
 		end
 
 		waiting_server = false
-		RunConsoleCommand("say","/advert JOIN THE MTA GAME WITH ME. Type !goto #3")
+		--RunConsoleCommand("say","/advert JOIN THE MTA GAME WITH ME. Type !goto #3")
 		RunConsoleCommand("aowl", "goto", serverid)
 	end)
 
