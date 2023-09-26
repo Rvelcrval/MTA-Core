@@ -9,7 +9,7 @@ local function on_join()
 
 	local serverid = "#" .. MTA_CONFIG.core.GMServerID
 	if gm_request:IsServerGamemode(MTA_CONFIG.core.GMServerID, "MTA") then
-		RunConsoleCommand("say","/advert JOIN THE MTA GAME WITH ME. Type !goto #3")
+		--RunConsoleCommand("say","/advert JOIN THE MTA GAME WITH ME. Type !goto #3")
 		RunConsoleCommand("aowl", "goto", serverid)
 		return
 	end
