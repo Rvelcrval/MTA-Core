@@ -31,10 +31,10 @@ if SERVER then
 		margin = margin or 75
 
 	   	local maxs = ply:OBBMaxs()
-	    local left = ply:WorldSpaceCenter() + ply:GetRight() * (-maxs.x + margin)
+	    local left = ply:WorldSpaceCenter() + ply:GetRight() * -(maxs.x + margin)
 	    local right = ply:WorldSpaceCenter() + ply:GetRight() * (maxs.x + margin)
 	    local forward = ply:WorldSpaceCenter() + ply:GetForward() * (maxs.y + margin)
-	    local backward = ply:WorldSpaceCenter() + ply:GetForward() * (-maxs.y + margin)
+	    local backward = ply:WorldSpaceCenter() + ply:GetForward() * -(maxs.y + margin)
 
 		if is_free_space(ply, forward, ent) then
 	        return forward
